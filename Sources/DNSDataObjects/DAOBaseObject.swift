@@ -9,8 +9,8 @@
 import DNSCore
 import Foundation
 
-class DAOBaseObject: DNSDataTranslation {
-    struct Metadata {
+open class DAOBaseObject: DNSDataTranslation {
+    public struct Metadata {
         var uuid: UUID = UUID()
 
         var created: Date = Date()
@@ -22,10 +22,10 @@ class DAOBaseObject: DNSDataTranslation {
         var updatedBy: Any?
     }
 
-    var id: String
-    var meta: Metadata = Metadata()
+    public var id: String
+    public var meta: Metadata = Metadata()
 
-    required override init() {
+    public required override init() {
         id = meta.uuid.uuidString
 
         super.init()
