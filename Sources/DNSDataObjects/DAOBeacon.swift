@@ -10,16 +10,16 @@ import CoreLocation
 import Foundation
 
 open class DAOBeacon: DAOBaseObject {
-    var name: String = ""
-    var range: String?
-    var accuracy: CLLocationAccuracy = 0 {
+    public var name: String = ""
+    public var range: String?
+    public var accuracy: CLLocationAccuracy = 0 {
         didSet {
             if accuracy < 0 {
                 accuracy = 50
             }
         }
     }
-    var data: CLBeacon?
+    public var data: CLBeacon?
 
     required public init() {
     }
