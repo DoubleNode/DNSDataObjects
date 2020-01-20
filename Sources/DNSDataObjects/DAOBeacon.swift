@@ -21,6 +21,37 @@ open class DAOBeacon: DAOBaseObject {
     }
     public var data: CLBeacon?
 
-    required public init() {
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.code = ""
+
+        super.init()
+
+        _ = self.dao(from: dictionary)
+    }
+
+    public init(from object: DAOBeacon) {
+        self.code = object.code
+        self.range = object.range
+        self.accuracy = object.accuracy
+
+        super.init(from: object)
+    }
+    
+    public func update(from object: DAOBeacon) {
+        self.code = object.code
+        self.range = object.range
+        self.accuracy = object.accuracy
+
+        super.update(from: object)
+    }
+
+    override public func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
+        self.code = dictionary["code"] as? String ?? self.code
+        self.range = dictionary["range"] as? String ?? self.range
+        self.accuracy = dictionary["accuracy"] as? CLLocationAccuracy ?? self.accuracy
+
+        _ = super.dao(from: dictionary)
+        
+        return self
     }
 }

@@ -25,9 +25,35 @@ open class DAOBaseObject: DNSDataTranslation {
     public var id: String
     public var meta: Metadata = Metadata()
 
-    public required override init() {
-        id = meta.uuid.uuidString
-
+    public init(id: String? = nil) {
+        self.id = ""
         super.init()
+
+        self.id = id ?? self.meta.uuid.uuidString
+    }
+
+    public init(from dictionary: Dictionary<String, Any?>) {
+        self.id = ""
+        super.init()
+
+        _ = self.dao(from: dictionary)
+    }
+
+    public init(from object: DAOBaseObject) {
+        self.id = ""
+        super.init()
+
+        self.update(from: object)
+    }
+
+    open func update(from object: DAOBaseObject) {
+        self.id = object.id
+        self.meta = object.meta
+    }
+
+    open func dao(from dictionary: Dictionary<String, Any?>) -> DAOBaseObject {
+        self.id = dictionary["id"] as? String ?? self.id
+        self.meta.updated = Date()
+        return self
     }
 }
