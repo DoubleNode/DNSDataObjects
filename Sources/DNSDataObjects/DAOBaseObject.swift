@@ -25,11 +25,18 @@ open class DAOBaseObject: DNSDataTranslation {
     public var id: String
     public var meta: Metadata = Metadata()
 
-    public init(id: String? = nil) {
+    public override init() {
         self.id = ""
         super.init()
 
-        self.id = id ?? self.meta.uuid.uuidString
+        self.id = self.meta.uuid.uuidString
+    }
+
+    public init(id: String) {
+        self.id = ""
+        super.init()
+
+        self.id = id
     }
 
     public init(from dictionary: Dictionary<String, Any?>) {

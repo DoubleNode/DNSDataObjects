@@ -15,7 +15,7 @@ open class DAOCenter: DAOBaseObject {
     open var activities: [DAOActivity]
     open var beacons: [DAOBeacon]
 
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    public override init() {
         self.centerNum = 0
         self.code = ""
         self.name = ""
@@ -24,19 +24,6 @@ open class DAOCenter: DAOBaseObject {
         self.beacons = []
 
         super.init()
-
-        _ = self.dao(from: dictionary)
-    }
-
-    public init(from object: DAOCenter) {
-        self.centerNum = object.centerNum
-        self.code = object.code
-        self.name = object.name
-
-        self.activities = object.activities
-        self.beacons = object.beacons
-
-        super.init(from: object)
     }
 
     public init(centerNum: Int16, code: String, name: String) {
@@ -50,6 +37,30 @@ open class DAOCenter: DAOBaseObject {
         super.init(id: code)
     }
     
+    public init(from object: DAOCenter) {
+        self.centerNum = object.centerNum
+        self.code = object.code
+        self.name = object.name
+
+        self.activities = object.activities
+        self.beacons = object.beacons
+
+        super.init(from: object)
+    }
+
+    public override init(from dictionary: Dictionary<String, Any?>) {
+        self.centerNum = 0
+        self.code = ""
+        self.name = ""
+
+        self.activities = []
+        self.beacons = []
+
+        super.init()
+
+        _ = self.dao(from: dictionary)
+    }
+
     public func update(from object: DAOCenter) {
         self.centerNum = object.centerNum
         self.code = object.code
@@ -61,7 +72,7 @@ open class DAOCenter: DAOBaseObject {
         super.update(from: object)
     }
 
-    override public func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
+    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
         self.centerNum = dictionary["id"] as? Int16 ?? self.centerNum
         self.code = dictionary["code"] as? String ?? self.code
         self.name = dictionary["name"] as? String ?? self.name

@@ -13,17 +13,22 @@ public class DAOActivity: DAOBaseObject {
     public var name: String
     open var beacons: [DAOBeacon]
     
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    public override init() {
         self.code = ""
         self.name = ""
-        
         self.beacons = []
-        
-        super.init()
 
-        _ = self.dao(from: dictionary)
+        super.init()
     }
 
+    public init(code: String, name: String) {
+        self.code = code
+        self.name = name
+        self.beacons = []
+
+        super.init(id: code)
+    }
+    
     public init(from object: DAOActivity) {
         self.code = object.code
         self.name = object.name
@@ -32,15 +37,16 @@ public class DAOActivity: DAOBaseObject {
         super.init(from: object)
     }
 
-    public init(code: String, name: String) {
-        self.code = code
-        self.name = name
-
+    public override init(from dictionary: Dictionary<String, Any?>) {
+        self.code = ""
+        self.name = ""
         self.beacons = []
+        
+        super.init()
 
-        super.init(id: code)
+        _ = self.dao(from: dictionary)
     }
-    
+
     public func update(from object: DAOActivity) {
         self.code = object.code
         self.name = object.name
@@ -50,7 +56,7 @@ public class DAOActivity: DAOBaseObject {
         super.update(from: object)
     }
 
-    override public func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
+    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
         self.code = dictionary["code"] as? String ?? self.code
         self.name = dictionary["name"] as? String ?? self.name
 

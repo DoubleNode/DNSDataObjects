@@ -21,12 +21,10 @@ open class DAOBeacon: DAOBaseObject {
     }
     public var data: CLBeacon?
 
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    public override init() {
         self.code = ""
-
+        
         super.init()
-
-        _ = self.dao(from: dictionary)
     }
 
     public init(from object: DAOBeacon) {
@@ -37,6 +35,14 @@ open class DAOBeacon: DAOBaseObject {
         super.init(from: object)
     }
     
+    public override init(from dictionary: Dictionary<String, Any?>) {
+        self.code = ""
+
+        super.init()
+
+        _ = self.dao(from: dictionary)
+    }
+
     public func update(from object: DAOBeacon) {
         self.code = object.code
         self.range = object.range
@@ -45,7 +51,7 @@ open class DAOBeacon: DAOBaseObject {
         super.update(from: object)
     }
 
-    override public func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
+    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
         self.code = dictionary["code"] as? String ?? self.code
         self.range = dictionary["range"] as? String ?? self.range
         self.accuracy = dictionary["accuracy"] as? CLLocationAccuracy ?? self.accuracy
