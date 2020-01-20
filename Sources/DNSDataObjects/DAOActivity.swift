@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class DAOActivity: DAOBaseObject {
+open class DAOActivity: DAOBaseObject {
     public var code: String
     public var name: String
     open var beacons: [DAOBeacon]
