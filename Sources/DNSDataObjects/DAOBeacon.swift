@@ -31,6 +31,7 @@ open class DAOBeacon: DAOBaseObject {
         self.code = object.code
         self.range = object.range
         self.accuracy = object.accuracy
+        self.data = object.data
 
         super.init(from: object)
     }
@@ -47,6 +48,7 @@ open class DAOBeacon: DAOBaseObject {
         self.code = object.code
         self.range = object.range
         self.accuracy = object.accuracy
+        self.data = object.data
 
         super.update(from: object)
     }
