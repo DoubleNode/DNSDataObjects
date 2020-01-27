@@ -19,6 +19,7 @@ open class DAOBeacon: DAOBaseObject {
             }
         }
     }
+    public var rssi: NSInteger?
     public var data: CLBeacon?
 
     public override init() {
