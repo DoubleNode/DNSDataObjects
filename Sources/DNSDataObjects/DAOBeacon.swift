@@ -19,7 +19,7 @@ open class DAOBeacon: DAOBaseObject {
             }
         }
     }
-    public var rssi: NSInteger?
+    public var rssi: Int?
     public var data: CLBeacon?
 
     public override init() {
@@ -33,6 +33,7 @@ open class DAOBeacon: DAOBaseObject {
         self.range = object.range
         self.accuracy = object.accuracy
         self.data = object.data
+        self.rssi = object.rssi
 
         super.init(from: object)
     }
@@ -50,6 +51,7 @@ open class DAOBeacon: DAOBaseObject {
         self.range = object.range
         self.accuracy = object.accuracy
         self.data = object.data
+        self.rssi = object.rssi
 
         super.update(from: object)
     }
@@ -58,6 +60,7 @@ open class DAOBeacon: DAOBaseObject {
         self.code = dictionary["code"] as? String ?? self.code
         self.range = dictionary["range"] as? String ?? self.range
         self.accuracy = dictionary["accuracy"] as? CLLocationAccuracy ?? self.accuracy
+        self.rssi = dictionary["rssi"] as? Int ?? self.rssi
 
         _ = super.dao(from: dictionary)
         
