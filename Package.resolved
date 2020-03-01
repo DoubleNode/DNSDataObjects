@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCore.git",
         "state": {
           "branch": null,
-          "revision": "b3ee4810f3564d4eb25ed1a2c11f47893307b162",
-          "version": "1.0.12"
+          "revision": "c7ff67bfd97355810b6fd024fb18d239cc4eb371",
+          "version": "1.0.32"
         }
       },
       {
@@ -24,8 +24,26 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCoreThreading.git",
         "state": {
           "branch": null,
-          "revision": "66d5e01881d1d822789051fa79332a5e0ffd93b8",
-          "version": "1.0.3"
+          "revision": "5aabf8903dc17a170055ddf7f307ec9ac89ba9a1",
+          "version": "1.0.10"
+        }
+      },
+      {
+        "package": "SFSymbol",
+        "repositoryURL": "https://github.com/Nirma/SFSymbol",
+        "state": {
+          "branch": null,
+          "revision": "5eba1ce4fc19b2f5aca2208b5927c544e0e89963",
+          "version": "0.2.0"
+        }
+      },
+      {
+        "package": "SwiftyBeaver",
+        "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
+        "state": {
+          "branch": null,
+          "revision": "2f2b7ac0b675e9d0ac696758f15bbff97eb65a31",
+          "version": "1.8.4"
         }
       }
     ]
