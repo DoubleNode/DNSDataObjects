@@ -12,7 +12,8 @@ open class DAOUser: DAOBaseObject {
     public var email: String
     public var firstName: String
     public var lastName: String
-    
+    public var cards: [DAOCard] = []
+
     public override init() {
         self.email = ""
         self.firstName = ""
@@ -33,6 +34,7 @@ open class DAOUser: DAOBaseObject {
         self.email = object.email
         self.firstName = object.firstName
         self.lastName = object.lastName
+        self.cards = object.cards
 
         super.init(from: object)
     }
@@ -51,14 +53,18 @@ open class DAOUser: DAOBaseObject {
         self.email = object.email
         self.firstName = object.firstName
         self.lastName = object.lastName
+        self.cards = object.cards
 
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOUser {
+    public override func dao(from dictionary: [String: Any?]) -> DAOUser {
         self.email = dictionary["email"] as? String ?? self.email
         self.firstName = dictionary["firstName"] as? String ?? self.firstName
         self.lastName = dictionary["lastName"] as? String ?? self.lastName
+        
+        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
+        self.cards = cards.map { DAOCard(from: $0) }
 
         _ = super.dao(from: dictionary)
         

@@ -11,6 +11,7 @@ import Foundation
 open class DAOAccount: DAOBaseObject {
     public var name: String
     public var user: DAOUser?
+    public var cards: [DAOCard] = []
 
     public override init() {
         self.name = ""
@@ -29,6 +30,7 @@ open class DAOAccount: DAOBaseObject {
     public init(from object: DAOAccount) {
         self.name = object.name
         self.user = object.user
+        self.cards = object.cards
 
         super.init(from: object)
     }
@@ -45,6 +47,7 @@ open class DAOAccount: DAOBaseObject {
     public func update(from object: DAOAccount) {
         self.name = object.name
         self.user = object.user
+        self.cards = object.cards
 
         super.update(from: object)
     }
@@ -52,6 +55,9 @@ open class DAOAccount: DAOBaseObject {
     public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOAccount {
         self.name = dictionary["name"] as? String ?? self.name
         self.user = DAOUser(from: dictionary["user"] as! Dictionary<String, Any?>)
+
+        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
+        self.cards = cards.map { DAOCard(from: $0) }
 
         _ = super.dao(from: dictionary)
         
