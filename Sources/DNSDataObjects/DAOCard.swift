@@ -47,7 +47,7 @@ open class DAOCard: DAOBaseObject {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOCard) {
+    open func update(from object: DAOCard) {
         self.nickname = object.nickname
         self.cardNumber = object.cardNumber
         self.pinNumber = object.pinNumber
@@ -55,7 +55,7 @@ open class DAOCard: DAOBaseObject {
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCard {
+    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCard {
         self.nickname = dictionary["nickname"] as? String ?? self.nickname
         self.cardNumber = dictionary["cardNumber"] as? String ?? self.cardNumber
         self.pinNumber = dictionary["pinNumber"] as? String ?? self.pinNumber

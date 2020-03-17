@@ -46,7 +46,7 @@ open class DAOBeacon: DAOBaseObject {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOBeacon) {
+    open func update(from object: DAOBeacon) {
         self.code = object.code
         self.range = object.range
         self.accuracy = object.accuracy
@@ -56,7 +56,7 @@ open class DAOBeacon: DAOBaseObject {
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
+    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
         self.code = dictionary["code"] as? String ?? self.code
         self.range = dictionary["range"] as? String ?? self.range
         self.accuracy = dictionary["accuracy"] as? CLLocationAccuracy ?? self.accuracy

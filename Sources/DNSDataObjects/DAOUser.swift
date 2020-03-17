@@ -49,7 +49,7 @@ open class DAOUser: DAOBaseObject {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOUser) {
+    open func update(from object: DAOUser) {
         self.email = object.email
         self.firstName = object.firstName
         self.lastName = object.lastName
@@ -58,7 +58,7 @@ open class DAOUser: DAOBaseObject {
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: [String: Any?]) -> DAOUser {
+    open override func dao(from dictionary: [String: Any?]) -> DAOUser {
         self.email = dictionary["email"] as? String ?? self.email
         self.firstName = dictionary["firstName"] as? String ?? self.firstName
         self.lastName = dictionary["lastName"] as? String ?? self.lastName

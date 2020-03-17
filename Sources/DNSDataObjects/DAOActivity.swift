@@ -47,7 +47,7 @@ open class DAOActivity: DAOBaseObject {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOActivity) {
+    open func update(from object: DAOActivity) {
         self.code = object.code
         self.name = object.name
 
@@ -56,7 +56,7 @@ open class DAOActivity: DAOBaseObject {
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
+    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
         self.code = dictionary["code"] as? String ?? self.code
         self.name = dictionary["name"] as? String ?? self.name
 

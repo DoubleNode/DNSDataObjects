@@ -61,7 +61,7 @@ open class DAOCenter: DAOBaseObject {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOCenter) {
+    open func update(from object: DAOCenter) {
         self.centerNum = object.centerNum
         self.code = object.code
         self.name = object.name
@@ -72,7 +72,7 @@ open class DAOCenter: DAOBaseObject {
         super.update(from: object)
     }
 
-    public override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
+    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
         self.centerNum = dictionary["id"] as? Int16 ?? self.centerNum
         self.code = dictionary["code"] as? String ?? self.code
         self.name = dictionary["name"] as? String ?? self.name
