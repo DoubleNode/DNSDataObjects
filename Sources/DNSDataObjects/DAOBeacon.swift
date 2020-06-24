@@ -2,8 +2,8 @@
 //  DAOBeacon.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
-//  Created by Darren Ehlers on 2019/08/12.
-//  Copyright © 2019 - 2016 Darren Ehlers and DoubleNode, LLC. All rights reserved.
+//  Created by Darren Ehlers.
+//  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import CoreLocation
