@@ -63,4 +63,10 @@ open class DAOBaseObject: DNSDataTranslation {
         self.meta.updated = Date()
         return self
     }
+
+    // MARK: - Equatable protocol methods -
+
+    static func == (lhs: DAOBaseObject, rhs: DAOBaseObject) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
