@@ -13,6 +13,8 @@ open class DAOUser: DAOBaseObject {
     public var firstName: String
     public var lastName: String
     public var cards: [DAOCard] = []
+    public var favoritedActivities: [DAOActivity] = []
+    public var myCenter: DAOCenter?
 
     public override init() {
         self.email = ""
@@ -54,6 +56,8 @@ open class DAOUser: DAOBaseObject {
         self.firstName = object.firstName
         self.lastName = object.lastName
         self.cards = object.cards
+        self.favoritedActivities = object.favoritedActivities
+        self.myCenter = object.myCenter
 
         super.update(from: object)
     }
