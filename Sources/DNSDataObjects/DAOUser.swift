@@ -88,4 +88,16 @@ open class DAOUser: DAOBaseObject {
         
         return self
     }
+
+    open override func dictionary() -> [String: Any?] {
+        var retval = super.dictionary()
+        retval.merge([
+            "email": self.email,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "phone": self.phone,
+            "dateOfBirth": self.dob?.dnsDate() ?? "",
+        ]) { (current, _) in current }
+        return retval
+    }
 }

@@ -71,4 +71,14 @@ open class DAOActivity: DAOBaseObject {
         
         return self
     }
+
+    open override func dictionary() -> [String: Any?] {
+        var retval = super.dictionary()
+        retval.merge([
+            "code": self.code,
+            "name": self.name,
+            "beacons": self.beacons.map { $0.dictionary() },
+        ]) { (current, _) in current }
+        return retval
+    }
 }

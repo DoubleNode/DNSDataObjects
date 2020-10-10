@@ -66,4 +66,15 @@ open class DAOBeacon: DAOBaseObject {
         
         return self
     }
+
+    open override func dictionary() -> [String: Any?] {
+        var retval = super.dictionary()
+        retval.merge([
+            "code": self.code,
+            "range": self.range,
+            "accuracy": self.accuracy,
+            "rssi": self.rssi,
+        ]) { (current, _) in current }
+        return retval
+    }
 }

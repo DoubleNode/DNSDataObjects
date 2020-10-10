@@ -64,6 +64,14 @@ open class DAOBaseObject: DNSDataTranslation {
         return self
     }
 
+    open func dictionary() -> [String: Any?] {
+        let retval = [
+            "id": self.id,
+        ]
+        
+        return retval
+    }
+
     // MARK: - Equatable protocol methods -
 
     static func == (lhs: DAOBaseObject, rhs: DAOBaseObject) -> Bool {

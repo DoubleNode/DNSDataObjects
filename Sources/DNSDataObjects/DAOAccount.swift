@@ -63,4 +63,14 @@ open class DAOAccount: DAOBaseObject {
         
         return self
     }
+
+    open override func dictionary() -> [String: Any?] {
+        var retval = super.dictionary()
+        retval.merge([
+            "name": self.name,
+            "user": self.user?.dictionary(),
+            "cards": self.cards.map { $0.dictionary() },
+        ]) { (current, _) in current }
+        return retval
+    }
 }
