@@ -79,7 +79,7 @@ open class DAOUser: DAOBaseObject {
         self.firstName = self.string(from: dictionary["firstName"] ?? self.firstName)!
         self.lastName = self.string(from: dictionary["lastName"] ?? self.lastName)!
         self.phone = self.string(from: dictionary["phone"] ?? self.phone)!
-        self.dob = self.date(from: dictionary["date"] ?? self.dob)!
+        self.dob = self.date(from: dictionary["dateOfBirth"] ?? self.dob)
 
         let cards = dictionary["cards"] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }
