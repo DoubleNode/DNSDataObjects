@@ -56,9 +56,9 @@ open class DAOCard: DAOBaseObject {
     }
 
     open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCard {
-        self.nickname = dictionary["nickname"] as? String ?? self.nickname
-        self.cardNumber = dictionary["cardNumber"] as? String ?? self.cardNumber
-        self.pinNumber = dictionary["pinNumber"] as? String ?? self.pinNumber
+        self.nickname = self.string(from: dictionary["nickname"] ?? self.nickname)!
+        self.cardNumber = self.string(from: dictionary["cardNumber"] ?? self.cardNumber)!
+        self.pinNumber = self.string(from: dictionary["pinNumber"] ?? self.pinNumber)!
 
         _ = super.dao(from: dictionary)
         

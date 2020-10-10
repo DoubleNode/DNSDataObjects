@@ -73,9 +73,9 @@ open class DAOCenter: DAOBaseObject {
     }
 
     open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
-        self.centerNum = dictionary["id"] as? Int16 ?? self.centerNum
-        self.code = dictionary["code"] as? String ?? self.code
-        self.name = dictionary["name"] as? String ?? self.name
+        self.centerNum = Int16(self.int(from: dictionary["id"] ?? self.centerNum)!)
+        self.code = self.string(from: dictionary["code"] ?? self.code)!
+        self.name = self.string(from: dictionary["name"] ?? self.name)!
 
         var activities: Array<DAOActivity> = []
         let activitiesData: Array<Dictionary<String, Any?>> = (dictionary["activities"] as? Array<Dictionary<String, Any?>>) ?? []

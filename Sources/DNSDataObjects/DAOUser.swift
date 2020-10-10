@@ -12,6 +12,8 @@ open class DAOUser: DAOBaseObject {
     public var email: String
     public var firstName: String
     public var lastName: String
+    public var phone: String = ""
+    public var dob: Date?
     public var cards: [DAOCard] = []
     public var favoritedActivities: [DAOActivity] = []
     public var myCenter: DAOCenter?
@@ -20,6 +22,8 @@ open class DAOUser: DAOBaseObject {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
+        self.phone = ""
+        self.dob = nil
 
         super.init()
     }
@@ -28,14 +32,18 @@ open class DAOUser: DAOBaseObject {
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
+        self.phone = ""
+        self.dob = nil
 
         super.init(id: email)
     }
-    
+
     public init(from object: DAOUser) {
         self.email = object.email
         self.firstName = object.firstName
         self.lastName = object.lastName
+        self.phone = object.phone
+        self.dob = object.dob
         self.cards = object.cards
 
         super.init(from: object)
@@ -45,6 +53,8 @@ open class DAOUser: DAOBaseObject {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
+        self.phone = ""
+        self.dob = nil
 
         super.init()
 
@@ -55,6 +65,8 @@ open class DAOUser: DAOBaseObject {
         self.email = object.email
         self.firstName = object.firstName
         self.lastName = object.lastName
+        self.phone = object.phone
+        self.dob = object.dob
         self.cards = object.cards
         self.favoritedActivities = object.favoritedActivities
         self.myCenter = object.myCenter
@@ -63,10 +75,12 @@ open class DAOUser: DAOBaseObject {
     }
 
     open override func dao(from dictionary: [String: Any?]) -> DAOUser {
-        self.email = dictionary["email"] as? String ?? self.email
-        self.firstName = dictionary["firstName"] as? String ?? self.firstName
-        self.lastName = dictionary["lastName"] as? String ?? self.lastName
-        
+        self.email = self.string(from: dictionary["email"] ?? self.email)!
+        self.firstName = self.string(from: dictionary["firstName"] ?? self.firstName)!
+        self.lastName = self.string(from: dictionary["lastName"] ?? self.lastName)!
+        self.phone = self.string(from: dictionary["phone"] ?? self.phone)!
+        self.dob = self.date(from: dictionary["date"] ?? self.dob)!
+
         let cards = dictionary["cards"] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }
 

@@ -57,8 +57,8 @@ open class DAOActivity: DAOBaseObject {
     }
 
     open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
-        self.code = dictionary["code"] as? String ?? self.code
-        self.name = dictionary["name"] as? String ?? self.name
+        self.code = self.string(from: dictionary["code"] ?? self.code)!
+        self.name = self.string(from: dictionary["name"] ?? self.name)!
 
         var beacons: Array<DAOBeacon> = []
         let beaconsData: Array<Dictionary<String, Any?>> = (dictionary["beacons"] as? Array<Dictionary<String, Any?>>) ?? []
