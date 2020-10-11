@@ -56,7 +56,7 @@ open class DAOBeacon: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOBeacon {
+    open override func dao(from dictionary: [String: Any?]) -> DAOBeacon {
         self.code = self.string(from: dictionary["code"] ?? self.code)!
         self.range = self.string(from: dictionary["range"] ?? self.range)
         self.accuracy = self.double(from: dictionary["accuracy"] ?? self.accuracy)!

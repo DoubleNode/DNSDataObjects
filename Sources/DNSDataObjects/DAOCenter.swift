@@ -72,20 +72,20 @@ open class DAOCenter: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOCenter {
+    open override func dao(from dictionary: [String: Any?]) -> DAOCenter {
         self.centerNum = Int16(self.int(from: dictionary["id"] ?? self.centerNum)!)
         self.code = self.string(from: dictionary["code"] ?? self.code)!
         self.name = self.string(from: dictionary["name"] ?? self.name)!
 
-        var activities: Array<DAOActivity> = []
-        let activitiesData: Array<Dictionary<String, Any?>> = (dictionary["activities"] as? Array<Dictionary<String, Any?>>) ?? []
+        var activities: [DAOActivity] = []
+        let activitiesData: [[String: Any?]] = (dictionary["activities"] as? [[String: Any?]]) ?? []
         activitiesData.forEach { (activityData) in
             activities.append(DAOActivity(from: activityData))
         }
         self.activities = activities
         
-        var beacons: Array<DAOBeacon> = []
-        let beaconsData: Array<Dictionary<String, Any?>> = (dictionary["beacons"] as? Array<Dictionary<String, Any?>>) ?? []
+        var beacons: [DAOBeacon] = []
+        let beaconsData: [[String: Any?]] = (dictionary["beacons"] as? [[String: Any?]]) ?? []
         beaconsData.forEach { (beaconData) in
             beacons.append(DAOBeacon(from: beaconData))
         }

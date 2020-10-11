@@ -56,12 +56,12 @@ open class DAOActivity: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: Dictionary<String, Any?>) -> DAOActivity {
+    open override func dao(from dictionary: [String: Any?]) -> DAOActivity {
         self.code = self.string(from: dictionary["code"] ?? self.code)!
         self.name = self.string(from: dictionary["name"] ?? self.name)!
 
-        var beacons: Array<DAOBeacon> = []
-        let beaconsData: Array<Dictionary<String, Any?>> = (dictionary["beacons"] as? Array<Dictionary<String, Any?>>) ?? []
+        var beacons: [DAOBeacon] = []
+        let beaconsData: [[String: Any?]] = (dictionary["beacons"] as? [[String: Any?]]) ?? []
         beaconsData.forEach { (beaconData) in
             beacons.append(DAOBeacon(from: beaconData))
         }
