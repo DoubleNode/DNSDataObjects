@@ -28,14 +28,14 @@ open class DAOUser: DAOBaseObject {
         super.init()
     }
 
-    public init(email: String, firstName: String, lastName: String) {
+    public init(id: String, email: String, firstName: String, lastName: String) {
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
         self.phone = ""
         self.dob = nil
 
-        super.init(id: email)
+        super.init(id: id)
     }
 
     public init(from object: DAOUser) {
