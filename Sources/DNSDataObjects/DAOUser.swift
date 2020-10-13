@@ -75,11 +75,11 @@ open class DAOUser: DAOBaseObject {
     }
 
     open override func dao(from dictionary: [String: Any?]) -> DAOUser {
-        self.email = self.string(from: dictionary["email"] ?? self.email)!
-        self.firstName = self.string(from: dictionary["firstName"] ?? self.firstName)!
-        self.lastName = self.string(from: dictionary["lastName"] ?? self.lastName)!
-        self.phone = self.string(from: dictionary["phone"] ?? self.phone)!
-        self.dob = self.date(from: dictionary["dateOfBirth"] ?? self.dob)
+        self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
+        self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
+        self.lastName = self.string(from: dictionary["lastName"] as Any?) ?? self.lastName
+        self.phone = self.string(from: dictionary["phone"] as Any?) ?? self.phone
+        self.dob = self.date(from: dictionary["dateOfBirth"] as Any?) ?? self.dob
 
         let cards = dictionary["cards"] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }

@@ -59,7 +59,7 @@ open class DAOBaseObject: DNSDataTranslation {
     }
 
     open func dao(from dictionary: [String: Any?]) -> DAOBaseObject {
-        self.id = self.string(from: dictionary["id"] ?? self.id)!
+        self.id = self.string(from: dictionary["id"] as Any?) ?? self.id
         self.meta.updated = Date()
         return self
     }
