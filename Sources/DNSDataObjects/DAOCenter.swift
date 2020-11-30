@@ -31,7 +31,7 @@ open class DAOCenter: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    public override init() {
+    required public init() {
         self.centerNum = 0
         self.code = ""
         self.name = ""
@@ -42,7 +42,7 @@ open class DAOCenter: DAOBaseObject {
         super.init()
     }
 
-    public init(centerNum: Int16, code: String, name: String) {
+    required public init(centerNum: Int16, code: String, name: String) {
         self.centerNum = centerNum
         self.code = code
         self.name = name
@@ -53,7 +53,7 @@ open class DAOCenter: DAOBaseObject {
         super.init(id: code)
     }
     
-    public init(from object: DAOCenter) {
+    required public init(from object: DAOCenter) {
         self.centerNum = object.centerNum
         self.code = object.code
         self.name = object.name
@@ -64,7 +64,18 @@ open class DAOCenter: DAOBaseObject {
         super.init(from: object)
     }
 
-    public override init(from dictionary: Dictionary<String, Any?>) {
+    required public init(id: String) {
+        self.centerNum = 0
+        self.code = ""
+        self.name = ""
+
+        self.activities = []
+        self.beacons = []
+
+        super.init(id: id)
+    }
+
+    required public override init(from dictionary: Dictionary<String, Any?>) {
         self.centerNum = 0
         self.code = ""
         self.name = ""

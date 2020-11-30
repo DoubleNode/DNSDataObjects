@@ -27,26 +27,33 @@ open class DAOAccount: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    public override init() {
+    required public init() {
         self.name = ""
         self.user = nil
 
         super.init()
     }
 
-    public init(name: String = "", user: DAOUser? = nil) {
+    required public init(name: String = "", user: DAOUser? = nil) {
         self.name = name
         self.user = user
 
         super.init()
     }
     
-    public init(from object: DAOAccount) {
+    required public init(from object: DAOAccount) {
         self.name = object.name
         self.user = object.user
         self.cards = object.cards
 
         super.init(from: object)
+    }
+
+    required public init(id: String) {
+        self.name = ""
+        self.user = nil
+
+        super.init(id: id)
     }
 
     public override init(from dictionary: Dictionary<String, Any?>) {

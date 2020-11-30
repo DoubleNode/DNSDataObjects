@@ -34,14 +34,14 @@ open class DAOBaseObject: DNSDataTranslation, Codable {
         meta = try container.decode(Metadata.self, forKey: .meta)
     }
     
-    public override init() {
+    required public override init() {
         self.id = ""
         super.init()
 
         self.id = self.meta.uuid.uuidString
     }
 
-    public init(id: String) {
+    required public init(id: String) {
         self.id = ""
         super.init()
 

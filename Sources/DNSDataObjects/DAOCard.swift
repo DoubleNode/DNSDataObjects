@@ -27,33 +27,41 @@ open class DAOCard: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    public override init() {
-        self.nickname = ""
+    required public init() {
         self.cardNumber = ""
+        self.nickname = ""
         self.pinNumber = ""
 
         super.init()
     }
 
-    public init(nickname: String, cardNumber: String, pinNumber: String) {
-        self.nickname = nickname
+    required public init(cardNumber: String, nickname: String, pinNumber: String) {
         self.cardNumber = cardNumber
+        self.nickname = nickname
         self.pinNumber = pinNumber
 
         super.init(id: cardNumber)
     }
     
-    public init(from object: DAOCard) {
-        self.nickname = object.nickname
+    required public init(from object: DAOCard) {
         self.cardNumber = object.cardNumber
+        self.nickname = object.nickname
         self.pinNumber = object.pinNumber
 
         super.init(from: object)
     }
 
-    public override init(from dictionary: Dictionary<String, Any?>) {
-        self.nickname = ""
+    required public init(id: String) {
         self.cardNumber = ""
+        self.nickname = ""
+        self.pinNumber = ""
+        
+        super.init(id: id)
+    }
+    
+    public override init(from dictionary: Dictionary<String, Any?>) {
+        self.cardNumber = ""
+        self.nickname = ""
         self.pinNumber = ""
 
         super.init()
@@ -62,18 +70,18 @@ open class DAOCard: DAOBaseObject {
     }
     
     open func update(from object: DAOCard) {
-        self.nickname = object.nickname
         self.cardNumber = object.cardNumber
+        self.nickname = object.nickname
         self.pinNumber = object.pinNumber
 
         super.update(from: object)
     }
 
     open override func dao(from dictionary: [String: Any?]) -> DAOCard {
-        self.nickname =
-            self.string(from: dictionary["nickname"] as Any?) ?? self.nickname
         self.cardNumber =
             self.string(from: dictionary["cardNumber"] as Any?) ?? self.cardNumber
+        self.nickname =
+            self.string(from: dictionary["nickname"] as Any?) ?? self.nickname
         self.pinNumber =
             self.string(from: dictionary["pinNumber"] as Any?) ?? self.pinNumber
 
@@ -85,8 +93,8 @@ open class DAOCard: DAOBaseObject {
     open override func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
-            "nickname": self.nickname,
             "cardNumber": self.cardNumber,
+            "nickname": self.nickname,
             "pinNumber": self.pinNumber,
         ]) { (current, _) in current }
         return retval

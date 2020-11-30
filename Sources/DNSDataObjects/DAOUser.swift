@@ -37,7 +37,7 @@ open class DAOUser: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    public override init() {
+    required public init() {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
@@ -66,6 +66,16 @@ open class DAOUser: DAOBaseObject {
         self.cards = object.cards
 
         super.init(from: object)
+    }
+
+    required public init(id: String) {
+        self.email = ""
+        self.firstName = ""
+        self.lastName = ""
+        self.phone = ""
+        self.dob = nil
+
+        super.init(id: id)
     }
 
     public override init(from dictionary: Dictionary<String, Any?>) {

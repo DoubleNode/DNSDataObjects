@@ -37,13 +37,13 @@ open class DAOBeacon: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    public override init() {
+    required public init() {
         self.code = ""
         
         super.init()
     }
 
-    public init(from object: DAOBeacon) {
+    required public init(from object: DAOBeacon) {
         self.code = object.code
         self.range = object.range
         self.accuracy = object.accuracy
@@ -53,7 +53,13 @@ open class DAOBeacon: DAOBaseObject {
         super.init(from: object)
     }
     
-    public override init(from dictionary: Dictionary<String, Any?>) {
+    required public init(id: String) {
+        self.code = ""
+
+        super.init(id: id)
+    }
+    
+    required public override init(from dictionary: Dictionary<String, Any?>) {
         self.code = ""
 
         super.init()
