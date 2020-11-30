@@ -22,6 +22,21 @@ open class DAOBeacon: DAOBaseObject {
     public var rssi: Int?
     public var data: CLBeacon?
 
+    private enum CodingKeys: String, CodingKey {
+        case code, range, accuracy, rssi
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = try container.decode(String.self, forKey: .code)
+        range = try container.decode(String.self, forKey: .range)
+        accuracy = try container.decode(CLLocationAccuracy.self, forKey: .accuracy)
+        rssi = try container.decode(Int.self, forKey: .rssi)
+
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
+    }
+
     public override init() {
         self.code = ""
         

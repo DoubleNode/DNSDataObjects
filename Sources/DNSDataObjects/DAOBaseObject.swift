@@ -9,8 +9,8 @@
 import DNSCore
 import Foundation
 
-open class DAOBaseObject: DNSDataTranslation {
-    public struct Metadata {
+open class DAOBaseObject: DNSDataTranslation, Codable {
+    public struct Metadata: Codable {
         var uuid: UUID = UUID()
 
         var created: Date = Date()
@@ -18,13 +18,22 @@ open class DAOBaseObject: DNSDataTranslation {
         var updated: Date = Date()
 
         var status: String?
-        var createdBy: Any?
-        var updatedBy: Any?
+        var createdBy: String?
+        var updatedBy: String?
     }
 
     public var id: String
     public var meta: Metadata = Metadata()
 
+    private enum CodingKeys: String, CodingKey {
+        case id, meta
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        meta = try container.decode(Metadata.self, forKey: .meta)
+    }
+    
     public override init() {
         self.id = ""
         super.init()

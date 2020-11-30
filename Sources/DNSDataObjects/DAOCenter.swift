@@ -15,6 +15,22 @@ open class DAOCenter: DAOBaseObject {
     open var activities: [DAOActivity]
     open var beacons: [DAOBeacon]
 
+    private enum CodingKeys: String, CodingKey {
+        case centerNum, code, name, activities, beacons
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        centerNum = try container.decode(Int16.self, forKey: .centerNum)
+        code = try container.decode(String.self, forKey: .code)
+        name = try container.decode(String.self, forKey: .name)
+        activities = try container.decode([DAOActivity].self, forKey: .activities)
+        beacons = try container.decode([DAOBeacon].self, forKey: .beacons)
+
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
+    }
+
     public override init() {
         self.centerNum = 0
         self.code = ""

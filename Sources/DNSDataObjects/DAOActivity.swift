@@ -11,8 +11,21 @@ import Foundation
 open class DAOActivity: DAOBaseObject {
     public var code: String
     public var name: String
-    open var beacons: [DAOBeacon]
+    open var beacons: [DAOBeacon] = []
     
+    private enum CodingKeys: String, CodingKey {
+        case code, name /*, beacons*/
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = try container.decode(String.self, forKey: .code)
+        name = try container.decode(String.self, forKey: .name)
+
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
+    }
+
     public override init() {
         self.code = ""
         self.name = ""

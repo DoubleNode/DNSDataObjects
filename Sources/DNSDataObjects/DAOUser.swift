@@ -18,6 +18,25 @@ open class DAOUser: DAOBaseObject {
     public var favoritedActivities: [DAOActivity] = []
     public var myCenter: DAOCenter?
 
+    private enum CodingKeys: String, CodingKey {
+        case email, firstName, lastName, phone, dob, cards, favoritedActivities, myCenter
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        email = try container.decode(String.self, forKey: .email)
+        firstName = try container.decode(String.self, forKey: .firstName)
+        lastName = try container.decode(String.self, forKey: .lastName)
+        phone = try container.decode(String.self, forKey: .phone)
+        dob = try container.decode(Date.self, forKey: .dob)
+        cards = try container.decode([DAOCard].self, forKey: .cards)
+        favoritedActivities = try container.decode([DAOActivity].self, forKey: .favoritedActivities)
+        myCenter = try container.decode(DAOCenter.self, forKey: .myCenter)
+
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
+    }
+
     public override init() {
         self.email = ""
         self.firstName = ""

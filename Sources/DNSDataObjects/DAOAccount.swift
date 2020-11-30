@@ -13,6 +13,20 @@ open class DAOAccount: DAOBaseObject {
     public var user: DAOUser?
     public var cards: [DAOCard] = []
 
+    private enum CodingKeys: String, CodingKey {
+        case name, user, cards
+    }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+        user = try container.decode(DAOUser.self, forKey: .user)
+        cards = try container.decode([DAOCard].self, forKey: .cards)
+
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
+    }
+
     public override init() {
         self.name = ""
         self.user = nil
