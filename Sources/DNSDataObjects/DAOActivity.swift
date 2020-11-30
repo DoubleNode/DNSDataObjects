@@ -26,7 +26,7 @@ open class DAOActivity: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.code = ""
         self.name = ""
         self.beacons = []
@@ -34,7 +34,33 @@ open class DAOActivity: DAOBaseObject {
         super.init()
     }
 
-    required public init(code: String, name: String) {
+    override public init(id: String) {
+        self.code = ""
+        self.name = ""
+        self.beacons = []
+        
+        super.init(id: id)
+    }
+    
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.code = ""
+        self.name = ""
+        self.beacons = []
+        
+        super.init()
+        
+        _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOActivity) {
+        self.code = object.code
+        self.name = object.name
+        self.beacons = object.beacons
+        
+        super.init(from: object)
+    }
+    
+    public init(code: String, name: String) {
         self.code = code
         self.name = name
         self.beacons = []
@@ -42,32 +68,6 @@ open class DAOActivity: DAOBaseObject {
         super.init(id: code)
     }
     
-    required public init(from object: DAOActivity) {
-        self.code = object.code
-        self.name = object.name
-        self.beacons = object.beacons
-
-        super.init(from: object)
-    }
-
-    required public init(id: String) {
-        self.code = ""
-        self.name = ""
-        self.beacons = []
-
-        super.init(id: id)
-    }
-    
-    public override init(from dictionary: Dictionary<String, Any?>) {
-        self.code = ""
-        self.name = ""
-        self.beacons = []
-        
-        super.init()
-
-        _ = self.dao(from: dictionary)
-    }
-
     open func update(from object: DAOActivity) {
         self.code = object.code
         self.name = object.name
@@ -77,7 +77,7 @@ open class DAOActivity: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOActivity {
+    override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
         self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
 
@@ -93,7 +93,7 @@ open class DAOActivity: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "code": self.code,

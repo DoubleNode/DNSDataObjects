@@ -27,44 +27,44 @@ open class DAOAccount: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.name = ""
         self.user = nil
 
         super.init()
     }
 
-    required public init(name: String = "", user: DAOUser? = nil) {
+    override public init(id: String) {
+        self.name = ""
+        self.user = nil
+        
+        super.init(id: id)
+    }
+    
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.name = ""
+        self.user = nil
+        
+        super.init()
+        
+        _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOAccount) {
+        self.name = object.name
+        self.user = object.user
+        self.cards = object.cards
+        
+        super.init(from: object)
+    }
+    
+    public init(name: String = "", user: DAOUser? = nil) {
         self.name = name
         self.user = user
 
         super.init()
     }
     
-    required public init(from object: DAOAccount) {
-        self.name = object.name
-        self.user = object.user
-        self.cards = object.cards
-
-        super.init(from: object)
-    }
-
-    required public init(id: String) {
-        self.name = ""
-        self.user = nil
-
-        super.init(id: id)
-    }
-
-    public override init(from dictionary: Dictionary<String, Any?>) {
-        self.name = ""
-        self.user = nil
-        
-        super.init()
-
-        _ = self.dao(from: dictionary)
-    }
-
     open func update(from object: DAOAccount) {
         self.name = object.name
         self.user = object.user
@@ -73,7 +73,7 @@ open class DAOAccount: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOAccount {
+    override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
         self.user = DAOUser(from: dictionary["user"] as? [String: Any?] ?? [:])
 
@@ -85,7 +85,7 @@ open class DAOAccount: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "name": self.name,

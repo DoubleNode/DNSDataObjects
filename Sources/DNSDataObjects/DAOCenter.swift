@@ -31,7 +31,7 @@ open class DAOCenter: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.centerNum = 0
         self.code = ""
         self.name = ""
@@ -42,7 +42,42 @@ open class DAOCenter: DAOBaseObject {
         super.init()
     }
 
-    required public init(centerNum: Int16, code: String, name: String) {
+    override public init(id: String) {
+        self.centerNum = 0
+        self.code = ""
+        self.name = ""
+        
+        self.activities = []
+        self.beacons = []
+        
+        super.init(id: id)
+    }
+    
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.centerNum = 0
+        self.code = ""
+        self.name = ""
+        
+        self.activities = []
+        self.beacons = []
+        
+        super.init()
+        
+        _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOCenter) {
+        self.centerNum = object.centerNum
+        self.code = object.code
+        self.name = object.name
+        
+        self.activities = object.activities
+        self.beacons = object.beacons
+        
+        super.init(from: object)
+    }
+    
+    public init(centerNum: Int16, code: String, name: String) {
         self.centerNum = centerNum
         self.code = code
         self.name = name
@@ -53,41 +88,6 @@ open class DAOCenter: DAOBaseObject {
         super.init(id: code)
     }
     
-    required public init(from object: DAOCenter) {
-        self.centerNum = object.centerNum
-        self.code = object.code
-        self.name = object.name
-
-        self.activities = object.activities
-        self.beacons = object.beacons
-
-        super.init(from: object)
-    }
-
-    required public init(id: String) {
-        self.centerNum = 0
-        self.code = ""
-        self.name = ""
-
-        self.activities = []
-        self.beacons = []
-
-        super.init(id: id)
-    }
-
-    required public override init(from dictionary: Dictionary<String, Any?>) {
-        self.centerNum = 0
-        self.code = ""
-        self.name = ""
-
-        self.activities = []
-        self.beacons = []
-
-        super.init()
-
-        _ = self.dao(from: dictionary)
-    }
-
     open func update(from object: DAOCenter) {
         self.centerNum = object.centerNum
         self.code = object.code
@@ -99,7 +99,7 @@ open class DAOCenter: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOCenter {
+    override open func dao(from dictionary: [String: Any?]) -> DAOCenter {
         self.centerNum = Int16(self.int(from: dictionary["id"] as Any?) ?? Int(self.centerNum))
         self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
@@ -123,7 +123,7 @@ open class DAOCenter: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "code": self.code,

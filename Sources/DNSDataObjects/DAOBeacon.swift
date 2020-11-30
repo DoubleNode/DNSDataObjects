@@ -37,13 +37,27 @@ open class DAOBeacon: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.code = ""
         
         super.init()
     }
 
-    required public init(from object: DAOBeacon) {
+    override public init(id: String) {
+        self.code = ""
+        
+        super.init(id: id)
+    }
+    
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.code = ""
+        
+        super.init()
+        
+        _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOBeacon) {
         self.code = object.code
         self.range = object.range
         self.accuracy = object.accuracy
@@ -53,20 +67,6 @@ open class DAOBeacon: DAOBaseObject {
         super.init(from: object)
     }
     
-    required public init(id: String) {
-        self.code = ""
-
-        super.init(id: id)
-    }
-    
-    required public override init(from dictionary: Dictionary<String, Any?>) {
-        self.code = ""
-
-        super.init()
-
-        _ = self.dao(from: dictionary)
-    }
-
     open func update(from object: DAOBeacon) {
         self.code = object.code
         self.range = object.range
@@ -77,7 +77,7 @@ open class DAOBeacon: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOBeacon {
+    override open func dao(from dictionary: [String: Any?]) -> DAOBeacon {
         self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
         self.range = self.string(from: dictionary["range"] as Any?) ?? self.range
         self.accuracy = self.double(from: dictionary["accuracy"] as Any?) ?? self.accuracy
@@ -88,7 +88,7 @@ open class DAOBeacon: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "code": self.code,

@@ -27,7 +27,7 @@ open class DAOCard: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
@@ -35,23 +35,7 @@ open class DAOCard: DAOBaseObject {
         super.init()
     }
 
-    required public init(cardNumber: String, nickname: String, pinNumber: String) {
-        self.cardNumber = cardNumber
-        self.nickname = nickname
-        self.pinNumber = pinNumber
-
-        super.init(id: cardNumber)
-    }
-    
-    required public init(from object: DAOCard) {
-        self.cardNumber = object.cardNumber
-        self.nickname = object.nickname
-        self.pinNumber = object.pinNumber
-
-        super.init(from: object)
-    }
-
-    required public init(id: String) {
+    override public init(id: String) {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
@@ -59,7 +43,7 @@ open class DAOCard: DAOBaseObject {
         super.init(id: id)
     }
     
-    public override init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: Dictionary<String, Any?>) {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
@@ -67,6 +51,22 @@ open class DAOCard: DAOBaseObject {
         super.init()
 
         _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOCard) {
+        self.cardNumber = object.cardNumber
+        self.nickname = object.nickname
+        self.pinNumber = object.pinNumber
+        
+        super.init(from: object)
+    }
+    
+    public init(cardNumber: String, nickname: String, pinNumber: String) {
+        self.cardNumber = cardNumber
+        self.nickname = nickname
+        self.pinNumber = pinNumber
+        
+        super.init(id: cardNumber)
     }
     
     open func update(from object: DAOCard) {
@@ -77,7 +77,7 @@ open class DAOCard: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOCard {
+    override open func dao(from dictionary: [String: Any?]) -> DAOCard {
         self.cardNumber =
             self.string(from: dictionary["cardNumber"] as Any?) ?? self.cardNumber
         self.nickname =
@@ -90,7 +90,7 @@ open class DAOCard: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "cardNumber": self.cardNumber,

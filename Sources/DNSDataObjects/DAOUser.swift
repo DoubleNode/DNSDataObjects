@@ -37,7 +37,7 @@ open class DAOUser: DAOBaseObject {
         try super.init(from: superDecoder)
     }
 
-    required public init() {
+    override public init() {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
@@ -47,6 +47,39 @@ open class DAOUser: DAOBaseObject {
         super.init()
     }
 
+    override public init(id: String) {
+        self.email = ""
+        self.firstName = ""
+        self.lastName = ""
+        self.phone = ""
+        self.dob = nil
+        
+        super.init(id: id)
+    }
+    
+    override public init(from dictionary: Dictionary<String, Any?>) {
+        self.email = ""
+        self.firstName = ""
+        self.lastName = ""
+        self.phone = ""
+        self.dob = nil
+        
+        super.init()
+        
+        _ = self.dao(from: dictionary)
+    }
+    
+    public init(from object: DAOUser) {
+        self.email = object.email
+        self.firstName = object.firstName
+        self.lastName = object.lastName
+        self.phone = object.phone
+        self.dob = object.dob
+        self.cards = object.cards
+        
+        super.init(from: object)
+    }
+    
     public init(id: String, email: String, firstName: String, lastName: String) {
         self.email = email
         self.firstName = firstName
@@ -55,39 +88,6 @@ open class DAOUser: DAOBaseObject {
         self.dob = nil
 
         super.init(id: id)
-    }
-
-    public init(from object: DAOUser) {
-        self.email = object.email
-        self.firstName = object.firstName
-        self.lastName = object.lastName
-        self.phone = object.phone
-        self.dob = object.dob
-        self.cards = object.cards
-
-        super.init(from: object)
-    }
-
-    required public init(id: String) {
-        self.email = ""
-        self.firstName = ""
-        self.lastName = ""
-        self.phone = ""
-        self.dob = nil
-
-        super.init(id: id)
-    }
-
-    public override init(from dictionary: Dictionary<String, Any?>) {
-        self.email = ""
-        self.firstName = ""
-        self.lastName = ""
-        self.phone = ""
-        self.dob = nil
-
-        super.init()
-
-        _ = self.dao(from: dictionary)
     }
 
     open func update(from object: DAOUser) {
@@ -103,7 +103,7 @@ open class DAOUser: DAOBaseObject {
         super.update(from: object)
     }
 
-    open override func dao(from dictionary: [String: Any?]) -> DAOUser {
+    override open func dao(from dictionary: [String: Any?]) -> DAOUser {
         self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
         self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
         self.lastName = self.string(from: dictionary["lastName"] as Any?) ?? self.lastName
@@ -118,7 +118,7 @@ open class DAOUser: DAOBaseObject {
         return self
     }
 
-    open override func dictionary() -> [String: Any?] {
+    override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
             "email": self.email,
