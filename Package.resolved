@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCore.git",
         "state": {
           "branch": null,
-          "revision": "15d36c6fbf7c6bd851c00d9a35bac8a1d94fe5f2",
-          "version": "1.2.38"
+          "revision": "dcccf58a04cd8ee8a969d9b3f54d5686771dd2d2",
+          "version": "1.3.0"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCoreThreading.git",
         "state": {
           "branch": null,
-          "revision": "c781049b43854080188112d1a05f70d4de2e0fc9",
-          "version": "1.2.1"
+          "revision": "4a2e6758c9c03591ee09a7873424d15a96baa384",
+          "version": "1.3.0"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
         "state": {
           "branch": null,
-          "revision": "c7b2fceb3fd0095acba4792c728f3f062baf8fb9",
-          "version": "1.9.2"
+          "revision": "2c513a2e8fbfbd6495afc4a05941d8e3fdba68e9",
+          "version": "1.9.3"
         }
       }
     ]
