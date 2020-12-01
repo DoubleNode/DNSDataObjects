@@ -9,22 +9,19 @@
 import Foundation
 
 open class DAOCard: DAOBaseObject {
-    public var cardNumber: String
-    public var nickname: String
-    public var pinNumber: String
+    public var cardNumber: String = ""
+    public var nickname: String = ""
+    public var pinNumber: String = ""
 
     private enum CodingKeys: String, CodingKey {
-        case nickname, cardNumber, pinNumber
+        case cardNumber, nickname, pinNumber
     }
     required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         cardNumber = try container.decode(String.self, forKey: .cardNumber)
         nickname = try container.decode(String.self, forKey: .nickname)
         pinNumber = try container.decode(String.self, forKey: .pinNumber)
-
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
