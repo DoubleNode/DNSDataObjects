@@ -33,7 +33,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable {
         id = try container.decode(String.self, forKey: .id)
         meta = try container.decode(Metadata.self, forKey: .meta)
     }
-    public func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(meta, forKey: .meta)
