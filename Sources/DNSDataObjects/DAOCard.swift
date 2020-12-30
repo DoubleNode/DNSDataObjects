@@ -35,15 +35,12 @@ open class DAOCard: DAOBaseObject {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
-
         super.init()
     }
-
     override public init(id: String) {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
-        
         super.init(id: id)
     }
     
@@ -51,34 +48,26 @@ open class DAOCard: DAOBaseObject {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""
-
         super.init()
-
         _ = self.dao(from: dictionary)
     }
-    
     public init(from object: DAOCard) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOCard) {
+        super.update(from: object)
         self.cardNumber = object.cardNumber
         self.nickname = object.nickname
         self.pinNumber = object.pinNumber
-        
-        super.init(from: object)
     }
-    
+
     public init(cardNumber: String, nickname: String, pinNumber: String) {
         self.cardNumber = cardNumber
         self.nickname = nickname
         self.pinNumber = pinNumber
         
         super.init(id: cardNumber)
-    }
-    
-    open func update(from object: DAOCard) {
-        self.cardNumber = object.cardNumber
-        self.nickname = object.nickname
-        self.pinNumber = object.pinNumber
-
-        super.update(from: object)
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOCard {
