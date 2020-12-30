@@ -6,7 +6,7 @@
 //  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
-import DNSCore
+import DNSCoreThreading
 import Foundation
 
 public enum DAOObjectError: Error
