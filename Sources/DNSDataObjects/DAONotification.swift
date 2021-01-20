@@ -22,10 +22,10 @@ open class DAONotification: DAOBaseObject {
         }
     }
     
-    var body = ""
-    var deepLink: URL?
-    var title = ""
-    var type: DAONotification.NotificationType
+    public var body = ""
+    public var deepLink: URL?
+    public var title = ""
+    public var type: DAONotification.NotificationType
     
     // TODO: Implement all CodingKeys
     private enum CodingKeys: String, CodingKey {
