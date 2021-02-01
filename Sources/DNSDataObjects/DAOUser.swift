@@ -15,11 +15,11 @@ open class DAOUser: DAOBaseObject {
     public var phone: String = ""
     public var dob: Date?
     public var cards: [DAOCard] = []
-    public var favoritedActivities: [DAOActivity] = []
+    public var favoritedActivityTypes: [DAOActivityType] = []
     public var myCenter: DAOCenter?
 
     private enum CodingKeys: String, CodingKey {
-        case email, firstName, lastName, phone, dob, cards, favoritedActivities, myCenter
+        case email, firstName, lastName, phone, dob, cards, favoritedActivityTypes, myCenter
     }
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -29,7 +29,7 @@ open class DAOUser: DAOBaseObject {
         phone = try container.decode(String.self, forKey: .phone)
         dob = try container.decode(Date.self, forKey: .dob)
         cards = try container.decode([DAOCard].self, forKey: .cards)
-        favoritedActivities = try container.decode([DAOActivity].self, forKey: .favoritedActivities)
+        favoritedActivityTypes = try container.decode([DAOActivityType].self, forKey: .favoritedActivityTypes)
         myCenter = try container.decode(DAOCenter.self, forKey: .myCenter)
 
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -97,7 +97,7 @@ open class DAOUser: DAOBaseObject {
         self.phone = object.phone
         self.dob = object.dob
         self.cards = object.cards
-        self.favoritedActivities = object.favoritedActivities
+        self.favoritedActivityTypes = object.favoritedActivityTypes
         self.myCenter = object.myCenter
 
         super.update(from: object)
