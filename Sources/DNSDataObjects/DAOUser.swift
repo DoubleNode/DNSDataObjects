@@ -16,7 +16,7 @@ open class DAOUser: DAOBaseObject {
     public var dob: Date?
     public var cards: [DAOCard] = []
     public var favoritedActivityTypes: [DAOActivityType] = []
-    public var myCenter: DAOCenter?
+    open var myCenter: DAOCenter?
 
     private enum CodingKeys: String, CodingKey {
         case email, firstName, lastName, phone, dob, cards, favoritedActivityTypes, myCenter
