@@ -6,13 +6,13 @@
 //  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
-import DNSCoreThreading
+import DNSError
 import Foundation
 
 public enum DAOObjectError: Error
 {
-    case typeMismatch(expectedType: String, actualType: String, domain: String, file: String, line: String, method: String)
-    case unexpectedNil(name: String, domain: String, file: String, line: String, method: String)
+    case typeMismatch(expectedType: String, actualType: String, _ codeLocation: DNSCodeLocation)
+    case unexpectedNil(name: String, _ codeLocation: DNSCodeLocation)
 }
 extension DAOObjectError: DNSError {
     public static let domain = "DAOOBJECT"
@@ -24,26 +24,26 @@ extension DAOObjectError: DNSError {
     
     public var nsError: NSError! {
         switch self {
-        case .typeMismatch(let expectedType, let actualType, let domain, let file, let line, let method):
-            let userInfo: [String : Any] = [
-                "ExpectedType": expectedType, "ActualType": actualType,
-                "DNSDomain": domain, "DNSFile": file, "DNSLine": line, "DNSMethod": method,
-                NSLocalizedDescriptionKey: self.errorDescription ?? "Unknown Error"
-            ]
+        case .typeMismatch(let expectedType, let actualType, let codeLocation):
+            var userInfo = codeLocation.userInfo
+            userInfo["ExpectedType"] = expectedType
+            userInfo["ActualType"] = actualType
+            userInfo[NSLocalizedDescriptionKey] = self.errorString
             return NSError.init(domain: Self.domain,
                                 code: Self.Code.typeMismatch.rawValue,
                                 userInfo: userInfo)
-        case .unexpectedNil(let name, let domain, let file, let line, let method):
-            let userInfo: [String : Any] = [
-                "Name": name, "DNSDomain": domain, "DNSFile": file, "DNSLine": line, "DNSMethod": method,
-                NSLocalizedDescriptionKey: self.errorDescription ?? "Unknown Error"
-            ]
+        case .unexpectedNil(let name, let codeLocation):
+            var userInfo = codeLocation.userInfo
+            userInfo["Name"] = name
             return NSError.init(domain: Self.domain,
                                 code: Self.Code.unexpectedNil.rawValue,
                                 userInfo: userInfo)
         }
     }
     public var errorDescription: String? {
+        return self.errorString
+    }
+    public var errorString: String? {
         switch self {
         case .typeMismatch:
             return NSLocalizedString("DAOOBJECT-Type Mismatch Error", comment: "")
@@ -55,10 +55,10 @@ extension DAOObjectError: DNSError {
     }
     public var failureReason: String? {
         switch self {
-        case .typeMismatch(_, _, let domain, let file, let line, let method):
-            return "\(domain):\(file):\(line):\(method)"
-        case .unexpectedNil(_, let domain, let file, let line, let method):
-            return "\(domain):\(file):\(line):\(method)"
+        case .typeMismatch(_, _, let codeLocation):
+            return codeLocation.failureReason
+        case .unexpectedNil(_, let codeLocation):
+            return codeLocation.failureReason
         }
     }
 }

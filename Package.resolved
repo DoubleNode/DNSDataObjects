@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCore.git",
         "state": {
           "branch": null,
-          "revision": "e61425be59a414e7cf0588387e8bf6cefc461941",
-          "version": "1.3.17"
+          "revision": "0449e40d43a3804bdd5b68b1923872671402f76e",
+          "version": "1.4.0"
         }
       },
       {
@@ -24,8 +24,17 @@
         "repositoryURL": "https://github.com/DoubleNode/DNSCoreThreading.git",
         "state": {
           "branch": null,
-          "revision": "80459667f316d4666d8190fceb187a335a92e0bf",
-          "version": "1.3.2"
+          "revision": "a41bf74644708924903ea0b6b9ec56903b7e28f2",
+          "version": "1.4.0"
+        }
+      },
+      {
+        "package": "DNSError",
+        "repositoryURL": "https://github.com/DoubleNode/DNSError.git",
+        "state": {
+          "branch": null,
+          "revision": "5075e2c42a79355346af633a778c5ce3359b38a9",
+          "version": "1.4.0"
         }
       },
       {
@@ -33,8 +42,8 @@
         "repositoryURL": "https://github.com/Nirma/SFSymbol",
         "state": {
           "branch": null,
-          "revision": "01bda7aadcedd27fdd599e1370c7989e8d746b85",
-          "version": "0.5.1"
+          "revision": "08dda98b2ba4a36653becaab6f4234f5fc2592d2",
+          "version": "1.0.0"
         }
       },
       {
