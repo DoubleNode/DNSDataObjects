@@ -55,9 +55,8 @@ extension DAOObjectError: DNSError {
     }
     public var failureReason: String? {
         switch self {
-        case .typeMismatch(_, _, let codeLocation):
-            return codeLocation.failureReason
-        case .unexpectedNil(_, let codeLocation):
+        case .typeMismatch(_, _, let codeLocation),
+             .unexpectedNil(_, let codeLocation):
             return codeLocation.failureReason
         }
     }
