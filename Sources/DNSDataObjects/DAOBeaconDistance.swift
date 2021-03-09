@@ -16,7 +16,7 @@ public enum DAOBeaconDistance: String, CaseIterable, Codable {
     case close
     case immediate
 
-    var code: String {
+    public var code: String {
         switch self {
         case .unknown:  return "unk"
         case .distant:  return "dis"
@@ -28,7 +28,7 @@ public enum DAOBeaconDistance: String, CaseIterable, Codable {
         }
     }
 
-    var index: Int {
+    public var index: Int {
         switch self {
         case .unknown:  return 1
         case .distant:  return 2
@@ -40,7 +40,7 @@ public enum DAOBeaconDistance: String, CaseIterable, Codable {
         }
     }
 
-    var signalLevel: Int8 {
+    public var signalLevel: Int8 {
         switch self {
         case .unknown:  return 5
         case .distant:  return 20
