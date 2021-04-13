@@ -26,27 +26,28 @@ open class DAOAccount: DAOBaseObject {
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
     }
+    override open func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(user, forKey: .user)
+        try container.encode(cards, forKey: .cards)
+    }
 
     override public init() {
         self.name = ""
         self.user = nil
-
         super.init()
     }
-
     override public init(id: String) {
         self.name = ""
         self.user = nil
-        
         super.init(id: id)
     }
-    
     override public init(from dictionary: Dictionary<String, Any?>) {
         self.name = ""
         self.user = nil
-        
         super.init()
-        
         _ = self.dao(from: dictionary)
     }
     
@@ -54,22 +55,17 @@ open class DAOAccount: DAOBaseObject {
         self.name = object.name
         self.user = object.user
         self.cards = object.cards
-        
         super.init(from: object)
     }
-    
     public init(name: String = "", user: DAOUser? = nil) {
         self.name = name
         self.user = user
-
         super.init()
     }
-    
     open func update(from object: DAOAccount) {
         self.name = object.name
         self.user = object.user
         self.cards = object.cards
-
         super.update(from: object)
     }
 
@@ -79,12 +75,9 @@ open class DAOAccount: DAOBaseObject {
 
         let cards = dictionary["cards"] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }
-
         _ = super.dao(from: dictionary)
-        
         return self
     }
-
     override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([

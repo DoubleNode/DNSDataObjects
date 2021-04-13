@@ -36,6 +36,18 @@ open class DAOUser: DAOBaseObject {
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
     }
+    override open func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(email, forKey: .email)
+        try container.encode(firstName, forKey: .firstName)
+        try container.encode(lastName, forKey: .lastName)
+        try container.encode(phone, forKey: .phone)
+        try container.encode(dob, forKey: .dob)
+        try container.encode(cards, forKey: .cards)
+        try container.encode(favoritedActivityTypes, forKey: .favoritedActivityTypes)
+        try container.encode(myCenter, forKey: .myCenter)
+    }
 
     override public init() {
         self.email = ""
@@ -43,29 +55,23 @@ open class DAOUser: DAOBaseObject {
         self.lastName = ""
         self.phone = ""
         self.dob = nil
-
         super.init()
     }
-
     override public init(id: String) {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
         self.phone = ""
         self.dob = nil
-        
         super.init(id: id)
     }
-    
     override public init(from dictionary: Dictionary<String, Any?>) {
         self.email = ""
         self.firstName = ""
         self.lastName = ""
         self.phone = ""
         self.dob = nil
-        
         super.init()
-        
         _ = self.dao(from: dictionary)
     }
     
@@ -76,17 +82,14 @@ open class DAOUser: DAOBaseObject {
         self.phone = object.phone
         self.dob = object.dob
         self.cards = object.cards
-        
         super.init(from: object)
     }
-    
     public init(id: String, email: String, firstName: String, lastName: String) {
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
         self.phone = ""
         self.dob = nil
-
         super.init(id: id)
     }
 
@@ -99,10 +102,8 @@ open class DAOUser: DAOBaseObject {
         self.cards = object.cards
         self.favoritedActivityTypes = object.favoritedActivityTypes
         self.myCenter = object.myCenter
-
         super.update(from: object)
     }
-
     override open func dao(from dictionary: [String: Any?]) -> DAOUser {
         self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
         self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
@@ -114,10 +115,8 @@ open class DAOUser: DAOBaseObject {
         self.cards = cards.map { DAOCard(from: $0) }
 
         _ = super.dao(from: dictionary)
-        
         return self
     }
-
     override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
