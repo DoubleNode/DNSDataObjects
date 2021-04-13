@@ -45,7 +45,7 @@ open class DAONotification: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
-        try container.encode(deepLink, forKey: .deepLink)
+        if deepLink != nil { try container.encode(deepLink, forKey: .deepLink) }
         try container.encode(title, forKey: .title)
         try container.encode(type, forKey: .type)
     }

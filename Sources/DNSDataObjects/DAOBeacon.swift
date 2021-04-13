@@ -23,7 +23,7 @@ open class DAOBeacon: DAOBaseObject {
     public var data: CLBeacon?
 
     private enum CodingKeys: String, CodingKey {
-        case code, range, accuracy, rssi
+        case code, range, accuracy, rssi, data
     }
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -31,6 +31,7 @@ open class DAOBeacon: DAOBaseObject {
         range = try container.decode(String.self, forKey: .range)
         accuracy = try container.decode(CLLocationAccuracy.self, forKey: .accuracy)
         rssi = try container.decode(Int.self, forKey: .rssi)
+        // FIXME: data = try container.decode(CLBeacon.self, forKey: .data)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -39,9 +40,10 @@ open class DAOBeacon: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(code, forKey: .code)
-        try container.encode(range, forKey: .range)
+        if range != nil { try container.encode(range, forKey: .range) }
         try container.encode(accuracy, forKey: .accuracy)
-        try container.encode(rssi, forKey: .rssi)
+        if rssi != nil { try container.encode(rssi, forKey: .rssi) }
+        // FIXME: if data != nil { try container.encode(data, forKey: .data) }
     }
 
     override public init() {

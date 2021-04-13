@@ -43,10 +43,10 @@ open class DAOUser: DAOBaseObject {
         try container.encode(firstName, forKey: .firstName)
         try container.encode(lastName, forKey: .lastName)
         try container.encode(phone, forKey: .phone)
-        try container.encode(dob, forKey: .dob)
+        if dob != nil { try container.encode(dob, forKey: .dob) }
         try container.encode(cards, forKey: .cards)
         try container.encode(favoritedActivityTypes, forKey: .favoritedActivityTypes)
-        try container.encode(myCenter, forKey: .myCenter)
+        if myCenter != nil { try container.encode(myCenter, forKey: .myCenter) }
     }
 
     override public init() {

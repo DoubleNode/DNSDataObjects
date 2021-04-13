@@ -30,7 +30,7 @@ open class DAOAccount: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
-        try container.encode(user, forKey: .user)
+        if user != nil { try container.encode(user, forKey: .user) }
         try container.encode(cards, forKey: .cards)
     }
 

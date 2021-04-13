@@ -31,7 +31,7 @@ open class DAOActivity: DAOBaseObject {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(code, forKey: .code)
         try container.encode(name, forKey: .name)
-        try container.encode(baseType, forKey: .baseType)
+        if baseType != nil { try container.encode(baseType, forKey: .baseType) }
     }
 
     override public init() {
