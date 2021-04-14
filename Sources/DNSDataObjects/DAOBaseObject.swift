@@ -26,17 +26,32 @@ open class DAOBaseObject: DNSDataTranslation, Codable {
     public var meta: Metadata = Metadata()
 
     private enum CodingKeys: String, CodingKey {
-        case id, meta
+        case id, metaUUID, metaCreated, metaSynced, metaUpdated
+        case metaStatus, metaCreatedBy, metaUpdatedBy
     }
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
-        meta = try container.decode(Metadata.self, forKey: .meta)
+        meta.uuid = UUID(uuidString: try container.decode(String.self, forKey: .metaUUID)) ?? UUID()
+        meta.created = try container.decode(Date.self, forKey: .metaCreated)
+        meta.synced = try container.decode(Date.self, forKey: .metaSynced)
+        meta.updated = try container.decode(Date.self, forKey: .metaUpdated)
+
+        meta.status = try container.decode(String.self, forKey: .metaStatus)
+        meta.createdBy = try container.decode(String.self, forKey: .metaCreatedBy)
+        meta.updatedBy = try container.decode(String.self, forKey: .metaUpdatedBy)
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(meta, forKey: .meta)
+        try container.encode(meta.uuid.uuidString, forKey: .metaUUID)
+        try container.encode(meta.created, forKey: .metaCreated)
+        try container.encode(meta.synced, forKey: .metaSynced)
+        try container.encode(meta.updated, forKey: .metaUpdated)
+
+        try container.encode(meta.status, forKey: .metaStatus)
+        try container.encode(meta.createdBy, forKey: .metaCreatedBy)
+        try container.encode(meta.updatedBy, forKey: .metaUpdatedBy)
     }
 
     public override init() {
