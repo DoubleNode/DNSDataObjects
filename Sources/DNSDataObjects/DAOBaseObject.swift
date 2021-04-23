@@ -64,7 +64,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable {
         super.init()
         self.id = id
     }
-    public init(from dictionary: Dictionary<String, Any?>) {
+    public init(from dictionary: [String: Any?]) {
         self.id = ""
         super.init()
         _ = self.dao(from: dictionary)

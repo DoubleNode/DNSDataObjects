@@ -65,7 +65,7 @@ open class DAOUser: DAOBaseObject {
         self.dob = nil
         super.init(id: id)
     }
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.email = ""
         self.firstName = ""
         self.lastName = ""

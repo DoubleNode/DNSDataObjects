@@ -48,7 +48,7 @@ open class DAOActivity: DAOBaseObject {
         self.beacons = []
         super.init(id: id)
     }
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.baseType = nil
         self.code = ""
         self.name = ""

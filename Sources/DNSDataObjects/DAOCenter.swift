@@ -55,7 +55,7 @@ open class DAOCenter: DAOBaseObject {
         self.beacons = []
         super.init(id: id)
     }
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.centerNum = 0
         self.code = ""
         self.name = ""

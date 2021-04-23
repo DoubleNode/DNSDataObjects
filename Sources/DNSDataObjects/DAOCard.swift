@@ -44,7 +44,7 @@ open class DAOCard: DAOBaseObject {
         super.init(id: id)
     }
     
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.cardNumber = ""
         self.nickname = ""
         self.pinNumber = ""

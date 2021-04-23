@@ -54,7 +54,7 @@ open class DAOBeacon: DAOBaseObject {
         self.code = ""
         super.init(id: id)
     }
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.code = ""
         super.init()
         _ = self.dao(from: dictionary)

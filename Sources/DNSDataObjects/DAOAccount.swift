@@ -44,7 +44,7 @@ open class DAOAccount: DAOBaseObject {
         self.user = nil
         super.init(id: id)
     }
-    override public init(from dictionary: Dictionary<String, Any?>) {
+    override public init(from dictionary: [String: Any?]) {
         self.name = ""
         self.user = nil
         super.init()
