@@ -11,15 +11,15 @@ import Foundation
 
 open class DAOBaseObject: DNSDataTranslation, Codable {
     public struct Metadata: Codable {
-        var uuid: UUID = UUID()
+        public var uuid: UUID = UUID()
 
-        var created: Date = Date()
-        var synced: Date?
-        var updated: Date = Date()
+        public var created: Date = Date()
+        public var synced: Date?
+        public var updated: Date = Date()
 
-        var status: String?
-        var createdBy: String?
-        var updatedBy: String?
+        public var status: String?
+        public var createdBy: String?
+        public var updatedBy: String?
     }
 
     public var id: String
