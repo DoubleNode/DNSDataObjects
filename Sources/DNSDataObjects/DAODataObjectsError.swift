@@ -1,5 +1,5 @@
 //
-//  DAOObjectError.swift
+//  DAODataObjectsError.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,14 +9,15 @@
 import DNSError
 import Foundation
 
-public enum DAOObjectError: Error
-{
+public extension DNSError {
+    typealias DataObjects = DNSDataObjectsError
+}
+public enum DNSDataObjectsError: DNSError {
     case unknown(_ codeLocation: DNSCodeLocation)
     case typeMismatch(expectedType: String, actualType: String, _ codeLocation: DNSCodeLocation)
     case unexpectedNil(name: String, _ codeLocation: DNSCodeLocation)
-}
-extension DAOObjectError: DNSError {
-    public static let domain = "DAOOBJECT"
+
+    public static let domain = "DATAOBJECTS"
     public enum Code: Int
     {
         case unknown = 1001
@@ -54,14 +55,14 @@ extension DAOObjectError: DNSError {
     public var errorString: String {
         switch self {
         case .unknown:
-            return String(format: NSLocalizedString("DAOOBJECT-Unknown Error%@", comment: ""),
+            return String(format: NSLocalizedString("DATAOBJECTS-Unknown Error%@", comment: ""),
                           " (\(Self.domain):\(Self.Code.unknown.rawValue))")
         case .typeMismatch(let expectedType, let actualType, _):
-            return String(format: NSLocalizedString("DAOOBJECT-Type Mismatch Error %@%@%@", comment: ""),
+            return String(format: NSLocalizedString("DATAOBJECTS-Type Mismatch Error %@%@%@", comment: ""),
                           expectedType, actualType,
                           " (\(Self.domain):\(Self.Code.typeMismatch.rawValue))")
         case .unexpectedNil(let name, _):
-            return String(format: NSLocalizedString("DAOOBJECT-Unexpected Nil Error %@%@", comment: ""),
+            return String(format: NSLocalizedString("DATAOBJECTS-Unexpected Nil Error %@%@", comment: ""),
                           name,
                           " (\(Self.domain):\(Self.Code.unexpectedNil.rawValue))")
         }
