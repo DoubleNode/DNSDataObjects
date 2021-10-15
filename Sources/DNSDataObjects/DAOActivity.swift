@@ -10,6 +10,7 @@ import Foundation
 
 open class DAOActivity: DAOBaseObject {
     public var baseType: DAOActivityType?
+    public var blackouts: [DAOActivityBlackout] = []
     public var bookingEndTime: Date?
     public var bookingStartTime: Date?
     public var code: String
@@ -17,11 +18,12 @@ open class DAOActivity: DAOBaseObject {
     open var beacons: [DAOBeacon] = []
 
     private enum CodingKeys: String, CodingKey {
-        case baseType, bookingEndTime, bookingStartTime, code, name /*, beacons*/
+        case baseType, blackouts, bookingEndTime, bookingStartTime, code, name /*, beacons*/
     }
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         baseType = try container.decode(DAOActivityType.self, forKey: .baseType)
+        blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)
         bookingEndTime = try container.decode(Date?.self, forKey: .bookingEndTime)
         bookingStartTime = try container.decode(Date?.self, forKey: .bookingStartTime)
         code = try container.decode(String.self, forKey: .code)
@@ -34,6 +36,7 @@ open class DAOActivity: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if baseType != nil { try container.encode(baseType, forKey: .baseType) }
+        try container.encode(blackouts, forKey: .blackouts)
         try container.encode(bookingEndTime, forKey: .bookingEndTime)
         try container.encode(bookingStartTime, forKey: .bookingStartTime)
         try container.encode(code, forKey: .code)
@@ -64,6 +67,7 @@ open class DAOActivity: DAOBaseObject {
     }
     public init(from object: DAOActivity) {
         self.baseType = object.baseType
+        self.blackouts = object.blackouts
         self.bookingEndTime = object.bookingEndTime
         self.bookingStartTime = object.bookingStartTime
         self.code = object.code
@@ -80,6 +84,7 @@ open class DAOActivity: DAOBaseObject {
     }
     open func update(from object: DAOActivity) {
         self.baseType = object.baseType
+        self.blackouts = object.blackouts
         self.bookingEndTime = object.bookingEndTime
         self.bookingStartTime = object.bookingStartTime
         self.code = object.code
