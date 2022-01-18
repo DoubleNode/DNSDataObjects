@@ -58,12 +58,13 @@ public enum DNSDataObjectsError: DNSError {
             return String(format: NSLocalizedString("DATAOBJECTS-Unknown Error%@", comment: ""),
                           " (\(Self.domain):\(Self.Code.unknown.rawValue))")
         case .typeMismatch(let expectedType, let actualType, _):
-            return String(format: NSLocalizedString("DATAOBJECTS-Type Mismatch Error %@%@%@", comment: ""),
-                          expectedType, actualType,
+            return String(format: NSLocalizedString("DATAOBJECTS-Type Mismatch Error%@%@%@", comment: ""),
+                          "\(expectedType)",
+                          "\(actualType)",
                           " (\(Self.domain):\(Self.Code.typeMismatch.rawValue))")
         case .unexpectedNil(let name, _):
-            return String(format: NSLocalizedString("DATAOBJECTS-Unexpected Nil Error %@%@", comment: ""),
-                          name,
+            return String(format: NSLocalizedString("DATAOBJECTS-Unexpected Nil Error%@%@", comment: ""),
+                          "\(name)",
                           " (\(Self.domain):\(Self.Code.unexpectedNil.rawValue))")
         }
     }
