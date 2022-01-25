@@ -1,0 +1,71 @@
+//
+//  DAOSystem.swift
+//  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
+//
+//  Created by Darren Ehlers.
+//  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
+//
+
+import Foundation
+
+open class DAOSystem: DAOBaseObject {
+    public enum State: String {
+        case green
+        case red
+        case yellow
+    }
+    public var name: String = ""
+    public var state: DAOSystem.State = .green
+
+    private enum CodingKeys: String, CodingKey {
+        case name, state
+    }
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+        let rawState = try container.decode(String.self, forKey: .state)
+        state = DAOSystem.State(rawValue: rawState) ?? .green
+    }
+    override open func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(state.rawValue, forKey: .state)
+    }
+
+    override public init() {
+        super.init()
+    }
+    
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    public init(from object: DAOSystem) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOSystem) {
+        super.update(from: object)
+        self.name = object.name
+        self.state = object.state
+    }
+
+    override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
+        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        let rawState = self.string(from: dictionary["state"] as Any?) ?? self.state.rawValue
+        self.state = DAOSystem.State(rawValue: rawState) ?? self.state
+        _ = super.dao(from: dictionary)
+        return self
+    }
+
+    override open func dictionary() -> [String: Any?] {
+        var retval = super.dictionary()
+        retval.merge([
+            "name": self.name,
+            "state": self.state.rawValue,
+        ]) { (current, _) in current }
+        return retval
+    }
+}
