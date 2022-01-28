@@ -14,15 +14,17 @@ open class DAOSystem: DAOBaseObject {
         case red
         case yellow
     }
+    public var message: String = ""
     public var name: String = ""
     public var state: DAOSystem.State = .green
 
     private enum CodingKeys: String, CodingKey {
-        case name, state
+        case message, name, state
     }
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        message = try container.decode(String.self, forKey: .message)
         name = try container.decode(String.self, forKey: .name)
         let rawState = try container.decode(String.self, forKey: .state)
         state = DAOSystem.State(rawValue: rawState) ?? .green
@@ -30,6 +32,7 @@ open class DAOSystem: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(message, forKey: .message)
         try container.encode(name, forKey: .name)
         try container.encode(state.rawValue, forKey: .state)
     }
@@ -48,11 +51,13 @@ open class DAOSystem: DAOBaseObject {
     }
     open func update(from object: DAOSystem) {
         super.update(from: object)
+        self.message = object.message
         self.name = object.name
         self.state = object.state
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
+        self.message = self.string(from: dictionary["message"] as Any?) ?? self.message
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
         let rawState = self.string(from: dictionary["state"] as Any?) ?? self.state.rawValue
         self.state = DAOSystem.State(rawValue: rawState) ?? self.state
@@ -63,6 +68,7 @@ open class DAOSystem: DAOBaseObject {
     override open func dictionary() -> [String: Any?] {
         var retval = super.dictionary()
         retval.merge([
+            "message": self.message,
             "name": self.name,
             "state": self.state.rawValue,
         ]) { (current, _) in current }
