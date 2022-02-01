@@ -10,6 +10,7 @@ import Foundation
 
 open class DAOSystem: DAOBaseObject {
     public enum State: String {
+        case none
         case green
         case red
         case yellow
