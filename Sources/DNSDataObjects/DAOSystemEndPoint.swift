@@ -9,27 +9,30 @@
 import Foundation
 
 open class DAOSystemEndPoint: DAOBaseObject {
-    public var name: String = ""
     public var currentState: DAOSystemState?
+    public var name: String = ""
+    public var system: DAOSystem?
 
     public var historyState: [DAOSystemState] = []
 
     private enum CodingKeys: String, CodingKey {
-        case name, currentState, historyState
+        case currentState, historyState, name, system
     }
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decode(String.self, forKey: .name)
         currentState = try container.decode(DAOSystemState.self, forKey: .currentState)
         historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
+        name = try container.decode(String.self, forKey: .name)
+        system = try container.decode(DAOSystem.self, forKey: .system)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(name, forKey: .name)
         try container.encode(currentState, forKey: .currentState)
         try container.encode(historyState, forKey: .historyState)
+        try container.encode(name, forKey: .name)
+        try container.encode(system, forKey: .system)
     }
 
     override public init() {
@@ -45,9 +48,10 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
     open func update(from object: DAOSystemEndPoint) {
         super.update(from: object)
-        self.name = object.name
         self.currentState = object.currentState
         self.historyState = object.historyState
+        self.name = object.name
+        self.system = object.system
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOSystemEndPoint {
