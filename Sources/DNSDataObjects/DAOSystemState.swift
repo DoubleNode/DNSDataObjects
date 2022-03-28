@@ -12,6 +12,7 @@ open class DAOSystemState: DAOBaseObject {
     public enum State: String {
         case none
         case green
+        case orange
         case red
         case yellow
     }
