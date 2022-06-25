@@ -63,9 +63,9 @@ open class DAOActivityType: DAOBaseObject {
         super.update(from: object)
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOActivityType {
+        _ = super.dao(from: dictionary)
         self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        _ = super.dao(from: dictionary)
         return self
     }
     override open func dictionary() -> [String: Any?] {

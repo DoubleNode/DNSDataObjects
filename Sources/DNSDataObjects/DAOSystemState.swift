@@ -50,9 +50,9 @@ open class DAOSystemState: DAOBaseObject {
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOSystemState {
+        _ = super.dao(from: dictionary)
         let rawState = self.string(from: dictionary["state"] as Any?) ?? self.state.rawValue
         self.state = DAOSystemState.State(rawValue: rawState) ?? self.state
-        _ = super.dao(from: dictionary)
         return self
     }
     override open func dictionary() -> [String: Any?] {

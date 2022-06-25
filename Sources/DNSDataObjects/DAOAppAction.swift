@@ -72,6 +72,11 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         super.init(from: object)
         self.update(from: object)
     }
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+
     public func update(from object: DAOAppAction) {
         super.update(from: object)
         // swiftlint:disable force_cast
@@ -93,9 +98,8 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         let copy = DAOAppAction(from: self)
         return copy
     }
-    public func mee(from dictionary: [String: Any?]) -> DAOAppAction {
-        _ = self.dao(from: dictionary)
-
+    override public func dao(from dictionary: [String: Any?]) -> DAOAppAction {
+        _ = super.dao(from: dictionary)
         self.deepLink = self.url(from: dictionary["deepLink"] as Any?) ?? self.deepLink
         let typeString = self.string(from: dictionary["type"] as Any?) ?? "popup"
         self.actionType = ActionType(rawValue: typeString) ?? .popup

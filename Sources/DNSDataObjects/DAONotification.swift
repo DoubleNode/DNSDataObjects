@@ -61,13 +61,11 @@ open class DAONotification: DAOBaseObject {
     }
     
     open override func dao(from dictionary: [String: Any?]) -> DAOBaseObject {
+        _ = super.dao(from: dictionary)
         self.body = self.string(from: dictionary["body"] as Any?) ?? ""
         self.deepLink = self.url(from: self.localized(dictionary["deepLink"] as Any?))
         self.title = self.string(from: dictionary["title"] as Any?) ?? ""
         self.type = NotificationType.notificationType(for: self.string(from: dictionary["type"] as Any?) ?? "")
-        
-        _ = super.dao(from: dictionary)
-        
         return self
     }
 }

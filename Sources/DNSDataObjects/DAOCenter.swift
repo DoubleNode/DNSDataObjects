@@ -91,6 +91,7 @@ open class DAOCenter: DAOBaseObject {
         super.update(from: object)
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOCenter {
+        _ = super.dao(from: dictionary)
         self.centerNum = Int16(self.int(from: dictionary["id"] as Any?) ?? Int(self.centerNum))
         self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
@@ -108,8 +109,6 @@ open class DAOCenter: DAOBaseObject {
             beacons.append(DAOBeacon(from: beaconData))
         }
         self.beacons = beacons
-
-        _ = super.dao(from: dictionary)
         return self
     }
     override open func dictionary() -> [String: Any?] {

@@ -94,6 +94,7 @@ open class DAOActivity: DAOBaseObject {
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
+        _ = super.dao(from: dictionary)
         // TODO: Implement baseType import
         self.bookingEndTime = self.date(from: dictionary["bookingEndTime"] as Any?)
         self.bookingStartTime = self.date(from: dictionary["bookingStartTime"] as Any?)
@@ -105,7 +106,6 @@ open class DAOActivity: DAOBaseObject {
             beacons.append(DAOBeacon(from: beaconData))
         }
         self.beacons = beacons
-        _ = super.dao(from: dictionary)
         return self
     }
     override open func dictionary() -> [String: Any?] {

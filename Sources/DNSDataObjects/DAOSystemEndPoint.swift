@@ -55,12 +55,12 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOSystemEndPoint {
+        _ = super.dao(from: dictionary)
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
         let currentStateData = dictionary["currentState"] as? [String: Any?] ?? [:]
         self.currentState = DAOSystemState(from: currentStateData)
         let historyStateData = dictionary["historyState"] as? [[String: Any?]] ?? []
         self.historyState = historyStateData.map { DAOSystemState(from: $0) }
-        _ = super.dao(from: dictionary)
         return self
     }
 

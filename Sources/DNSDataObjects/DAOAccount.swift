@@ -70,12 +70,12 @@ open class DAOAccount: DAOBaseObject {
     }
 
     override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
+        _ = super.dao(from: dictionary)
         self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
         self.user = DAOUser(from: dictionary["user"] as? [String: Any?] ?? [:])
 
         let cards = dictionary["cards"] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }
-        _ = super.dao(from: dictionary)
         return self
     }
     override open func dictionary() -> [String: Any?] {
