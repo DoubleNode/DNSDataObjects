@@ -25,7 +25,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable {
     public var id: String
     public var meta: Metadata = Metadata()
 
-    private enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case id, metaUUID, metaCreated, metaSynced, metaUpdated
         case metaStatus, metaCreatedBy, metaUpdatedBy
     }
