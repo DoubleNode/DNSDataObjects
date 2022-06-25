@@ -44,7 +44,7 @@ open class DAOAppAction: DAOBaseObject, NSCopying {
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
     }
-    override public func encode(to encoder: Encoder) throws {
+    override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(actionType, forKey: .actionType)
