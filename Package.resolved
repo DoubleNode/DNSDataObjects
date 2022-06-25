@@ -54,15 +54,6 @@
           "revision": "12b5acf96d98f91d50de447369bd18df74600f1a",
           "version": "1.9.6"
         }
-      },
-      {
-        "package": "Tagging",
-        "repositoryURL": "https://github.com/alexruperez/Tagging",
-        "state": {
-          "branch": null,
-          "revision": "038ec53dc6fde61c0fe14744114e4758e57caf1a",
-          "version": "0.1.0"
-        }
       }
     ]
   },

@@ -6,14 +6,10 @@
 //  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
-//import DNSBaseStage
 import DNSCore
 import Foundation
-import Tagging
 
-public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
-    public typealias RawTag = DNSString
-
+open class DAOAppAction: DAOBaseObject, NSCopying {
     public enum ActionType: String, CaseIterable, Codable {
         case popup
     }
@@ -26,13 +22,12 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
     public var imageUrl: DNSURL = DNSURL()
     public var okayLabel: DNSString = DNSString()
     public var subTitle: DNSString = DNSString()
-    public var tags: Tags = []
     public var title: DNSString = DNSString()
 
     // TODO: Finish adding Coding Keys
     public enum CodingKeys: String, CodingKey {
         case actionType, body, cancelLabel, deepLink, disclaimer,
-             imageUrl, okayLabel, subTitle, tags, tag1, title
+             imageUrl, okayLabel, subTitle, title
     }
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -44,7 +39,6 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         imageUrl = try container.decode(DNSURL.self, forKey: .imageUrl)
         okayLabel = try container.decode(DNSString.self, forKey: .okayLabel)
         subTitle = try container.decode(DNSString.self, forKey: .subTitle)
-        tags = try container.decode(Tags.self, forKey: .tags)
         title = try container.decode(DNSString.self, forKey: .title)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
@@ -61,7 +55,6 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         try container.encode(imageUrl, forKey: .imageUrl)
         try container.encode(okayLabel, forKey: .okayLabel)
         try container.encode(subTitle, forKey: .subTitle)
-        try container.encode(tags, forKey: .tags)
         try container.encode(title, forKey: .title)
     }
 
@@ -77,7 +70,7 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         _ = self.dao(from: dictionary)
     }
 
-    public func update(from object: DAOAppAction) {
+    open func update(from object: DAOAppAction) {
         super.update(from: object)
         // swiftlint:disable force_cast
         self.actionType = object.actionType
@@ -88,17 +81,16 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
         self.imageUrl = object.imageUrl.copy() as! DNSURL
         self.okayLabel = object.okayLabel.copy() as! DNSString
         self.subTitle = object.subTitle.copy() as! DNSString
-        self.tags = object.tags
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 
     // NSCopying protocol methods
-    public func copy(with zone: NSZone? = nil) -> Any {
+    open func copy(with zone: NSZone? = nil) -> Any {
         let copy = DAOAppAction(from: self)
         return copy
     }
-    override public func dao(from dictionary: [String: Any?]) -> DAOAppAction {
+    override open func dao(from dictionary: [String: Any?]) -> DAOAppAction {
         _ = super.dao(from: dictionary)
         self.deepLink = self.url(from: dictionary["deepLink"] as Any?) ?? self.deepLink
         let typeString = self.string(from: dictionary["type"] as Any?) ?? "popup"
@@ -117,14 +109,9 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
 
         let imagesData = dictionary["images"] as? [String: Any] ?? [:]
         self.imageUrl = self.dnsurl(from: imagesData["top"]) ?? self.imageUrl
-
-        let tagsStrings = dictionary["tags"] as? [Any] ?? []
-        self.tags = tagsStrings.compactMap {
-            Tag<DAOAppAction>(rawValue: self.dnsstring(from: $0) ?? DNSString())
-        }
         return self
     }
-    public func isDiffFrom(_ rhs: Any?) -> Bool {
+    open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOAppAction else { return true }
         let lhs = self
         return lhs.actionType != rhs.actionType
@@ -135,7 +122,6 @@ public final class DAOAppAction: DAOBaseObject, Taggable, NSCopying {
             || lhs.imageUrl != rhs.imageUrl
             || lhs.okayLabel != rhs.okayLabel
             || lhs.subTitle != rhs.subTitle
-            || lhs.tags != rhs.tags
             || lhs.title != rhs.title
     }
 }
