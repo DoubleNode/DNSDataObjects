@@ -9,14 +9,14 @@
 import DNSCore
 import Foundation
 
-public class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
-    var sunday: Bool = true
-    var monday: Bool = true
-    var tuesday: Bool = true
-    var wednesday: Bool = true
-    var thursday: Bool = true
-    var friday: Bool = true
-    var saturday: Bool = true
+open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
+    public var sunday: Bool = true
+    public var monday: Bool = true
+    public var tuesday: Bool = true
+    public var wednesday: Bool = true
+    public var thursday: Bool = true
+    public var friday: Bool = true
+    public var saturday: Bool = true
 
     // Equatable protocol methods
     static public func ==(lhs: DAODayOfWeekFlags, rhs: DAODayOfWeekFlags) -> Bool {
@@ -30,7 +30,7 @@ public class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
     }
 
     // Hashable protocol methods
-    public func hash(into hasher: inout Hasher) {
+    open func hash(into hasher: inout Hasher) {
         hasher.combine(sunday)
         hasher.combine(monday)
         hasher.combine(tuesday)
