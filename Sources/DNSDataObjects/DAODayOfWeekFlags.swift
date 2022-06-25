@@ -18,6 +18,8 @@ open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
     public var friday: Bool = true
     public var saturday: Bool = true
 
+    public init() { }
+
     // Equatable protocol methods
     static public func ==(lhs: DAODayOfWeekFlags, rhs: DAODayOfWeekFlags) -> Bool {
         return lhs.sunday == rhs.sunday &&
