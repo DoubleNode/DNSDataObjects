@@ -17,20 +17,20 @@ open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
     public var thursday: Bool = true
     public var friday: Bool = true
     public var saturday: Bool = true
-
+    
     public init() { }
-
+    
     // Equatable protocol methods
     static public func ==(lhs: DAODayOfWeekFlags, rhs: DAODayOfWeekFlags) -> Bool {
         return lhs.sunday == rhs.sunday &&
-            lhs.monday == rhs.monday &&
-            lhs.tuesday == rhs.tuesday &&
-            lhs.wednesday == rhs.wednesday &&
-            lhs.thursday == rhs.thursday &&
-            lhs.friday == rhs.friday &&
-            lhs.saturday == rhs.saturday
+        lhs.monday == rhs.monday &&
+        lhs.tuesday == rhs.tuesday &&
+        lhs.wednesday == rhs.wednesday &&
+        lhs.thursday == rhs.thursday &&
+        lhs.friday == rhs.friday &&
+        lhs.saturday == rhs.saturday
     }
-
+    
     // Hashable protocol methods
     open func hash(into hasher: inout Hasher) {
         hasher.combine(sunday)
@@ -41,7 +41,7 @@ open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
         hasher.combine(friday)
         hasher.combine(saturday)
     }
-
+    
     // NSCopying protocol methods
     open func copy(with zone: NSZone? = nil) -> Any {
         let copy = DAODayOfWeekFlags()
