@@ -26,6 +26,7 @@ open class DAOBeacon: DAOBaseObject {
     public var rssi: Int?
     public var data: CLBeacon?
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

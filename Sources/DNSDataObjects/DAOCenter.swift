@@ -18,6 +18,7 @@ open class DAOCenter: DAOBaseObject {
     public var name: String = ""
     open var activities: [DAOActivity] = []
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

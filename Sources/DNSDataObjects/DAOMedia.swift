@@ -14,10 +14,11 @@ open class DAOMedia: DAOBaseObject {
         case type, url, preloadUrl
     }
 
-    var type: DNSMediaType = .unknown
-    var url: DNSURL = DNSURL()
-    var preloadUrl: DNSURL = DNSURL()
+    public var type: DNSMediaType = .unknown
+    public var url: DNSURL = DNSURL()
+    public var preloadUrl: DNSURL = DNSURL()
 
+    // MARK: - Initializers -
     public init(type: DNSMediaType) {
         self.type = type
         super.init()

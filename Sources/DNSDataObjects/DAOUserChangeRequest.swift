@@ -16,6 +16,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     public var user: DAOUser?
     public var requestedRole: DNSUserRole = .user
     
+    // MARK: - Initializers -
     public init(user: DAOUser) {
         self.user = user
         super.init()

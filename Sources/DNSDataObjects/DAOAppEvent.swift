@@ -17,8 +17,8 @@ open class DAOAppEvent: DAOBaseObject {
     public static var defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
     public static var defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
 
-    var endTime: Date = DAOAppEvent.defaultEndTime
-    var priority: Int = DNSPriority.normal {
+    public var endTime: Date = DAOAppEvent.defaultEndTime
+    public var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
                 priority = DNSPriority.highest
@@ -27,9 +27,10 @@ open class DAOAppEvent: DAOBaseObject {
             }
         }
     }
-    var startTime: Date = DAOAppEvent.defaultStartTime
-    var title: DNSString = DNSString()
+    public var startTime: Date = DAOAppEvent.defaultStartTime
+    public var title: DNSString = DNSString()
 
+    // MARK: - Initializers -
     public init(title: DNSString = DNSString(),
                 startTime: Date = DAOAppEvent.defaultStartTime,
                 endTime: Date = DAOAppEvent.defaultEndTime) {

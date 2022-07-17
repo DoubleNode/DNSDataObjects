@@ -29,6 +29,7 @@ open class DAOAppAction: DAOBaseObject {
     public var subTitle: DNSString = DNSString()
     public var title: DNSString = DNSString()
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

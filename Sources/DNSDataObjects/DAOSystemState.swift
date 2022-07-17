@@ -15,6 +15,7 @@ open class DAOSystemState: DAOBaseObject {
     
     public var state: DNSSystemState = .green
     
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

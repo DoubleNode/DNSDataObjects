@@ -19,6 +19,7 @@ open class DAOSystem: DAOBaseObject {
     public var endPoints: [DAOSystemEndPoint] = []
     public var historyState: [DAOSystemState] = []
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

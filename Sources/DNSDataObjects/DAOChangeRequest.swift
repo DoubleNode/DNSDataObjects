@@ -9,6 +9,7 @@
 import Foundation
 
 open class DAOChangeRequest: DAOBaseObject {
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

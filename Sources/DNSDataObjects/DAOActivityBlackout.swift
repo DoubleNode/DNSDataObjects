@@ -18,6 +18,7 @@ open class DAOActivityBlackout: DAOBaseObject {
     public var message: DNSString = DNSString()
     public var startTime: Date?
 
+    // MARK: - Initializers -
     public override init() {
         super.init()
     }

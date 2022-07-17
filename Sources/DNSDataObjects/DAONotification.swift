@@ -19,6 +19,7 @@ open class DAONotification: DAOBaseObject {
     public var title = ""
     public var type: DNSNotificationType = .unknown
     
+    // MARK: - Initializers -
     public init(type: DNSNotificationType) {
         self.type = type
         super.init()

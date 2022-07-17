@@ -22,6 +22,7 @@ open class DAOUser: DAOBaseObject {
     public var favorites: [DAOActivityType] = []
     open var myCenter: DAOCenter?
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

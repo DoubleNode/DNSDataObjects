@@ -16,6 +16,7 @@ open class DAOActivityType: DAOBaseObject {
     public var code: String = ""
     public var name: String = ""
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

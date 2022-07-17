@@ -30,6 +30,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     public var id: String = ""
     public var meta: Metadata = Metadata()
 
+    // MARK: - Initializers -
     public override init() {
         super.init()
         self.id = self.meta.uuid.uuidString

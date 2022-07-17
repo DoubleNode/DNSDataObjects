@@ -17,6 +17,7 @@ open class DAOCard: DAOBaseObject {
     public var nickname: String = ""
     public var pinNumber: String = ""
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }

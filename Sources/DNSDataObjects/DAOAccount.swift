@@ -20,6 +20,7 @@ open class DAOAccount: DAOBaseObject {
     public var emailNotifications: Bool = false
     public var pushNotifications: Bool = false
 
+    // MARK: - Initializers -
     override public init() {
         super.init()
     }
