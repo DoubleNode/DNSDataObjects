@@ -48,19 +48,19 @@ open class DAONotification: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAONotification {
         _ = super.dao(from: dictionary)
-        self.body = self.string(from: dictionary["body"] as Any?) ?? self.body
-        self.deepLink = self.dnsurl(from: dictionary["deepLink"] as Any?) ?? self.deepLink
-        self.title = self.string(from: dictionary["title"] as Any?) ?? self.title
-        self.type = DNSNotificationType(rawValue: self.string(from: dictionary["type"] as Any?) ?? "") ?? .unknown
+        self.body = self.string(from: dictionary[CodingKeys.body.rawValue] as Any?) ?? self.body
+        self.deepLink = self.dnsurl(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
+        self.title = self.string(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
+        self.type = DNSNotificationType(rawValue: self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? "") ?? .unknown
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "body": self.body,
-            "deepLink": self.deepLink,
-            "title": self.title,
-            "type": self.type,
+            CodingKeys.body.rawValue: self.body,
+            CodingKeys.deepLink.rawValue: self.deepLink,
+            CodingKeys.title.rawValue: self.title,
+            CodingKeys.type.rawValue: self.type,
         ]) { (current, _) in current }
         return retval
     }

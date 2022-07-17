@@ -55,19 +55,19 @@ open class DAOBeacon: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOBeacon {
         _ = super.dao(from: dictionary)
-        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
-        self.range = self.string(from: dictionary["range"] as Any?) ?? self.range
-        self.accuracy = self.double(from: dictionary["accuracy"] as Any?) ?? self.accuracy
-        self.rssi = self.int(from: dictionary["rssi"] as Any?) ?? self.rssi
+        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
+        self.range = self.string(from: dictionary[CodingKeys.range.rawValue] as Any?) ?? self.range
+        self.accuracy = self.double(from: dictionary[CodingKeys.accuracy.rawValue] as Any?) ?? self.accuracy
+        self.rssi = self.int(from: dictionary[CodingKeys.rssi.rawValue] as Any?) ?? self.rssi
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "code": self.code,
-            "range": self.range,
-            "accuracy": self.accuracy,
-            "rssi": self.rssi,
+            CodingKeys.code.rawValue: self.code,
+            CodingKeys.range.rawValue: self.range,
+            CodingKeys.accuracy.rawValue: self.accuracy,
+            CodingKeys.rssi.rawValue: self.rssi,
         ]) { (current, _) in current }
         return retval
     }

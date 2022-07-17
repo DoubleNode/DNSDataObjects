@@ -50,17 +50,17 @@ open class DAOCard: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOCard {
         _ = super.dao(from: dictionary)
-        self.cardNumber = self.string(from: dictionary["cardNumber"] as Any?) ?? self.cardNumber
-        self.nickname = self.string(from: dictionary["nickname"] as Any?) ?? self.nickname
-        self.pinNumber = self.string(from: dictionary["pinNumber"] as Any?) ?? self.pinNumber
+        self.cardNumber = self.string(from: dictionary[CodingKeys.cardNumber.rawValue] as Any?) ?? self.cardNumber
+        self.nickname = self.string(from: dictionary[CodingKeys.nickname.rawValue] as Any?) ?? self.nickname
+        self.pinNumber = self.string(from: dictionary[CodingKeys.pinNumber.rawValue] as Any?) ?? self.pinNumber
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "cardNumber": self.cardNumber,
-            "nickname": self.nickname,
-            "pinNumber": self.pinNumber,
+            CodingKeys.cardNumber.rawValue: self.cardNumber,
+            CodingKeys.nickname.rawValue: self.nickname,
+            CodingKeys.pinNumber.rawValue: self.pinNumber,
         ]) { (current, _) in current }
         return retval
     }

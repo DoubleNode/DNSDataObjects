@@ -10,7 +10,8 @@ import Foundation
 
 open class DAOUser: DAOBaseObject {
     public enum CodingKeys: String, CodingKey {
-        case email, firstName, lastName, phone, dob, cards, favorites, myCenter
+        case email, firstName, lastName, phone, dob
+        case cards, favorites, myCenter
     }
 
     public var email: String = ""
@@ -62,33 +63,33 @@ open class DAOUser: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOUser {
         _ = super.dao(from: dictionary)
-        self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
-        self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
-        self.lastName = self.string(from: dictionary["lastName"] as Any?) ?? self.lastName
-        self.phone = self.string(from: dictionary["phone"] as Any?) ?? self.phone
-        self.dob = self.date(from: dictionary["dateOfBirth"] as Any?) ?? self.dob
+        self.email = self.string(from: dictionary[CodingKeys.email.rawValue]  as Any?) ?? self.email
+        self.firstName = self.string(from: dictionary[CodingKeys.firstName.rawValue] as Any?) ?? self.firstName
+        self.lastName = self.string(from: dictionary[CodingKeys.lastName.rawValue] as Any?) ?? self.lastName
+        self.phone = self.string(from: dictionary[CodingKeys.phone.rawValue] as Any?) ?? self.phone
+        self.dob = self.date(from: dictionary[CodingKeys.dob.rawValue] as Any?) ?? self.dob
 
-        let cardsData = dictionary["cards"] as? [[String: Any?]] ?? []
+        let cardsData = dictionary[CodingKeys.cards.rawValue] as? [[String: Any?]] ?? []
         self.cards = cardsData.map { DAOCard(from: $0) }
 
-        let favoritesData = dictionary["favorites"] as? [[String: Any?]] ?? []
+        let favoritesData = dictionary[CodingKeys.favorites.rawValue] as? [[String: Any?]] ?? []
         self.favorites = favoritesData.map { DAOActivityType(from: $0) }
 
-        let myCenterData = dictionary["myCenter"] as? [String: Any?] ?? [:]
+        let myCenterData = dictionary[CodingKeys.myCenter.rawValue] as? [String: Any?] ?? [:]
         self.myCenter = DAOCenter(from: myCenterData)
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "email": self.email,
-            "firstName": self.firstName,
-            "lastName": self.lastName,
-            "phone": self.phone,
-            "dateOfBirth": self.dob,
-            "cards": self.cards.map { $0.asDictionary },
-            "favorites": self.favorites.map { $0.asDictionary },
-            "myCenter": self.myCenter?.asDictionary,
+            CodingKeys.email.rawValue: self.email,
+            CodingKeys.firstName.rawValue: self.firstName,
+            CodingKeys.lastName.rawValue: self.lastName,
+            CodingKeys.phone.rawValue: self.phone,
+            CodingKeys.dob.rawValue: self.dob,
+            CodingKeys.cards.rawValue: self.cards.map { $0.asDictionary },
+            CodingKeys.favorites.rawValue: self.favorites.map { $0.asDictionary },
+            CodingKeys.myCenter.rawValue: self.myCenter?.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

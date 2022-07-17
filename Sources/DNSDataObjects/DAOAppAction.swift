@@ -58,7 +58,7 @@ open class DAOAppAction: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOAppAction {
         _ = super.dao(from: dictionary)
-        let typeString = self.string(from: dictionary[CodingKeys.actionType.rawValue] as Any?) ?? "popup"
+        let typeString = self.string(from: dictionary[CodingKeys.actionType.rawValue] as Any?) ?? ""
         self.actionType = DNSActionType(rawValue: typeString) ?? .popup
         self.deepLink = self.url(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
 

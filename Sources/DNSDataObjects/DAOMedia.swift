@@ -43,18 +43,18 @@ open class DAOMedia: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOMedia {
         _ = super.dao(from: dictionary)
-        let typeData = self.string(from: dictionary["type"] as Any?) ?? self.type.rawValue
+        let typeData = self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? self.type.rawValue
         self.type = DNSMediaType(rawValue: typeData) ?? .unknown
-        self.url = self.dnsurl(from: dictionary["url"] as Any?) ?? self.url
-        self.preloadUrl = self.dnsurl(from: dictionary["preloadUrl"] as Any?) ?? self.preloadUrl
+        self.url = self.dnsurl(from: dictionary[CodingKeys.url.rawValue] as Any?) ?? self.url
+        self.preloadUrl = self.dnsurl(from: dictionary[CodingKeys.preloadUrl.rawValue] as Any?) ?? self.preloadUrl
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "type": self.type.rawValue,
-            "url": self.url.asDictionary,
-            "preloadUrl": self.preloadUrl.asDictionary,
+            CodingKeys.type.rawValue: self.type.rawValue,
+            CodingKeys.url.rawValue: self.url.asDictionary,
+            CodingKeys.preloadUrl.rawValue: self.preloadUrl.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

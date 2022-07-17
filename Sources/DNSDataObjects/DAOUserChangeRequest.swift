@@ -40,15 +40,17 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOChangeRequest {
         _ = super.dao(from: dictionary)
-        let userData: [String: Any?] = dictionary["user"] as? [String : Any?] ?? [:]
+        let userData: [String: Any?] = dictionary[CodingKeys.user.rawValue] as? [String : Any?] ?? [:]
         self.user = DAOUser(from: userData)
-        let roleData = self.int(from: dictionary["requestedRole"] as Any?) ?? self.requestedRole.rawValue
+        let roleData = self.int(from: dictionary[CodingKeys.requestedRole.rawValue] as Any?) ?? self.requestedRole.rawValue
         self.requestedRole = DNSUserRole(rawValue: roleData) ?? .user
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
+            CodingKeys.user.rawValue: self.user?.asDictionary,
+            CodingKeys.requestedRole.rawValue: self.requestedRole.rawValue,
         ]) { (current, _) in current }
         return retval
     }
