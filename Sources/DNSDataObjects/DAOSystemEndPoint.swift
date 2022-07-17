@@ -13,9 +13,9 @@ open class DAOSystemEndPoint: DAOBaseObject {
         case currentState, historyState, name, system
     }
 
-    public var currentState: DAOSystemState?
+    public var currentState = DAOSystemState()
     public var name: String = ""
-    public var system: DAOSystem?
+    public var system = DAOSystem()
     public var historyState: [DAOSystemState] = []
 
     // MARK: - Initializers -
@@ -43,22 +43,22 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOSystemEndPoint {
         _ = super.dao(from: dictionary)
-        let currentStateData = dictionary["currentState"] as? [String: Any?] ?? [:]
+        let currentStateData = dictionary[CodingKeys.currentState.rawValue] as? [String: Any?] ?? [:]
         self.currentState = DAOSystemState(from: currentStateData)
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        let systemData = dictionary["system"] as? [String: Any?] ?? [:]
+        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+        let systemData = dictionary[CodingKeys.system.rawValue] as? [String: Any?] ?? [:]
         self.system = DAOSystem(from: systemData)
-        let historyStateData = dictionary["historyState"] as? [[String: Any?]] ?? []
+        let historyStateData = dictionary[CodingKeys.historyState.rawValue] as? [[String: Any?]] ?? []
         self.historyState = historyStateData.map { DAOSystemState(from: $0) }
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "currentState": self.currentState?.asDictionary ?? [:],
-            "name": self.name,
-            "system": self.system?.asDictionary ?? [:],
-            "historyState": self.historyState,
+            CodingKeys.currentState.rawValue: self.currentState.asDictionary,
+            CodingKeys.name.rawValue: self.name,
+            CodingKeys.system.rawValue: self.system.asDictionary,
+            CodingKeys.historyState.rawValue: self.historyState,
         ]) { (current, _) in current }
         return retval
     }

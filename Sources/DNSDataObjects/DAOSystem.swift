@@ -6,6 +6,7 @@
 //  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOSystem: DAOBaseObject {
@@ -13,9 +14,9 @@ open class DAOSystem: DAOBaseObject {
         case message, name, currentState, endPoints, historyState
     }
 
-    public var message: String = ""
-    public var name: String = ""
-    public var currentState: DAOSystemState?
+    public var message = DNSString()
+    public var name = DNSString()
+    public var currentState = DAOSystemState()
     public var endPoints: [DAOSystemEndPoint] = []
     public var historyState: [DAOSystemState] = []
 
@@ -45,23 +46,24 @@ open class DAOSystem: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
         _ = super.dao(from: dictionary)
-        self.message = self.string(from: dictionary["message"] as Any?) ?? self.message
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        let currentStateData = dictionary["currentState"] as? [String: Any?] ?? [:]
+        self.message = self.dnsstring(from: dictionary[CodingKeys.message.rawValue] as Any?) ?? self.message
+        self.name = self.dnsstring(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+        let currentStateData = dictionary[CodingKeys.currentState.rawValue] as? [String: Any?] ?? [:]
         self.currentState = DAOSystemState(from: currentStateData)
-//        let endPointsData = dictionary["historyState"] as? [[String: Any?]] ?? []
-//        self.endPoints = endPointsData.map { DAOSystemEndPoint(from: $0) }
-        let historyStateData = dictionary["historyState"] as? [[String: Any?]] ?? []
+        let endPointsData = dictionary[CodingKeys.endPoints.rawValue] as? [[String: Any?]] ?? []
+        self.endPoints = endPointsData.map { DAOSystemEndPoint(from: $0) }
+        let historyStateData = dictionary[CodingKeys.historyState.rawValue] as? [[String: Any?]] ?? []
         self.historyState = historyStateData.map { DAOSystemState(from: $0) }
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "message": self.message,
-            "name": self.name,
-            "currentState": self.currentState?.asDictionary ?? [:],
-            "historyState": self.historyState,
+            CodingKeys.message.rawValue: self.message,
+            CodingKeys.name.rawValue: self.name,
+            CodingKeys.currentState.rawValue: self.currentState.asDictionary,
+            CodingKeys.endPoints.rawValue: self.endPoints.map { $0.asDictionary },
+            CodingKeys.historyState.rawValue: self.historyState.map { $0.asDictionary },
         ]) { (current, _) in current }
         return retval
     }
@@ -70,8 +72,8 @@ open class DAOSystem: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        message = try container.decode(String.self, forKey: .message)
-        name = try container.decode(String.self, forKey: .name)
+        message = try container.decode(DNSString.self, forKey: .message)
+        name = try container.decode(DNSString.self, forKey: .name)
         currentState = try container.decode(DAOSystemState.self, forKey: .currentState)
         endPoints = try container.decode([DAOSystemEndPoint].self, forKey: .endPoints)
         historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
