@@ -90,8 +90,3 @@ open class DAOMedia: DAOBaseObject {
             || lhs.preloadUrl != rhs.preloadUrl
     }
 }
-public extension DAOMedia {
-    func display(using helper: DNSMediaDisplay) {
-        helper.display(from: self)
-    }
-}

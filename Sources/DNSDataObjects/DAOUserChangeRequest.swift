@@ -62,7 +62,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
+//        var container = encoder.container(keyedBy: CodingKeys.self)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -73,7 +73,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOChangeRequest else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
-        let lhs = self
+//        let lhs = self
         return false
     }
 }
