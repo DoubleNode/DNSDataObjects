@@ -56,20 +56,22 @@ open class DAOActivity: DAOBaseObject {
     override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
         _ = super.dao(from: dictionary)
         // TODO: Implement baseType import
-        self.bookingEndTime = self.date(from: dictionary["bookingEndTime"] as Any?)
-        self.bookingStartTime = self.date(from: dictionary["bookingStartTime"] as Any?)
-        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        let baseTypeData = dictionary[CodingKeys.baseType.rawValue] as? [String: Any?] ?? [:]
+        self.baseType = DAOActivityType(from: baseTypeData)
+        self.bookingEndTime = self.date(from: dictionary[CodingKeys.bookingEndTime.rawValue] as Any?)
+        self.bookingStartTime = self.date(from: dictionary[CodingKeys.bookingStartTime.rawValue] as Any?)
+        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
+        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "baseType": self.baseType?.asDictionary,
-            "bookingEndTime": self.bookingEndTime,
-            "bookingStartTime": self.bookingStartTime,
-            "code": self.code,
-            "name": self.name,
+            CodingKeys.baseType.rawValue: self.baseType?.asDictionary,
+            CodingKeys.bookingEndTime.rawValue: self.bookingEndTime,
+            CodingKeys.bookingStartTime.rawValue: self.bookingStartTime,
+            CodingKeys.code.rawValue: self.code,
+            CodingKeys.name.rawValue: self.name,
         ]) { (current, _) in current }
         return retval
     }

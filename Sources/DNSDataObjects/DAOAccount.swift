@@ -54,25 +54,25 @@ open class DAOAccount: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
         _ = super.dao(from: dictionary)
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        self.user = DAOUser(from: dictionary["user"] as? [String: Any?] ?? [:])
+        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+        self.user = DAOUser(from: dictionary[CodingKeys.user.rawValue] as? [String: Any?] ?? [:])
         
-        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
+        let cards = dictionary[CodingKeys.cards.rawValue] as? [[String: Any?]] ?? []
         self.cards = cards.map { DAOCard(from: $0) }
-        self.emailNotifications = self.bool(from: dictionary["emailNotifications"] ??
+        self.emailNotifications = self.bool(from: dictionary[CodingKeys.emailNotifications.rawValue] ??
                                             self.emailNotifications)!
-        self.pushNotifications = self.bool(from: dictionary["pushNotifications"] ??
+        self.pushNotifications = self.bool(from: dictionary[CodingKeys.pushNotifications.rawValue] ??
                                            self.pushNotifications)!
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "name": self.name,
-            "user": self.user?.asDictionary,
-            "cards": self.cards.map { $0.asDictionary },
-            "emailNotifications": self.emailNotifications,
-            "pushNotifications": self.pushNotifications,
+            CodingKeys.name.rawValue: self.name,
+            CodingKeys.user.rawValue: self.user?.asDictionary,
+            CodingKeys.cards.rawValue: self.cards.map { $0.asDictionary },
+            CodingKeys.emailNotifications.rawValue: self.emailNotifications,
+            CodingKeys.pushNotifications.rawValue: self.pushNotifications,
         ]) { (current, _) in current }
         return retval
     }

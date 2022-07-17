@@ -60,19 +60,19 @@ open class DAOAppEvent: DAOBaseObject {
     }
     override open func dao(from dictionary: [String: Any?]) -> DAOAppEvent {
         _ = super.dao(from: dictionary)
-        self.endTime = self.time(from: dictionary["endTime"] as Any?) ?? self.endTime
-        self.priority = self.int(from: dictionary["priority"] as Any?) ?? self.priority
-        self.startTime = self.time(from: dictionary["startTime"] as Any?) ?? self.startTime
-        self.title = self.dnsstring(from: dictionary["title"] as Any?) ?? self.title
+        self.endTime = self.time(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
+        self.priority = self.int(from: dictionary[CodingKeys.priority.rawValue] as Any?) ?? self.priority
+        self.startTime = self.time(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
+        self.title = self.dnsstring(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "endTime": self.endTime,
-            "priority": self.priority,
-            "startTime": self.startTime,
-            "title": self.title.asDictionary,
+            CodingKeys.endTime.rawValue: self.endTime,
+            CodingKeys.priority.rawValue: self.priority,
+            CodingKeys.startTime.rawValue: self.startTime,
+            CodingKeys.title.rawValue: self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

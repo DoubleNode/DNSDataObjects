@@ -42,17 +42,17 @@ open class DAOActivityBlackout: DAOBaseObject {
     }
     open override func dao(from dictionary: [String: Any?]) -> DAOActivityBlackout {
         _ = super.dao(from: dictionary)
-        self.endTime = self.date(from: dictionary["endTime"] as Any?) ?? self.endTime
-        self.message = self.dnsstring(from: dictionary["message"] as Any?) ?? self.message
-        self.startTime = self.date(from: dictionary["startTime"] as Any?) ?? self.startTime
+        self.endTime = self.date(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
+        self.message = self.dnsstring(from: dictionary[CodingKeys.message.rawValue] as Any?) ?? self.message
+        self.startTime = self.date(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
         return self
     }
     override open var asDictionary: [String: Any?] {
         var retval = super.asDictionary
         retval.merge([
-            "endTime": self.endTime,
-            "message": self.message.asDictionary,
-            "startTime": self.startTime,
+            CodingKeys.endTime.rawValue: self.endTime,
+            CodingKeys.message.rawValue: self.message.asDictionary,
+            CodingKeys.startTime.rawValue: self.startTime,
         ]) { (current, _) in current }
         return retval
     }
