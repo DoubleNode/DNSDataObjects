@@ -9,29 +9,100 @@
 import Foundation
 
 open class DAOUser: DAOBaseObject {
-    public var email: String
-    public var firstName: String
-    public var lastName: String
+    public enum CodingKeys: String, CodingKey {
+        case email, firstName, lastName, phone, dob, cards, favorites, myCenter
+    }
+
+    public var email: String = ""
+    public var firstName: String = ""
+    public var lastName: String = ""
     public var phone: String = ""
     public var dob: Date?
     public var cards: [DAOCard] = []
-    public var favoritedActivityTypes: [DAOActivityType] = []
+    public var favorites: [DAOActivityType] = []
     open var myCenter: DAOCenter?
 
-    private enum CodingKeys: String, CodingKey {
-        case email, firstName, lastName, phone, dob, cards, favoritedActivityTypes, myCenter
+    override public init() {
+        super.init()
     }
+    override public init(id: String) {
+        super.init(id: id)
+    }
+    public init(id: String, email: String, firstName: String, lastName: String) {
+        self.email = email
+        self.firstName = firstName
+        self.lastName = lastName
+        self.phone = ""
+        self.dob = nil
+        super.init(id: id)
+    }
+
+    // MARK: - DAO copy methods -
+    public init(from object: DAOUser) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOUser) {
+        super.update(from: object)
+        self.email = object.email
+        self.firstName = object.firstName
+        self.lastName = object.lastName
+        self.phone = object.phone
+        self.dob = object.dob
+        self.cards = object.cards
+        self.favorites = object.favorites
+        self.myCenter = object.myCenter
+    }
+
+    // MARK: - DAO translation methods -
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAOUser {
+        _ = super.dao(from: dictionary)
+        self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
+        self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
+        self.lastName = self.string(from: dictionary["lastName"] as Any?) ?? self.lastName
+        self.phone = self.string(from: dictionary["phone"] as Any?) ?? self.phone
+        self.dob = self.date(from: dictionary["dateOfBirth"] as Any?) ?? self.dob
+
+        let cardsData = dictionary["cards"] as? [[String: Any?]] ?? []
+        self.cards = cardsData.map { DAOCard(from: $0) }
+
+        let favoritesData = dictionary["favorites"] as? [[String: Any?]] ?? []
+        self.favorites = favoritesData.map { DAOActivityType(from: $0) }
+
+        let myCenterData = dictionary["myCenter"] as? [String: Any?] ?? [:]
+        self.myCenter = DAOCenter(from: myCenterData)
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "email": self.email,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "phone": self.phone,
+            "dateOfBirth": self.dob,
+            "cards": self.cards.map { $0.asDictionary },
+            "favorites": self.favorites.map { $0.asDictionary },
+            "myCenter": self.myCenter?.asDictionary,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         email = try container.decode(String.self, forKey: .email)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
         phone = try container.decode(String.self, forKey: .phone)
-        dob = try container.decode(Date.self, forKey: .dob)
+        dob = try container.decode(Date?.self, forKey: .dob)
         cards = try container.decode([DAOCard].self, forKey: .cards)
-        favoritedActivityTypes = try container.decode([DAOActivityType].self, forKey: .favoritedActivityTypes)
+        favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
         myCenter = try container.decode(DAOCenter.self, forKey: .myCenter)
-
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -43,88 +114,27 @@ open class DAOUser: DAOBaseObject {
         try container.encode(firstName, forKey: .firstName)
         try container.encode(lastName, forKey: .lastName)
         try container.encode(phone, forKey: .phone)
-        if dob != nil { try container.encode(dob, forKey: .dob) }
+        try container.encode(dob, forKey: .dob)
         try container.encode(cards, forKey: .cards)
-        try container.encode(favoritedActivityTypes, forKey: .favoritedActivityTypes)
-        if myCenter != nil { try container.encode(myCenter, forKey: .myCenter) }
+        try container.encode(favorites, forKey: .favorites)
+        try container.encode(myCenter, forKey: .myCenter)
     }
 
-    override public init() {
-        self.email = ""
-        self.firstName = ""
-        self.lastName = ""
-        self.phone = ""
-        self.dob = nil
-        super.init()
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOUser(from: self)
+        return copy
     }
-    override public init(id: String) {
-        self.email = ""
-        self.firstName = ""
-        self.lastName = ""
-        self.phone = ""
-        self.dob = nil
-        super.init(id: id)
-    }
-    override public init(from dictionary: [String: Any?]) {
-        self.email = ""
-        self.firstName = ""
-        self.lastName = ""
-        self.phone = ""
-        self.dob = nil
-        super.init()
-        _ = self.dao(from: dictionary)
-    }
-    
-    public init(from object: DAOUser) {
-        self.email = object.email
-        self.firstName = object.firstName
-        self.lastName = object.lastName
-        self.phone = object.phone
-        self.dob = object.dob
-        self.cards = object.cards
-        super.init(from: object)
-    }
-    public init(id: String, email: String, firstName: String, lastName: String) {
-        self.email = email
-        self.firstName = firstName
-        self.lastName = lastName
-        self.phone = ""
-        self.dob = nil
-        super.init(id: id)
-    }
-
-    open func update(from object: DAOUser) {
-        self.email = object.email
-        self.firstName = object.firstName
-        self.lastName = object.lastName
-        self.phone = object.phone
-        self.dob = object.dob
-        self.cards = object.cards
-        self.favoritedActivityTypes = object.favoritedActivityTypes
-        self.myCenter = object.myCenter
-        super.update(from: object)
-    }
-    override open func dao(from dictionary: [String: Any?]) -> DAOUser {
-        _ = super.dao(from: dictionary)
-        self.email = self.string(from: dictionary["email"]  as Any?) ?? self.email
-        self.firstName = self.string(from: dictionary["firstName"] as Any?) ?? self.firstName
-        self.lastName = self.string(from: dictionary["lastName"] as Any?) ?? self.lastName
-        self.phone = self.string(from: dictionary["phone"] as Any?) ?? self.phone
-        self.dob = self.date(from: dictionary["dateOfBirth"] as Any?) ?? self.dob
-
-        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
-        self.cards = cards.map { DAOCard(from: $0) }
-        return self
-    }
-    override open func dictionary() -> [String: Any?] {
-        var retval = super.dictionary()
-        retval.merge([
-            "email": self.email,
-            "firstName": self.firstName,
-            "lastName": self.lastName,
-            "phone": self.phone,
-            "dateOfBirth": self.dob?.dnsDate() ?? "",
-        ]) { (current, _) in current }
-        return retval
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOUser else { return true }
+        let lhs = self
+        return lhs.email != rhs.email
+            || lhs.firstName != rhs.firstName
+            || lhs.lastName != rhs.lastName
+            || lhs.phone != rhs.phone
+            || lhs.dob != rhs.dob
+            || lhs.cards != rhs.cards
+            || lhs.favorites != rhs.favorites
+            || lhs.myCenter != rhs.myCenter
     }
 }

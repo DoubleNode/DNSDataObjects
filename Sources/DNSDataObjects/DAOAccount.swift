@@ -9,19 +9,81 @@
 import Foundation
 
 open class DAOAccount: DAOBaseObject {
-    public var name: String
+    public enum CodingKeys: String, CodingKey {
+        case name, user, cards, emailNotifications, pushNotifications
+    }
+
+    public var name: String = ""
     public var user: DAOUser?
     public var cards: [DAOCard] = []
 
-    private enum CodingKeys: String, CodingKey {
-        case name, user, cards
+    public var emailNotifications: Bool = false
+    public var pushNotifications: Bool = false
+
+    override public init() {
+        super.init()
     }
+    override public init(id: String) {
+        super.init(id: id)
+    }
+    public init(name: String = "", user: DAOUser? = nil) {
+        self.name = name
+        self.user = user
+        super.init()
+    }
+
+    // MARK: - DAO copy methods -
+    public init(from object: DAOAccount) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOAccount) {
+        super.update(from: object)
+        self.name = object.name
+        self.user = object.user
+        self.cards = object.cards
+        self.emailNotifications = object.emailNotifications
+        self.pushNotifications = object.pushNotifications
+    }
+
+    // MARK: - DAO translation methods -
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
+        _ = super.dao(from: dictionary)
+        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        self.user = DAOUser(from: dictionary["user"] as? [String: Any?] ?? [:])
+        
+        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
+        self.cards = cards.map { DAOCard(from: $0) }
+        self.emailNotifications = self.bool(from: dictionary["emailNotifications"] ??
+                                            self.emailNotifications)!
+        self.pushNotifications = self.bool(from: dictionary["pushNotifications"] ??
+                                           self.pushNotifications)!
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "name": self.name,
+            "user": self.user?.asDictionary,
+            "cards": self.cards.map { $0.asDictionary },
+            "emailNotifications": self.emailNotifications,
+            "pushNotifications": self.pushNotifications,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
         user = try container.decode(DAOUser.self, forKey: .user)
         cards = try container.decode([DAOCard].self, forKey: .cards)
-
+        emailNotifications = try container.decode(Bool.self, forKey: .emailNotifications)
+        pushNotifications = try container.decode(Bool.self, forKey: .pushNotifications)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -32,59 +94,22 @@ open class DAOAccount: DAOBaseObject {
         try container.encode(name, forKey: .name)
         if user != nil { try container.encode(user, forKey: .user) }
         try container.encode(cards, forKey: .cards)
+        try container.encode(emailNotifications, forKey: .emailNotifications)
+        try container.encode(pushNotifications, forKey: .pushNotifications)
     }
 
-    override public init() {
-        self.name = ""
-        self.user = nil
-        super.init()
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOAccount(from: self)
+        return copy
     }
-    override public init(id: String) {
-        self.name = ""
-        self.user = nil
-        super.init(id: id)
-    }
-    override public init(from dictionary: [String: Any?]) {
-        self.name = ""
-        self.user = nil
-        super.init()
-        _ = self.dao(from: dictionary)
-    }
-    
-    public init(from object: DAOAccount) {
-        self.name = object.name
-        self.user = object.user
-        self.cards = object.cards
-        super.init(from: object)
-    }
-    public init(name: String = "", user: DAOUser? = nil) {
-        self.name = name
-        self.user = user
-        super.init()
-    }
-    open func update(from object: DAOAccount) {
-        self.name = object.name
-        self.user = object.user
-        self.cards = object.cards
-        super.update(from: object)
-    }
-
-    override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
-        _ = super.dao(from: dictionary)
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        self.user = DAOUser(from: dictionary["user"] as? [String: Any?] ?? [:])
-
-        let cards = dictionary["cards"] as? [[String: Any?]] ?? []
-        self.cards = cards.map { DAOCard(from: $0) }
-        return self
-    }
-    override open func dictionary() -> [String: Any?] {
-        var retval = super.dictionary()
-        retval.merge([
-            "name": self.name,
-            "user": self.user?.dictionary(),
-            "cards": self.cards.map { $0.dictionary() },
-        ]) { (current, _) in current }
-        return retval
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOAccount else { return true }
+        let lhs = self
+        return lhs.name != rhs.name
+            || lhs.user != rhs.user
+            || lhs.cards != rhs.cards
+            || lhs.emailNotifications != rhs.emailNotifications
+            || lhs.pushNotifications != rhs.pushNotifications
     }
 }

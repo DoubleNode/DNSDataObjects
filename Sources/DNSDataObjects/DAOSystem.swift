@@ -9,16 +9,63 @@
 import Foundation
 
 open class DAOSystem: DAOBaseObject {
+    public enum CodingKeys: String, CodingKey {
+        case message, name, currentState, endPoints, historyState
+    }
+
     public var message: String = ""
     public var name: String = ""
     public var currentState: DAOSystemState?
-
     public var endPoints: [DAOSystemEndPoint] = []
     public var historyState: [DAOSystemState] = []
 
-    private enum CodingKeys: String, CodingKey {
-        case message, name, currentState, endPoints, historyState
+    override public init() {
+        super.init()
     }
+
+    // MARK: - DAO copy methods -
+    public init(from object: DAOSystem) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOSystem) {
+        super.update(from: object)
+        self.message = object.message
+        self.name = object.name
+        self.currentState = object.currentState
+        self.endPoints = object.endPoints
+        self.historyState = object.historyState
+    }
+
+    // MARK: - DAO translation methods -
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
+        _ = super.dao(from: dictionary)
+        self.message = self.string(from: dictionary["message"] as Any?) ?? self.message
+        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        let currentStateData = dictionary["currentState"] as? [String: Any?] ?? [:]
+        self.currentState = DAOSystemState(from: currentStateData)
+//        let endPointsData = dictionary["historyState"] as? [[String: Any?]] ?? []
+//        self.endPoints = endPointsData.map { DAOSystemEndPoint(from: $0) }
+        let historyStateData = dictionary["historyState"] as? [[String: Any?]] ?? []
+        self.historyState = historyStateData.map { DAOSystemState(from: $0) }
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "message": self.message,
+            "name": self.name,
+            "currentState": self.currentState?.asDictionary ?? [:],
+            "historyState": self.historyState,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -38,47 +85,18 @@ open class DAOSystem: DAOBaseObject {
         try container.encode(historyState, forKey: .historyState)
     }
 
-    override public init() {
-        super.init()
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOSystem(from: self)
+        return copy
     }
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
-    }
-    public init(from object: DAOSystem) {
-        super.init(from: object)
-        self.update(from: object)
-    }
-    open func update(from object: DAOSystem) {
-        super.update(from: object)
-        self.message = object.message
-        self.name = object.name
-        self.currentState = object.currentState
-        self.endPoints = object.endPoints
-        self.historyState = object.historyState
-    }
-
-    override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
-        _ = super.dao(from: dictionary)
-        self.message = self.string(from: dictionary["message"] as Any?) ?? self.message
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        let currentStateData = dictionary["currentState"] as? [String: Any?] ?? [:]
-        self.currentState = DAOSystemState(from: currentStateData)
-//        let endPointsData = dictionary["historyState"] as? [[String: Any?]] ?? []
-//        self.endPoints = endPointsData.map { DAOSystemEndPoint(from: $0) }
-        let historyStateData = dictionary["historyState"] as? [[String: Any?]] ?? []
-        self.historyState = historyStateData.map { DAOSystemState(from: $0) }
-        return self
-    }
-
-    override open func dictionary() -> [String: Any?] {
-        var retval = super.dictionary()
-        retval.merge([
-            "message": self.message,
-            "name": self.name,
-            "currentState": self.currentState?.dictionary() ?? [:],
-            "historyState": self.historyState,
-        ]) { (current, _) in current }
-        return retval
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOSystem else { return true }
+        let lhs = self
+        return lhs.message != rhs.message
+            || lhs.name != rhs.name
+            || lhs.currentState != rhs.currentState
+            || lhs.endPoints != rhs.endPoints
+            || lhs.historyState != rhs.historyState
     }
 }

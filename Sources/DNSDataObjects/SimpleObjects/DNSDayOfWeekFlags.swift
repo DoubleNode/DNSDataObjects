@@ -1,5 +1,5 @@
 //
-//  DAODayOfWeekFlags.swift
+//  DNSDayOfWeekFlags.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
+open class DNSDayOfWeekFlags: Codable, Hashable, NSCopying {
     public var sunday: Bool = true
     public var monday: Bool = true
     public var tuesday: Bool = true
@@ -21,7 +21,7 @@ open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
     public init() { }
     
     // Equatable protocol methods
-    static public func ==(lhs: DAODayOfWeekFlags, rhs: DAODayOfWeekFlags) -> Bool {
+    static public func ==(lhs: DNSDayOfWeekFlags, rhs: DNSDayOfWeekFlags) -> Bool {
         return lhs.sunday == rhs.sunday &&
         lhs.monday == rhs.monday &&
         lhs.tuesday == rhs.tuesday &&
@@ -44,7 +44,7 @@ open class DAODayOfWeekFlags: Codable, Hashable, NSCopying {
     
     // NSCopying protocol methods
     open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAODayOfWeekFlags()
+        let copy = DNSDayOfWeekFlags()
         copy.sunday = sunday
         copy.monday = monday
         copy.tuesday = tuesday

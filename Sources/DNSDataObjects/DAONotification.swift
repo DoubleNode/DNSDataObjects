@@ -6,37 +6,68 @@
 //  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAONotification: DAOBaseObject {
-    public enum NotificationType: String, CaseIterable, Codable {
-        case unknown
-        case alert
-        case deepLink
-        case deepLinkAuto
-        public static func notificationType(for typeString: String) -> NotificationType {
-            guard let retval = (DAONotification.NotificationType.allCases.first { typeString == $0.rawValue }) else {
-                return .unknown
-            }
-            return retval
-        }
-    }
-    
-    public var body = ""
-    public var deepLink: URL?
-    public var title = ""
-    public var type: DAONotification.NotificationType
-    
-    // TODO: Implement all CodingKeys
-    private enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case body, deepLink, title, type
     }
+
+    public var body = ""
+    public var deepLink: DNSURL = DNSURL()
+    public var title = ""
+    public var type: DNSNotificationType = .unknown
+    
+    public init(type: DNSNotificationType) {
+        self.type = type
+        super.init()
+    }
+    
+    // MARK: - DAO copy methods -
+    public init(from object: DAONotification) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAONotification) {
+        super.update(from: object)
+        self.body = object.body
+        self.deepLink = object.deepLink
+        self.title = object.title
+        self.type = object.type
+    }
+
+    // MARK: - DAO translation methods -
+    public override init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAONotification {
+        _ = super.dao(from: dictionary)
+        self.body = self.string(from: dictionary["body"] as Any?) ?? self.body
+        self.deepLink = self.dnsurl(from: dictionary["deepLink"] as Any?) ?? self.deepLink
+        self.title = self.string(from: dictionary["title"] as Any?) ?? self.title
+        self.type = DNSNotificationType(rawValue: self.string(from: dictionary["type"] as Any?) ?? "") ?? .unknown
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "body": self.body,
+            "deepLink": self.deepLink,
+            "title": self.title,
+            "type": self.type,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = try container.decode(String.self, forKey: .body)
-        deepLink = try container.decode(URL.self, forKey: .deepLink)
+        deepLink = try container.decode(DNSURL.self, forKey: .deepLink)
         title = try container.decode(String.self, forKey: .title)
-        type = try container.decode(DAONotification.NotificationType.self, forKey: .type)
+        type = try container.decode(DNSNotificationType.self, forKey: .type)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -45,27 +76,22 @@ open class DAONotification: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
-        if deepLink != nil { try container.encode(deepLink, forKey: .deepLink) }
+        try container.encode(deepLink, forKey: .deepLink)
         try container.encode(title, forKey: .title)
         try container.encode(type, forKey: .type)
     }
 
-    public override init(from dictionary: [String: Any?]) {
-        self.type = .unknown
-        super.init()
-        _ = self.dao(from: dictionary)
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAONotification(from: self)
+        return copy
     }
-    public init(type: DAONotification.NotificationType) {
-        self.type = type
-        super.init()
-    }
-    
-    open override func dao(from dictionary: [String: Any?]) -> DAOBaseObject {
-        _ = super.dao(from: dictionary)
-        self.body = self.string(from: dictionary["body"] as Any?) ?? ""
-        self.deepLink = self.url(from: self.localized(dictionary["deepLink"] as Any?))
-        self.title = self.string(from: dictionary["title"] as Any?) ?? ""
-        self.type = NotificationType.notificationType(for: self.string(from: dictionary["type"] as Any?) ?? "")
-        return self
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAONotification else { return true }
+        let lhs = self
+        return lhs.body != rhs.body
+            || lhs.deepLink != rhs.deepLink
+            || lhs.title != rhs.title
+            || lhs.type != rhs.type
     }
 }

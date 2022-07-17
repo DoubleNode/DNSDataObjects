@@ -9,20 +9,74 @@
 import Foundation
 
 open class DAOActivity: DAOBaseObject {
+    public enum CodingKeys: String, CodingKey {
+        case baseType, blackouts, bookingEndTime, bookingStartTime, code, name
+    }
+
     public var baseType: DAOActivityType?
     public var blackouts: [DAOActivityBlackout] = []
     public var bookingEndTime: Date?
     public var bookingStartTime: Date?
-    public var code: String
-    public var name: String
-    open var beacons: [DAOBeacon] = []
+    public var code: String = ""
+    public var name: String = ""
 
-    private enum CodingKeys: String, CodingKey {
-        case baseType, blackouts, bookingEndTime, bookingStartTime, code, name /*, beacons*/
+    override public init() {
+        super.init()
     }
+    override public init(id: String) {
+        super.init(id: id)
+    }
+    public init(code: String, name: String) {
+        self.code = code
+        self.name = name
+        super.init(id: code)
+    }
+
+    // MARK: - DAO copy methods -
+    public init(from object: DAOActivity) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOActivity) {
+        super.update(from: object)
+        self.baseType = object.baseType
+        self.blackouts = object.blackouts
+        self.bookingEndTime = object.bookingEndTime
+        self.bookingStartTime = object.bookingStartTime
+        self.code = object.code
+        self.name = object.name
+    }
+
+    // MARK: - DAO translation methods -
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
+        _ = super.dao(from: dictionary)
+        // TODO: Implement baseType import
+        self.bookingEndTime = self.date(from: dictionary["bookingEndTime"] as Any?)
+        self.bookingStartTime = self.date(from: dictionary["bookingStartTime"] as Any?)
+        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
+        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "baseType": self.baseType?.asDictionary,
+            "bookingEndTime": self.bookingEndTime,
+            "bookingStartTime": self.bookingStartTime,
+            "code": self.code,
+            "name": self.name,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decode(DAOActivityType.self, forKey: .baseType)
+        baseType = try container.decode(DAOActivityType?.self, forKey: .baseType)
         blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)
         bookingEndTime = try container.decode(Date?.self, forKey: .bookingEndTime)
         bookingStartTime = try container.decode(Date?.self, forKey: .bookingStartTime)
@@ -35,7 +89,7 @@ open class DAOActivity: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        if baseType != nil { try container.encode(baseType, forKey: .baseType) }
+        try container.encode(baseType, forKey: .baseType)
         try container.encode(blackouts, forKey: .blackouts)
         try container.encode(bookingEndTime, forKey: .bookingEndTime)
         try container.encode(bookingStartTime, forKey: .bookingStartTime)
@@ -43,81 +97,19 @@ open class DAOActivity: DAOBaseObject {
         try container.encode(name, forKey: .name)
     }
 
-    override public init() {
-        self.baseType = nil
-        self.code = ""
-        self.name = ""
-        self.beacons = []
-        super.init()
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOActivity(from: self)
+        return copy
     }
-    override public init(id: String) {
-        self.baseType = nil
-        self.code = ""
-        self.name = ""
-        self.beacons = []
-        super.init(id: id)
-    }
-    override public init(from dictionary: [String: Any?]) {
-        self.baseType = nil
-        self.code = ""
-        self.name = ""
-        self.beacons = []
-        super.init()
-        _ = self.dao(from: dictionary)
-    }
-    public init(from object: DAOActivity) {
-        self.baseType = object.baseType
-        self.blackouts = object.blackouts
-        self.bookingEndTime = object.bookingEndTime
-        self.bookingStartTime = object.bookingStartTime
-        self.code = object.code
-        self.name = object.name
-        self.beacons = object.beacons
-        super.init(from: object)
-    }
-    public init(code: String, name: String) {
-        self.baseType = nil
-        self.code = code
-        self.name = name
-        self.beacons = []
-        super.init(id: code)
-    }
-    open func update(from object: DAOActivity) {
-        self.baseType = object.baseType
-        self.blackouts = object.blackouts
-        self.bookingEndTime = object.bookingEndTime
-        self.bookingStartTime = object.bookingStartTime
-        self.code = object.code
-        self.name = object.name
-        self.beacons = object.beacons
-        super.update(from: object)
-    }
-
-    override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
-        _ = super.dao(from: dictionary)
-        // TODO: Implement baseType import
-        self.bookingEndTime = self.date(from: dictionary["bookingEndTime"] as Any?)
-        self.bookingStartTime = self.date(from: dictionary["bookingStartTime"] as Any?)
-        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        var beacons: [DAOBeacon] = []
-        let beaconsData: [[String: Any?]] = (dictionary["beacons"] as? [[String: Any?]]) ?? []
-        beaconsData.forEach { (beaconData) in
-            beacons.append(DAOBeacon(from: beaconData))
-        }
-        self.beacons = beacons
-        return self
-    }
-    override open func dictionary() -> [String: Any?] {
-        var retval = super.dictionary()
-        retval.merge([
-            "baseType": self.baseType?.code,
-            "bookingEndTime": self.bookingEndTime,
-            "bookingStartTime": self.bookingStartTime,
-            "code": self.code,
-            "name": self.name,
-            "beacons": self.beacons.map { $0.dictionary() },
-        ]) { (current, _) in current }
-        return retval
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOActivity else { return true }
+        let lhs = self
+        return lhs.baseType != rhs.baseType
+            || lhs.blackouts != rhs.blackouts
+            || lhs.bookingEndTime != rhs.bookingEndTime
+            || lhs.bookingStartTime != rhs.bookingStartTime
+            || lhs.code != rhs.code
+            || lhs.name != rhs.name
     }
 }

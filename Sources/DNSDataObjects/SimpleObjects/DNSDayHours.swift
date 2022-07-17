@@ -1,5 +1,5 @@
 //
-//  DAODayHours.swift
+//  DNSDayHours.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DAODayHours: Codable, Hashable, NSCopying {
+open class DNSDayHours: Codable, Hashable, NSCopying {
     public var open: DNSTimeOfDay?
     public var close: DNSTimeOfDay?
 
@@ -28,7 +28,7 @@ open class DAODayHours: Codable, Hashable, NSCopying {
     open var isOpen: Bool {
         !isClosed
     }
-    
+
     open func open(on date: Date = Date()) -> Date? {
         guard let open = self.open else { return nil }
         let date = date
@@ -47,10 +47,10 @@ open class DAODayHours: Codable, Hashable, NSCopying {
         self.open = open
         self.close = close
     }
-    public init(from object: DAODayHours) {
+    public init(from object: DNSDayHours) {
         self.update(from: object)
     }
-    open func update(from object: DAODayHours) {
+    open func update(from object: DNSDayHours) {
         self.open = object.open
         self.close = object.close
     }
@@ -63,7 +63,7 @@ open class DAODayHours: Codable, Hashable, NSCopying {
 
     // NSCopying protocol methods
     open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAODayHours(from: self)
+        let copy = DNSDayHours(from: self)
         return copy
     }
 
@@ -87,13 +87,13 @@ open class DAODayHours: Codable, Hashable, NSCopying {
     }
 
     // MARK: - Equatable protocol methods -
-    static public func !=(lhs: DAODayHours, rhs: DAODayHours) -> Bool {
+    static public func !=(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
         !(lhs == rhs)
     }
-    static public func ==(lhs: DAODayHours, rhs: DAODayHours) -> Bool {
+    static public func ==(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
         lhs.open == rhs.open && lhs.close == rhs.close
     }
-    
+
     // MARK: - Localizations -
     public enum Localizations {
         static let closedEntireDay = NSLocalizedString("DataObjectsDayHoursClosedEntireDay", comment: "DataObjectsDayHoursClosedEntireDay")  // "Closed entire day"

@@ -1,5 +1,5 @@
 //
-//  DAOBeaconDistance.swift
+//  DNSBeaconDistance.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum DAOBeaconDistance: String, CaseIterable, Codable {
+public enum DNSBeaconDistance: String, CaseIterable, Codable {
     case unknown
     case distant
     case far
@@ -27,7 +27,6 @@ public enum DAOBeaconDistance: String, CaseIterable, Codable {
         default:        return "imm"
         }
     }
-
     public var index: Int {
         switch self {
         case .unknown:  return 1
@@ -39,7 +38,6 @@ public enum DAOBeaconDistance: String, CaseIterable, Codable {
         default:        return 6
         }
     }
-
     public var signalLevel: Int8 {
         switch self {
         case .unknown:  return 5

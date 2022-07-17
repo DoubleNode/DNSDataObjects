@@ -1,5 +1,5 @@
 //
-//  DAODataObjectsError.swift
+//  DNSDataObjectsError.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.

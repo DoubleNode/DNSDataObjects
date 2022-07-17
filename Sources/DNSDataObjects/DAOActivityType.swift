@@ -9,12 +9,57 @@
 import Foundation
 
 open class DAOActivityType: DAOBaseObject {
-    public var code: String
-    public var name: String
-    
-    private enum CodingKeys: String, CodingKey {
-        case code, name /*, beacons*/
+    public enum CodingKeys: String, CodingKey {
+        case code, name
     }
+
+    public var code: String = ""
+    public var name: String = ""
+
+    override public init() {
+        super.init()
+    }
+    override public init(id: String) {
+        super.init(id: id)
+    }
+    public init(code: String, name: String) {
+        self.code = code
+        self.name = name
+        super.init(id: code)
+    }
+    
+    // MARK: - DAO copy methods -
+    public init(from object: DAOActivityType) {
+        super.init(from: object)
+        self.update(from: object)
+    }
+    open func update(from object: DAOActivityType) {
+        super.update(from: object)
+        self.code = object.code
+        self.name = object.name
+    }
+
+    // MARK: - DAO translation methods -
+    override public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    override open func dao(from dictionary: [String: Any?]) -> DAOActivityType {
+        _ = super.dao(from: dictionary)
+        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
+        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
+        return self
+    }
+    override open var asDictionary: [String: Any?] {
+        var retval = super.asDictionary
+        retval.merge([
+            "code": self.code,
+            "name": self.name,
+        ]) { (current, _) in current }
+        return retval
+    }
+
+    // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = try container.decode(String.self, forKey: .code)
@@ -30,50 +75,15 @@ open class DAOActivityType: DAOBaseObject {
         try container.encode(name, forKey: .name)
     }
 
-    override public init() {
-        self.code = ""
-        self.name = ""
-        super.init()
+    // MARK: - NSCopying protocol methods -
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOActivityType(from: self)
+        return copy
     }
-    override public init(id: String) {
-        self.code = ""
-        self.name = ""
-        super.init(id: id)
-    }
-    override public init(from dictionary: [String: Any?]) {
-        self.code = ""
-        self.name = ""
-        super.init()
-        _ = self.dao(from: dictionary)
-    }
-    public init(from object: DAOActivityType) {
-        self.code = object.code
-        self.name = object.name
-        super.init(from: object)
-    }
-    public init(code: String, name: String) {
-        self.code = code
-        self.name = name
-        super.init(id: code)
-    }
-    
-    open func update(from object: DAOActivityType) {
-        self.code = object.code
-        self.name = object.name
-        super.update(from: object)
-    }
-    override open func dao(from dictionary: [String: Any?]) -> DAOActivityType {
-        _ = super.dao(from: dictionary)
-        self.code = self.string(from: dictionary["code"] as Any?) ?? self.code
-        self.name = self.string(from: dictionary["name"] as Any?) ?? self.name
-        return self
-    }
-    override open func dictionary() -> [String: Any?] {
-        var retval = super.dictionary()
-        retval.merge([
-            "code": self.code,
-            "name": self.name,
-        ]) { (current, _) in current }
-        return retval
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOActivityType else { return true }
+        let lhs = self
+        return lhs.code != rhs.code
+            || lhs.name != rhs.name
     }
 }
