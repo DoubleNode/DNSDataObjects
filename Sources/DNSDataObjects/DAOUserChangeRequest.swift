@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class DAOUserChangeRequest: DAOChangeRequest {
+open class DAOUserChangeRequest: DAOChangeRequest {
     public enum CodingKeys: String, CodingKey {
         case user, requestedRole
     }

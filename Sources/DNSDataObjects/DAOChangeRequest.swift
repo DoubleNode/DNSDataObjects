@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class DAOChangeRequest: DAOBaseObject {
+open class DAOChangeRequest: DAOBaseObject {
     override public init() {
         super.init()
     }

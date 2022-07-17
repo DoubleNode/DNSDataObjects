@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DAOMedia: DAOBaseObject {
+open class DAOMedia: DAOBaseObject {
     public enum CodingKeys: String, CodingKey {
         case type, url, preloadUrl
     }
