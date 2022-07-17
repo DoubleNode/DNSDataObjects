@@ -78,7 +78,7 @@ open class DAOApplication: DAOBaseObject {
     }
 
     // MARK: - Utility methods -
-    func utilityActiveAppEvent() -> DAOAppEvent? {
+    open func utilityActiveAppEvent() -> DAOAppEvent? {
         let now = Date()
         return appEvents
             .filter { $0.startTime < now && $0.endTime > now }
