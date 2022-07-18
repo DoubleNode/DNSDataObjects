@@ -9,13 +9,16 @@
 import DNSCore
 import Foundation
 
-open class DNSDayHours: Codable, Hashable, NSCopying {
-    public var open: DNSTimeOfDay?
+open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
+    public enum CodingKeys: String, CodingKey {
+        case close, open
+    }
+    
     public var close: DNSTimeOfDay?
-
+    public var open: DNSTimeOfDay?
+    
     open var openTime: Date { open() ?? Date() }
     open var closeTime: Date { close() ?? Date() }
-
     open var isClosedToday: Bool {
         (open == nil) && (close == nil)
     }
@@ -28,46 +31,84 @@ open class DNSDayHours: Codable, Hashable, NSCopying {
     open var isOpen: Bool {
         !isClosed
     }
-
-    open func open(on date: Date = Date()) -> Date? {
+    
+    // MARK: - Initializers -
+    override public init() {
+        super.init()
+    }
+    public init(open: DNSTimeOfDay?,
+                close: DNSTimeOfDay?) {
+        super.init()
+        self.close = close
+        self.open = open
+    }
+    
+    // MARK: - DAO copy methods -
+    public init(from object: DNSDayHours) {
+        super.init()
+        self.update(from: object)
+    }
+    open func update(from object: DNSDayHours) {
+        self.close = object.close
+        self.open = object.open
+    }
+    
+    // MARK: - DAO translation methods -
+    public init(from dictionary: [String: Any?]) {
+        super.init()
+        _ = self.dao(from: dictionary)
+    }
+    open func dao(from dictionary: [String: Any?]) -> DNSDayHours {
+        self.close = self.timeOfDay(from: dictionary[CodingKeys.close.rawValue] as Any?) ?? self.close
+        self.open = self.timeOfDay(from: dictionary[CodingKeys.open.rawValue] as Any?) ?? self.open
+        return self
+    }
+    open var asDictionary: [String: Any?] {
+        let retval: [String: Any?] = [
+            CodingKeys.close.rawValue: self.close,
+            CodingKeys.open.rawValue: self.open,
+        ]
+        return retval
+    }
+    
+    // MARK: - Codable protocol methods -
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        close = try container.decode(DNSTimeOfDay.self, forKey: .close)
+        open = try container.decode(DNSTimeOfDay.self, forKey: .open)
+    }
+    open func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(close, forKey: .close)
+        try container.encode(open, forKey: .open)
+    }
+    
+    // MARK: - NSCopying protocol methods -
+    open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DNSDayHours(from: self)
+        return copy
+    }
+    open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DNSDayHours else { return true }
+        let lhs = self
+        return lhs.close != rhs.close
+        || lhs.open != rhs.open
+    }
+}
+extension DNSDayHours {
+    public func open(on date: Date = Date()) -> Date? {
         guard let open = self.open else { return nil }
         let date = date
         return open.time(on: date)
     }
-    open func close(on date: Date = Date()) -> Date? {
+    public func close(on date: Date = Date()) -> Date? {
         guard let open = self.open else { return nil }
         guard let close = self.close else { return nil }
         let date = open.value <= close.value ? Date() : Date().nextDay
         return close.time(on: date)
     }
-
-    public init() { }
-    public init(open: DNSTimeOfDay?,
-                close: DNSTimeOfDay?) {
-        self.open = open
-        self.close = close
-    }
-    public init(from object: DNSDayHours) {
-        self.update(from: object)
-    }
-    open func update(from object: DNSDayHours) {
-        self.open = object.open
-        self.close = object.close
-    }
-
-    // Hashable protocol methods
-    open func hash(into hasher: inout Hasher) {
-        hasher.combine(open)
-        hasher.combine(close)
-    }
-
-    // NSCopying protocol methods
-    open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DNSDayHours(from: self)
-        return copy
-    }
-
-    open func timeAsString(forceMinutes: Bool = false) -> String {
+    
+    public func timeAsString(forceMinutes: Bool = false) -> String {
         var retval = ""
         if open == nil && close == nil {
             return Localizations.closedEntireDay
@@ -87,12 +128,12 @@ open class DNSDayHours: Codable, Hashable, NSCopying {
     }
 
     // MARK: - Equatable protocol methods -
-    static public func !=(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
-        !(lhs == rhs)
-    }
-    static public func ==(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
-        lhs.open == rhs.open && lhs.close == rhs.close
-    }
+//    static public func !=(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
+//        !(lhs == rhs)
+//    }
+//    static public func ==(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
+//        lhs.open == rhs.open && lhs.close == rhs.close
+//    }
 
     // MARK: - Localizations -
     public enum Localizations {

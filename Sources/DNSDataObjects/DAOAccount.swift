@@ -14,7 +14,7 @@ open class DAOAccount: DAOBaseObject {
     }
 
     public var name: String = ""
-    public var user: DAOUser?
+    public var user = DAOUser()
     public var cards: [DAOCard] = []
 
     public var emailNotifications: Bool = false
@@ -29,7 +29,7 @@ open class DAOAccount: DAOBaseObject {
     }
     public init(name: String = "", user: DAOUser? = nil) {
         self.name = name
-        self.user = user
+        self.user = user ?? self.user
         super.init()
     }
 
@@ -69,7 +69,7 @@ open class DAOAccount: DAOBaseObject {
         var retval = super.asDictionary
         retval.merge([
             CodingKeys.name.rawValue: self.name,
-            CodingKeys.user.rawValue: self.user?.asDictionary,
+            CodingKeys.user.rawValue: self.user.asDictionary,
             CodingKeys.cards.rawValue: self.cards.map { $0.asDictionary },
             CodingKeys.emailNotifications.rawValue: self.emailNotifications,
             CodingKeys.pushNotifications.rawValue: self.pushNotifications,
@@ -93,7 +93,7 @@ open class DAOAccount: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
-        if user != nil { try container.encode(user, forKey: .user) }
+        try container.encode(user, forKey: .user)
         try container.encode(cards, forKey: .cards)
         try container.encode(emailNotifications, forKey: .emailNotifications)
         try container.encode(pushNotifications, forKey: .pushNotifications)

@@ -78,7 +78,6 @@ open class DAOSystemState: DAOBaseObject {
     
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         failureCodes = try container.decode([String: DNSSystemStateNumbers].self, forKey: .failureCodes)
         failureRate = try container.decode(DNSSystemStateNumbers.self, forKey: .failureRate)
@@ -87,6 +86,9 @@ open class DAOSystemState: DAOBaseObject {
         state = DNSSystemState(rawValue: rawState) ?? .green
         let rawStateOverride = try container.decode(String.self, forKey: .stateOverride)
         stateOverride = DNSSystemState(rawValue: rawStateOverride) ?? .none
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

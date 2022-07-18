@@ -103,7 +103,6 @@ open class DAOAlert: DAOBaseObject {
         startTime = try container.decode(Date.self, forKey: .startTime)
         tagLine = try container.decode(DNSString.self, forKey: .tagLine)
         title = try container.decode(DNSString.self, forKey: .title)
-
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

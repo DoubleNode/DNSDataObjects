@@ -65,12 +65,14 @@ open class DAOSystemEndPoint: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         currentState = try container.decode(DAOSystemState.self, forKey: .currentState)
         name = try container.decode(String.self, forKey: .name)
         system = try container.decode(DAOSystem.self, forKey: .system)
         historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
+        // Get superDecoder for superclass and call super.init(from:) with it
+        let superDecoder = try container.superDecoder()
+        try super.init(from: superDecoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
