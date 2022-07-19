@@ -15,7 +15,7 @@ open class DAONotification: DAOBaseObject {
     }
 
     public var body = ""
-    public var deepLink: DNSURL = DNSURL()
+    public var deepLink: URL?
     public var title = ""
     public var type: DNSNotificationType = .unknown
     
@@ -49,7 +49,7 @@ open class DAONotification: DAOBaseObject {
     override open func dao(from dictionary: [String: Any?]) -> DAONotification {
         _ = super.dao(from: dictionary)
         self.body = self.string(from: dictionary[CodingKeys.body.rawValue] as Any?) ?? self.body
-        self.deepLink = self.dnsurl(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
+        self.deepLink = self.url(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
         self.title = self.string(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
         self.type = DNSNotificationType(rawValue: self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? "") ?? .unknown
         return self
@@ -69,7 +69,7 @@ open class DAONotification: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = try container.decode(String.self, forKey: .body)
-        deepLink = try container.decode(DNSURL.self, forKey: .deepLink)
+        deepLink = try container.decode(URL.self, forKey: .deepLink)
         title = try container.decode(String.self, forKey: .title)
         type = try container.decode(DNSNotificationType.self, forKey: .type)
         // Get superDecoder for superclass and call super.init(from:) with it
