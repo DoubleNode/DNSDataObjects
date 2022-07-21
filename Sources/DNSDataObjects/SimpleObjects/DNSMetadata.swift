@@ -12,6 +12,7 @@ import Foundation
 public class DNSMetadata: DNSDataTranslation, Codable {
     public enum CodingKeys: String, CodingKey {
         case uuid, created, synced, updated, status, createdBy, updatedBy
+        case genericValues
     }
 
     public var uuid: UUID = UUID()
@@ -23,6 +24,8 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     public var status = ""
     public var createdBy = ""
     public var updatedBy = ""
+    
+    public var genericValues: [String: Any?] = [:]
 
     // MARK: - Initializers -
     override public init() {
@@ -42,6 +45,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.status = object.status
         self.createdBy = object.createdBy
         self.updatedBy = object.updatedBy
+        self.genericValues = object.genericValues
     }
 
     // MARK: - DAO translation methods -
@@ -58,6 +62,8 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.status = self.string(from: dictionary[CodingKeys.status.rawValue] as Any?) ?? self.status
         self.createdBy = self.string(from: dictionary[CodingKeys.createdBy.rawValue] as Any?) ?? self.createdBy
         self.updatedBy = self.string(from: dictionary[CodingKeys.updatedBy.rawValue] as Any?) ?? self.updatedBy
+        let genericData = dictionary[CodingKeys.genericValues.rawValue] as? [String: Any?] ?? [:]
+        self.genericValues = genericData
         return self
     }
     open var asDictionary: [String: Any?] {
@@ -69,6 +75,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
             CodingKeys.status.rawValue: self.status,
             CodingKeys.createdBy.rawValue: self.createdBy,
             CodingKeys.updatedBy.rawValue: self.updatedBy,
+            CodingKeys.genericValues.rawValue: self.genericValues,
         ]
         return retval
     }
