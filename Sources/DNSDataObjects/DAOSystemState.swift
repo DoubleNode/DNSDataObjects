@@ -3,7 +3,7 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import Foundation
@@ -107,6 +107,7 @@ open class DAOSystemState: DAOBaseObject {
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOSystemState else { return true }
+        guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.failureCodes != rhs.failureCodes
             || lhs.failureRate != rhs.failureRate

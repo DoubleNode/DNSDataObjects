@@ -77,6 +77,7 @@ public class DAORegion: DAOBaseObject {
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAORegion else { return true }
+        guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.districts != rhs.districts
             || lhs.name != rhs.name

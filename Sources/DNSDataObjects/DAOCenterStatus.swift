@@ -3,7 +3,7 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2020 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
@@ -41,6 +41,7 @@ open class DAOCenterStatus: DAOBaseObject {
         self.startTime = object.startTime
         self.status = object.status
     }
+
     // MARK: - DAO translation methods -
     override public init(from dictionary: [String: Any?]) {
         super.init()
@@ -89,6 +90,22 @@ open class DAOCenterStatus: DAOBaseObject {
         try container.encode(scope.rawValue, forKey: .scope)
         try container.encode(startTime, forKey: .startTime)
         try container.encode(status.rawValue, forKey: .status)
+    }
+
+    // NSCopying protocol methods
+    override open func copy(with zone: NSZone? = nil) -> Any {
+        let copy = DAOCenterStatus(from: self)
+        return copy
+    }
+    override open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DAOCenterStatus else { return true }
+        guard !super.isDiffFrom(rhs) else { return true }
+        let lhs = self
+        return lhs.endTime != rhs.endTime
+            || lhs.message != rhs.message
+            || lhs.scope != rhs.scope
+            || lhs.startTime != rhs.startTime
+            || lhs.status != rhs.status
     }
 
     // MARK: - Utility methods -

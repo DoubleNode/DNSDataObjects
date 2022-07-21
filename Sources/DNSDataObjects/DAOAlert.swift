@@ -127,6 +127,7 @@ open class DAOAlert: DAOBaseObject {
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOAlert else { return true }
+        guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.endTime != rhs.endTime
             || lhs.imageUrl != rhs.imageUrl
