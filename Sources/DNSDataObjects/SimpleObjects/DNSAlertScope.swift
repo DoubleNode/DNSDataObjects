@@ -9,9 +9,9 @@
 import DNSCore
 import Foundation
 
-public enum DNSAlertScope: String, CaseIterable, Codable {
-    case all
+public enum DNSAlertScope: Int, CaseIterable, Codable {
     case center
     case district
     case region
+    case all
 }

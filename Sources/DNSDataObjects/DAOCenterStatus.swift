@@ -32,6 +32,10 @@ open class DAOCenterStatus: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
+    required public init(status: DNSStatus) {
+        super.init()
+        self.status = status
+    }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOCenterStatus) {
@@ -55,7 +59,7 @@ open class DAOCenterStatus: DAOBaseObject {
         _ = super.dao(from: data)
         self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
         self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
-        let scopeData = self.string(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
+        let scopeData = self.int(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
         self.scope = DNSAlertScope(rawValue: scopeData) ?? .center
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
@@ -79,7 +83,7 @@ open class DAOCenterStatus: DAOBaseObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = try container.decode(Date.self, forKey: .endTime)
         message = try container.decode(DNSString.self, forKey: .message)
-        scope = DNSAlertScope(rawValue: try container.decode(String.self, forKey: .scope)) ?? .center
+        scope = DNSAlertScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .center
         startTime = try container.decode(Date.self, forKey: .startTime)
         status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
         // Get superDecoder for superclass and call super.init(from:) with it

@@ -78,7 +78,7 @@ open class DAOAlert: DAOBaseObject {
         self.imageUrl = self.dnsurl(from: data[field(.imageUrl)] as Any?) ?? self.imageUrl
         self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
-        let scopeData = self.string(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
+        let scopeData = self.int(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
         self.scope = DNSAlertScope(rawValue: scopeData) ?? .all
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
