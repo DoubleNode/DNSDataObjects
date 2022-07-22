@@ -34,7 +34,7 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-.package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.2")
+.package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.3")
 ]
 ```
 
@@ -53,4 +53,4 @@ DNSDataObjects and the DNSFramework are owned and maintained by Darren Ehlers an
 
 ## License
 
-DNSDataObjects and the DNSFramework are Copyright © 2020 - 2016 Darren Ehlers and DoubleNode, LLC. All rights reserved.
+DNSDataObjects and the DNSFramework are Copyright © 2022 - 2016 Darren Ehlers and DoubleNode, LLC. All rights reserved.

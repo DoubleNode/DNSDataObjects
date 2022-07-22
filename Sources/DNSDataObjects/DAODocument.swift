@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAODocument: DAOBaseObject {
+    // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case title, url

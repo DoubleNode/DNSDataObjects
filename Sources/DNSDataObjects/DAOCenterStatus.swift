@@ -10,6 +10,7 @@ import DNSCore
 import UIKit
 
 open class DAOCenterStatus: DAOBaseObject {
+    // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, message, scope, startTime, status

@@ -1,9 +1,9 @@
 //
 //  DAORegion.swift
-//  Main Event App
+//  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
-//  Created by Darren.Ehlers on 1/9/20.
-//  Copyright © 2020 Main Event Entertainment LP. All rights reserved.
+//  Created by Darren Ehlers.
+//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore

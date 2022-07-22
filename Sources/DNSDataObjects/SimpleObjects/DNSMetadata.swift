@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 public class DNSMetadata: DNSDataTranslation, Codable {
+    // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case uuid, created, synced, updated, status, createdBy, updatedBy

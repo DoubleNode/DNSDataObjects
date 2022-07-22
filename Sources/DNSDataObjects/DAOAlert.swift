@@ -1,15 +1,16 @@
 //
 //  DAOAlert.swift
-//  Main Event App
+//  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
-//  Created by Darren.Ehlers on 1/9/20.
-//  Copyright © 2020 Main Event Entertainment LP. All rights reserved.
+//  Created by Darren Ehlers.
+//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
 import Foundation
 
 open class DAOAlert: DAOBaseObject {
+    // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, imageUrl, name, priority, scope
@@ -36,10 +37,12 @@ open class DAOAlert: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(title: DNSString,
+    public init(status: DNSStatus,
+                title: DNSString,
                 tagLine: DNSString,
                 startTime: Date = defaultStartTime,
                 endTime: Date = defaultEndTime) {
+        self.status = status
         self.title = title
         self.tagLine = tagLine
         self.startTime = startTime

@@ -11,6 +11,7 @@ import DNSCore
 import Foundation
 
 open class DAOBeacon: DAOBaseObject {
+    // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case code, range, accuracy, rssi, data
