@@ -1,5 +1,5 @@
 //
-//  DAOCenterEvent.swift
+//  DAOPlaceEvent.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DAOCenterEvent: DAOBaseObject {
+open class DAOPlaceEvent: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -40,11 +40,11 @@ open class DAOCenterEvent: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOCenterEvent) {
+    required public init(from object: DAOPlaceEvent) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOCenterEvent) {
+    open func update(from object: DAOPlaceEvent) {
         super.update(from: object)
         self.endDate = object.endDate
         self.name = object.name
@@ -57,7 +57,7 @@ open class DAOCenterEvent: DAOBaseObject {
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOCenterEvent {
+    override open func dao(from data: DNSDataDictionary) -> DAOPlaceEvent {
         _ = super.dao(from: data)
         self.endDate = self.time(from: data[field(.endDate)] as Any?) ?? self.endDate
         self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
@@ -103,11 +103,11 @@ open class DAOCenterEvent: DAOBaseObject {
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOCenterEvent(from: self)
+        let copy = DAOPlaceEvent(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOCenterEvent else { return true }
+        guard let rhs = rhs as? DAOPlaceEvent else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.endDate != rhs.endDate

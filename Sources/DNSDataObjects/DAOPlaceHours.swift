@@ -1,5 +1,5 @@
 //
-//  DAOCenterHours.swift
+//  DAOPlaceHours.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,18 +9,18 @@
 import DNSCore
 import Foundation
 
-open class DAOCenterHours: DAOBaseObject {
+open class DAOPlaceHours: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var eventType: DAOCenterEvent.Type { return DAOCenterEvent.self }
-    open class var holidayType: DAOCenterHoliday.Type { return DAOCenterHoliday.self }
+    open class var eventType: DAOPlaceEvent.Type { return DAOPlaceEvent.self }
+    open class var holidayType: DAOPlaceHoliday.Type { return DAOPlaceHoliday.self }
 
-    open class func createEvent() -> DAOCenterEvent { eventType.init() }
-    open class func createEvent(from object: DAOCenterEvent) -> DAOCenterEvent { eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOCenterEvent { eventType.init(from: data) }
+    open class func createEvent() -> DAOPlaceEvent { eventType.init() }
+    open class func createEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { eventType.init(from: object) }
+    open class func createEvent(from data: DNSDataDictionary) -> DAOPlaceEvent { eventType.init(from: data) }
 
-    open class func createHoliday() -> DAOCenterHoliday { holidayType.init() }
-    open class func createHoliday(from object: DAOCenterHoliday) -> DAOCenterHoliday { holidayType.init(from: object) }
-    open class func createHoliday(from data: DNSDataDictionary) -> DAOCenterHoliday { holidayType.init(from: data) }
+    open class func createHoliday() -> DAOPlaceHoliday { holidayType.init() }
+    open class func createHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { holidayType.init(from: object) }
+    open class func createHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday { holidayType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -29,18 +29,18 @@ open class DAOCenterHours: DAOBaseObject {
         case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     }
 
-    public var events: [DAOCenterEvent] = []
-    public var holidays: [DAOCenterHoliday] = []
+    public var events: [DAOPlaceEvent] = []
+    public var holidays: [DAOPlaceHoliday] = []
 
-    public var monday = DNSDayHours()
-    public var tuesday = DNSDayHours()
-    public var wednesday = DNSDayHours()
-    public var thursday = DNSDayHours()
-    public var friday = DNSDayHours()
-    public var saturday = DNSDayHours()
-    public var sunday = DNSDayHours()
+    public var monday = DNSDailyHours()
+    public var tuesday = DNSDailyHours()
+    public var wednesday = DNSDailyHours()
+    public var thursday = DNSDailyHours()
+    public var friday = DNSDailyHours()
+    public var saturday = DNSDailyHours()
+    public var sunday = DNSDailyHours()
 
-    public var today: DNSDayHours {
+    public var today: DNSDailyHours {
         switch Date().dnsDayOfWeek {
         case .unknown: return self.sunday
         case .sunday: return self.sunday
@@ -68,22 +68,22 @@ open class DAOCenterHours: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOCenterHours) {
+    required public init(from object: DAOPlaceHours) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOCenterHours) {
+    open func update(from object: DAOPlaceHours) {
         super.update(from: object)
         self.events = object.events
         self.holidays = object.holidays
         // swiftlint:disable force_cast
-        self.monday = object.monday.copy() as! DNSDayHours
-        self.tuesday = object.tuesday.copy() as! DNSDayHours
-        self.wednesday = object.wednesday.copy() as! DNSDayHours
-        self.thursday = object.thursday.copy() as! DNSDayHours
-        self.friday = object.friday.copy() as! DNSDayHours
-        self.saturday = object.saturday.copy() as! DNSDayHours
-        self.sunday = object.sunday.copy() as! DNSDayHours
+        self.monday = object.monday.copy() as! DNSDailyHours
+        self.tuesday = object.tuesday.copy() as! DNSDailyHours
+        self.wednesday = object.wednesday.copy() as! DNSDailyHours
+        self.thursday = object.thursday.copy() as! DNSDailyHours
+        self.friday = object.friday.copy() as! DNSDailyHours
+        self.saturday = object.saturday.copy() as! DNSDailyHours
+        self.sunday = object.sunday.copy() as! DNSDailyHours
         // swiftlint:enable force_cast
     }
 
@@ -91,26 +91,26 @@ open class DAOCenterHours: DAOBaseObject {
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOCenterHours {
+    override open func dao(from data: DNSDataDictionary) -> DAOPlaceHours {
         _ = super.dao(from: data)
         let eventsData: [DNSDataDictionary] = data[field(.events)] as? [DNSDataDictionary] ?? []
         self.events = eventsData.map { Self.createEvent(from: $0) }
         let holidaysData: [DNSDataDictionary] = data[field(.holidays)] as? [DNSDataDictionary] ?? []
         self.holidays = holidaysData.map { Self.createHoliday(from: $0) }
         let mondayData: DNSDataDictionary = data[field(.monday)] as? DNSDataDictionary ?? [:]
-        self.monday = DNSDayHours(from: mondayData)
+        self.monday = DNSDailyHours(from: mondayData)
         let tuesdayData: DNSDataDictionary = data[field(.tuesday)] as? DNSDataDictionary ?? [:]
-        self.tuesday = DNSDayHours(from: tuesdayData)
+        self.tuesday = DNSDailyHours(from: tuesdayData)
         let wednesdayData: DNSDataDictionary = data[field(.wednesday)] as? DNSDataDictionary ?? [:]
-        self.wednesday = DNSDayHours(from: wednesdayData)
+        self.wednesday = DNSDailyHours(from: wednesdayData)
         let thursdayData: DNSDataDictionary = data[field(.thursday)] as? DNSDataDictionary ?? [:]
-        self.thursday = DNSDayHours(from: thursdayData)
+        self.thursday = DNSDailyHours(from: thursdayData)
         let fridayData: DNSDataDictionary = data[field(.friday)] as? DNSDataDictionary ?? [:]
-        self.friday = DNSDayHours(from: fridayData)
+        self.friday = DNSDailyHours(from: fridayData)
         let saturdayData: DNSDataDictionary = data[field(.saturday)] as? DNSDataDictionary ?? [:]
-        self.saturday = DNSDayHours(from: saturdayData)
+        self.saturday = DNSDailyHours(from: saturdayData)
         let sundayData: DNSDataDictionary = data[field(.sunday)] as? DNSDataDictionary ?? [:]
-        self.sunday = DNSDayHours(from: sundayData)
+        self.sunday = DNSDailyHours(from: sundayData)
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -132,15 +132,15 @@ open class DAOCenterHours: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = try container.decode([DAOCenterEvent].self, forKey: .events)
-        holidays = try container.decode([DAOCenterHoliday].self, forKey: .holidays)
-        monday = try container.decode(DNSDayHours.self, forKey: .monday)
-        tuesday = try container.decode(DNSDayHours.self, forKey: .tuesday)
-        wednesday = try container.decode(DNSDayHours.self, forKey: .wednesday)
-        thursday = try container.decode(DNSDayHours.self, forKey: .thursday)
-        friday = try container.decode(DNSDayHours.self, forKey: .friday)
-        saturday = try container.decode(DNSDayHours.self, forKey: .saturday)
-        sunday = try container.decode(DNSDayHours.self, forKey: .sunday)
+        events = try container.decode([DAOPlaceEvent].self, forKey: .events)
+        holidays = try container.decode([DAOPlaceHoliday].self, forKey: .holidays)
+        monday = try container.decode(DNSDailyHours.self, forKey: .monday)
+        tuesday = try container.decode(DNSDailyHours.self, forKey: .tuesday)
+        wednesday = try container.decode(DNSDailyHours.self, forKey: .wednesday)
+        thursday = try container.decode(DNSDailyHours.self, forKey: .thursday)
+        friday = try container.decode(DNSDailyHours.self, forKey: .friday)
+        saturday = try container.decode(DNSDailyHours.self, forKey: .saturday)
+        sunday = try container.decode(DNSDailyHours.self, forKey: .sunday)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -161,11 +161,11 @@ open class DAOCenterHours: DAOBaseObject {
 
     // NSCopying protocol methods
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOCenterHours(from: self)
+        let copy = DAOPlaceHours(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOCenterHours else { return true }
+        guard let rhs = rhs as? DAOPlaceHours else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.events != rhs.events

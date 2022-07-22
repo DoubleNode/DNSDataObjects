@@ -1,5 +1,5 @@
 //
-//  DAOCenterStatus.swift
+//  DAOPlaceStatus.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import UIKit
 
-open class DAOCenterStatus: DAOBaseObject {
+open class DAOPlaceStatus: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -18,11 +18,10 @@ open class DAOCenterStatus: DAOBaseObject {
 
     public var endTime = Date()
     public var message: DNSString = DNSString(with: "")
-    public var scope: DNSAlertScope = .center
+    public var scope: DNSAlertScope = .place
     public var startTime = Date()
     public var status: DNSStatus = .open
 
-    public var color: UIColor { utilityColor() }
     public var isOpen: Bool { utilityIsOpen() }
     
     // MARK: - Initializers -
@@ -38,11 +37,11 @@ open class DAOCenterStatus: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOCenterStatus) {
+    required public init(from object: DAOPlaceStatus) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOCenterStatus) {
+    open func update(from object: DAOPlaceStatus) {
         super.update(from: object)
         self.endTime = object.endTime
         self.message = object.message
@@ -55,12 +54,12 @@ open class DAOCenterStatus: DAOBaseObject {
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOCenterStatus {
+    override open func dao(from data: DNSDataDictionary) -> DAOPlaceStatus {
         _ = super.dao(from: data)
         self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
         self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
         let scopeData = self.int(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
-        self.scope = DNSAlertScope(rawValue: scopeData) ?? .center
+        self.scope = DNSAlertScope(rawValue: scopeData) ?? .place
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
         self.status = DNSStatus(rawValue: statusData) ?? .open
@@ -83,7 +82,7 @@ open class DAOCenterStatus: DAOBaseObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = try container.decode(Date.self, forKey: .endTime)
         message = try container.decode(DNSString.self, forKey: .message)
-        scope = DNSAlertScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .center
+        scope = DNSAlertScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .place
         startTime = try container.decode(Date.self, forKey: .startTime)
         status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -102,11 +101,11 @@ open class DAOCenterStatus: DAOBaseObject {
 
     // NSCopying protocol methods
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOCenterStatus(from: self)
+        let copy = DAOPlaceStatus(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOCenterStatus else { return true }
+        guard let rhs = rhs as? DAOPlaceStatus else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.endTime != rhs.endTime
@@ -117,9 +116,6 @@ open class DAOCenterStatus: DAOBaseObject {
     }
 
     // MARK: - Utility methods -
-    open func utilityColor() -> UIColor {
-        return UIColor.blue
-    }
     open func utilityIsOpen() -> Bool {
         return [.open, .grandOpening, .holiday].contains(self.status)
     }

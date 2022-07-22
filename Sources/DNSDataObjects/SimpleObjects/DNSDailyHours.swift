@@ -1,5 +1,5 @@
 //
-//  DNSDayHours.swift
+//  DNSDailyHours.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
+open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -46,11 +46,11 @@ open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
     }
     
     // MARK: - DAO copy methods -
-    public init(from object: DNSDayHours) {
+    public init(from object: DNSDailyHours) {
         super.init()
         self.update(from: object)
     }
-    open func update(from object: DNSDayHours) {
+    open func update(from object: DNSDailyHours) {
         self.close = object.close
         self.open = object.open
     }
@@ -60,7 +60,7 @@ open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
         super.init()
         _ = self.dao(from: data)
     }
-    open func dao(from data: DNSDataDictionary) -> DNSDayHours {
+    open func dao(from data: DNSDataDictionary) -> DNSDailyHours {
         self.close = self.timeOfDay(from: data[field(.close)] as Any?) ?? self.close
         self.open = self.timeOfDay(from: data[field(.open)] as Any?) ?? self.open
         return self
@@ -87,17 +87,17 @@ open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
     
     // MARK: - NSCopying protocol methods -
     open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DNSDayHours(from: self)
+        let copy = DNSDailyHours(from: self)
         return copy
     }
     open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DNSDayHours else { return true }
+        guard let rhs = rhs as? DNSDailyHours else { return true }
         let lhs = self
         return lhs.close != rhs.close
         || lhs.open != rhs.open
     }
 }
-extension DNSDayHours {
+extension DNSDailyHours {
     public func open(on date: Date = Date()) -> Date? {
         guard let open = self.open else { return nil }
         let date = date
@@ -130,10 +130,10 @@ extension DNSDayHours {
     }
 
     // MARK: - Equatable protocol methods -
-//    static public func !=(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
+//    static public func !=(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
 //        !(lhs == rhs)
 //    }
-//    static public func ==(lhs: DNSDayHours, rhs: DNSDayHours) -> Bool {
+//    static public func ==(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
 //        lhs.open == rhs.open && lhs.close == rhs.close
 //    }
 

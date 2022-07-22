@@ -13,7 +13,7 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var activityType: DAOActivityType.Type { return DAOActivityType.self }
     open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var centerType: DAOCenter.Type { return DAOCenter.self }
+    open class var centerType: DAOPlace.Type { return DAOPlace.self }
 
     open class func createActivity() -> DAOActivityType { activityType.init() }
     open class func createActivity(from object: DAOActivityType) -> DAOActivityType { activityType.init(from: object) }
@@ -23,9 +23,9 @@ open class DAOUser: DAOBaseObject {
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
     open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
 
-    open class func createCenter() -> DAOCenter { centerType.init() }
-    open class func createCenter(from object: DAOCenter) -> DAOCenter { centerType.init(from: object) }
-    open class func createCenter(from data: DNSDataDictionary) -> DAOCenter { centerType.init(from: data) }
+    open class func createCenter() -> DAOPlace { centerType.init() }
+    open class func createCenter(from object: DAOPlace) -> DAOPlace { centerType.init(from: object) }
+    open class func createCenter(from data: DNSDataDictionary) -> DAOPlace { centerType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -41,7 +41,7 @@ open class DAOUser: DAOBaseObject {
     public var dob: Date?
     public var cards: [DAOCard] = []
     public var favorites: [DAOActivityType] = []
-    open var myCenter: DAOCenter?
+    open var myCenter: DAOPlace?
 
     // MARK: - Initializers -
     required public init() {
@@ -123,7 +123,7 @@ open class DAOUser: DAOBaseObject {
         dob = try container.decode(Date?.self, forKey: .dob)
         cards = try container.decode([DAOCard].self, forKey: .cards)
         favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
-        myCenter = try container.decode(DAOCenter.self, forKey: .myCenter)
+        myCenter = try container.decode(DAOPlace.self, forKey: .myCenter)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

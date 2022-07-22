@@ -1,5 +1,5 @@
 //
-//  DAOCenter.swift
+//  DAOPlace.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -10,13 +10,13 @@ import CoreLocation
 import DNSCore
 import Foundation
 
-open class DAOCenter: DAOBaseObject {
+open class DAOPlace: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var activityType: DAOActivity.Type { return DAOActivity.self }
     open class var alertType: DAOAlert.Type { return DAOAlert.self }
     open class var districtType: DAODistrict.Type { return DAODistrict.self }
-    open class var hoursType: DAOCenterHours.Type { return DAOCenterHours.self }
-    open class var statusType: DAOCenterStatus.Type { return DAOCenterStatus.self }
+    open class var hoursType: DAOPlaceHours.Type { return DAOPlaceHours.self }
+    open class var statusType: DAOPlaceStatus.Type { return DAOPlaceStatus.self }
 
     open class func createActivity() -> DAOActivity { activityType.init() }
     open class func createActivity(from object: DAOActivity) -> DAOActivity { activityType.init(from: object) }
@@ -30,13 +30,13 @@ open class DAOCenter: DAOBaseObject {
     open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
     open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict { districtType.init(from: data) }
 
-    open class func createHours() -> DAOCenterHours { hoursType.init() }
-    open class func createHours(from object: DAOCenterHours) -> DAOCenterHours { hoursType.init(from: object) }
-    open class func createHours(from data: DNSDataDictionary) -> DAOCenterHours { hoursType.init(from: data) }
+    open class func createHours() -> DAOPlaceHours { hoursType.init() }
+    open class func createHours(from object: DAOPlaceHours) -> DAOPlaceHours { hoursType.init(from: object) }
+    open class func createHours(from data: DNSDataDictionary) -> DAOPlaceHours { hoursType.init(from: data) }
 
-    open class func createStatus() -> DAOCenterStatus { statusType.init() }
-    open class func createStatus(from object: DAOCenterStatus) -> DAOCenterStatus { statusType.init(from: object) }
-    open class func createStatus(from data: DNSDataDictionary) -> DAOCenterStatus { statusType.init(from: data) }
+    open class func createStatus() -> DAOPlaceStatus { statusType.init() }
+    open class func createStatus(from object: DAOPlaceStatus) -> DAOPlaceStatus { statusType.init(from: object) }
+    open class func createStatus(from data: DNSDataDictionary) -> DAOPlaceStatus { statusType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -49,13 +49,13 @@ open class DAOCenter: DAOBaseObject {
     public var address = ""
     public var alerts: [DAOAlert] = []
     public var code = ""
-    public var district = DAOCenter.createDistrict()
+    public var district = DAOPlace.createDistrict()
     public var geohash = ""
     public var geopoint: CLLocation?
-    public var hours = DAOCenter.createHours()
+    public var hours = DAOPlace.createHours()
     public var name = DNSString()
     public var phone = ""
-    public var statuses: [DAOCenterStatus] = [] {
+    public var statuses: [DAOPlaceStatus] = [] {
         didSet {
             self.statuses.filter { $0.id.isEmpty }
                 .forEach {
@@ -79,11 +79,11 @@ open class DAOCenter: DAOBaseObject {
     }
     
     // MARK: - DAO copy methods -
-    required public init(from object: DAOCenter) {
+    required public init(from object: DAOPlace) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOCenter) {
+    open func update(from object: DAOPlace) {
         super.update(from: object)
         self.activities = object.activities
         self.address = object.address
@@ -103,7 +103,7 @@ open class DAOCenter: DAOBaseObject {
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOCenter {
+    override open func dao(from data: DNSDataDictionary) -> DAOPlace {
         _ = super.dao(from: data)
         var activities: [DAOActivity] = []
         let activitiesData: [DNSDataDictionary] = (data[field(.activities)] as? [DNSDataDictionary]) ?? []
@@ -127,7 +127,7 @@ open class DAOCenter: DAOBaseObject {
         self.hours = Self.createHours(from: hoursData)
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
-        var statuses: [DAOCenterStatus] = []
+        var statuses: [DAOPlaceStatus] = []
         let statusesData: [DNSDataDictionary] = (data[field(.statuses)] as? [DNSDataDictionary]) ?? []
         statusesData.forEach { (statusData) in
             statuses.append(Self.createStatus(from: statusData))
@@ -165,10 +165,10 @@ open class DAOCenter: DAOBaseObject {
         geohash = try container.decode(String.self, forKey: .geohash)
         let geopointData = try container.decode([String: Double].self, forKey: .geopoint)
         geopoint = CLLocation(from: geopointData)
-        hours = try container.decode(DAOCenterHours.self, forKey: .hours)
+        hours = try container.decode(DAOPlaceHours.self, forKey: .hours)
         name = try container.decode(DNSString.self, forKey: .name)
         phone = try container.decode(String.self, forKey: .phone)
-        statuses = try container.decode([DAOCenterStatus].self, forKey: .statuses)
+        statuses = try container.decode([DAOPlaceStatus].self, forKey: .statuses)
         timeZone = try container.decode(TimeZone.self, forKey: .timeZone)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
@@ -193,11 +193,11 @@ open class DAOCenter: DAOBaseObject {
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOCenter(from: self)
+        let copy = DAOPlace(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOCenter else { return true }
+        guard let rhs = rhs as? DAOPlace else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.activities != rhs.activities
@@ -215,7 +215,7 @@ open class DAOCenter: DAOBaseObject {
     }
 }
 
-extension DAOCenter {
+extension DAOPlace {
     public var status: DNSStatus {
         return self.statusNow().status
     }
@@ -230,7 +230,7 @@ extension DAOCenter {
     public func statusMessage(for date: Date = Date()) -> DNSString {
         return self.status(for: date)?.message ?? DNSString(with: "")
     }
-    public func status(for date: Date = Date()) -> DAOCenterStatus? {
+    public func status(for date: Date = Date()) -> DAOPlaceStatus? {
         let status = self.statuses
             .filter { date.isSameDate(as: $0.startTime) ||
                 date.isSameDate(as: $0.endTime) ||
@@ -245,7 +245,7 @@ extension DAOCenter {
     public func isStatusOpenNow() -> Bool {
         return statusNow().isOpen
     }
-    public func statusNow() -> DAOCenterStatus {
+    public func statusNow() -> DAOPlaceStatus {
         let date = Date()
         let status = statuses
             .filter { ($0.startTime < date && $0.endTime > date) }
@@ -253,7 +253,7 @@ extension DAOCenter {
             .sorted { $0.scope.rawValue < $1.scope.rawValue }
             .first
         guard let status else {
-            return DAOCenterStatus(status: DNSStatus.open)
+            return DAOPlaceStatus(status: .open)
         }
         return status
     }

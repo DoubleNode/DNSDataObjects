@@ -1,5 +1,5 @@
 //
-//  DAOCenterTests.swift
+//  DAOPlaceTests.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjectsTests
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import DNSDataObjects
 
-final class DAOCenterTests: XCTestCase {
+final class DAOPlaceTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct

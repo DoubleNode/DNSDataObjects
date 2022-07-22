@@ -10,8 +10,8 @@ import DNSCore
 import Foundation
 
 public enum DNSAlertScope: Int, CaseIterable, Codable {
-    case center
-    case district
-    case region
-    case all
+    case place = 1000
+    case district = 3000
+    case region = 5000
+    case all = 10000
 }
