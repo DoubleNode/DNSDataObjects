@@ -10,21 +10,38 @@ import DNSCore
 import UIKit
 
 open class DAODistrict: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var centerType: DAOCenter.Type { return DAOCenter.self }
+    open class var regionType: DAORegion.Type { return DAORegion.self }
+
+    open class func createCenter() -> DAOCenter { centerType.init() }
+    open class func createCenter(from object: DAOCenter) -> DAOCenter { centerType.init(from: object) }
+    open class func createCenter(from data: DNSDataDictionary) -> DAOCenter { centerType.init(from: data) }
+
+    open class func createRegion() -> DAORegion { regionType.init() }
+    open class func createRegion(from object: DAORegion) -> DAORegion { regionType.init(from: object) }
+    open class func createRegion(from data: DNSDataDictionary) -> DAORegion { regionType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case centers, name, region
     }
 
     public var centers: [DAOCenter] = []
     public var name = DNSString()
-    public var region = DAORegion()
+    public var region = DAODistrict.createRegion()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAODistrict) {
+    required public init(from object: DAODistrict) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -36,25 +53,24 @@ open class DAODistrict: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAODistrict {
-        _ = super.dao(from: dictionary)
-        let centersData: [[String: Any?]] = dictionary[CodingKeys.centers.rawValue] as? [[String: Any?]] ?? []
-        self.centers = centersData.map { DAOCenter(from: $0) }
-        self.name = self.dnsstring(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        let regionData = dictionary[CodingKeys.region.rawValue] as? [String: Any?] ?? [:]
-        self.region = DAORegion(from: regionData)
+    override open func dao(from data: DNSDataDictionary) -> DAODistrict {
+        _ = super.dao(from: data)
+        let centersData: [DNSDataDictionary] = data[field(.centers)] as? [DNSDataDictionary] ?? []
+        self.centers = centersData.map { Self.createCenter(from: $0) }
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
+        let regionData = data[field(.region)] as? DNSDataDictionary ?? [:]
+        self.region = Self.createRegion(from: regionData)
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.centers.rawValue: self.centers.map { $0.asDictionary },
-            CodingKeys.name.rawValue: self.name.asDictionary,
-            CodingKeys.region.rawValue: self.region.asDictionary,
+            field(.centers): self.centers.map { $0.asDictionary },
+            field(.name): self.name.asDictionary,
+            field(.region): self.region.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

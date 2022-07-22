@@ -10,21 +10,25 @@ import DNSCore
 import Foundation
 
 open class DAOActivityBlackout: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, message, startTime
     }
 
     public var endTime: Date?
-    public var message: DNSString = DNSString()
+    public var message = DNSString()
     public var startTime: Date?
 
     // MARK: - Initializers -
-    public override init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOActivityBlackout) {
+    required public init(from object: DAOActivityBlackout) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -36,23 +40,22 @@ open class DAOActivityBlackout: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    open override func dao(from dictionary: [String: Any?]) -> DAOActivityBlackout {
-        _ = super.dao(from: dictionary)
-        self.endTime = self.date(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
-        self.message = self.dnsstring(from: dictionary[CodingKeys.message.rawValue] as Any?) ?? self.message
-        self.startTime = self.date(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
+    open override func dao(from data: DNSDataDictionary) -> DAOActivityBlackout {
+        _ = super.dao(from: data)
+        self.endTime = self.date(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
+        self.startTime = self.date(from: data[field(.startTime)] as Any?) ?? self.startTime
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.endTime.rawValue: self.endTime,
-            CodingKeys.message.rawValue: self.message.asDictionary,
-            CodingKeys.startTime.rawValue: self.startTime,
+            field(.endTime): self.endTime,
+            field(.message): self.message.asDictionary,
+            field(.startTime): self.startTime,
         ]) { (current, _) in current }
         return retval
     }

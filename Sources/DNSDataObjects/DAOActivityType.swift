@@ -6,21 +6,23 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOActivityType: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case code, name
     }
 
-    public var code: String = ""
-    public var name: String = ""
+    public var code = ""
+    public var name = ""
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
     public init(code: String, name: String) {
@@ -30,7 +32,7 @@ open class DAOActivityType: DAOBaseObject {
     }
     
     // MARK: - DAO copy methods -
-    public init(from object: DAOActivityType) {
+    required public init(from object: DAOActivityType) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -41,21 +43,20 @@ open class DAOActivityType: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOActivityType {
-        _ = super.dao(from: dictionary)
-        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+    override open func dao(from data: DNSDataDictionary) -> DAOActivityType {
+        _ = super.dao(from: data)
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+                                                 self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.code.rawValue: self.code,
-            CodingKeys.name.rawValue: self.name,
+            field(.code): self.code,
+            field(.name): self.name,
         ]) { (current, _) in current }
         return retval
     }

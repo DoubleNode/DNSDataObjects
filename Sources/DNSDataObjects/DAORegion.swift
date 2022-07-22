@@ -10,6 +10,15 @@ import DNSCore
 import UIKit
 
 public class DAORegion: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var districtType: DAODistrict.Type { return DAODistrict.self }
+
+    open class func createDistrict() -> DAODistrict { districtType.init() }
+    open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
+    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict { districtType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case districts, name
     }
@@ -18,12 +27,15 @@ public class DAORegion: DAOBaseObject {
     public var name = DNSString()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAORegion) {
+    required public init(from object: DAORegion) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -34,22 +46,21 @@ public class DAORegion: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAORegion {
-        _ = super.dao(from: dictionary)
-        let districtsData: [[String: Any?]] = dictionary[CodingKeys.districts.rawValue] as? [[String: Any?]] ?? []
-        self.districts = districtsData.map { DAODistrict(from: $0) }
-        self.name = self.dnsstring(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+    override open func dao(from data: DNSDataDictionary) -> DAORegion {
+        _ = super.dao(from: data)
+        let districtsData: [DNSDataDictionary] = data[field(.districts)] as? [DNSDataDictionary] ?? []
+        self.districts = districtsData.map { Self.createDistrict(from: $0) }
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.districts.rawValue: self.districts.map { $0.asDictionary },
-            CodingKeys.name.rawValue: self.name.asDictionary,
+            field(.districts): self.districts.map { $0.asDictionary },
+            field(.name): self.name.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

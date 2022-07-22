@@ -7,9 +7,11 @@
 //
 
 import CoreLocation
+import DNSCore
 import Foundation
 
 open class DAOBeacon: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case code, range, accuracy, rssi, data
     }
@@ -27,15 +29,15 @@ open class DAOBeacon: DAOBaseObject {
     public var data: CLBeacon?
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOBeacon) {
+    required public init(from object: DAOBeacon) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -49,25 +51,24 @@ open class DAOBeacon: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOBeacon {
-        _ = super.dao(from: dictionary)
-        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
-        self.range = self.string(from: dictionary[CodingKeys.range.rawValue] as Any?) ?? self.range
-        self.accuracy = self.double(from: dictionary[CodingKeys.accuracy.rawValue] as Any?) ?? self.accuracy
-        self.rssi = self.int(from: dictionary[CodingKeys.rssi.rawValue] as Any?) ?? self.rssi
+    override open func dao(from data: DNSDataDictionary) -> DAOBeacon {
+        _ = super.dao(from: data)
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        self.range = self.string(from: data[field(.range)] as Any?) ?? self.range
+        self.accuracy = self.double(from: data[field(.accuracy)] as Any?) ?? self.accuracy
+        self.rssi = self.int(from: data[field(.rssi)] as Any?) ?? self.rssi
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.code.rawValue: self.code,
-            CodingKeys.range.rawValue: self.range,
-            CodingKeys.accuracy.rawValue: self.accuracy,
-            CodingKeys.rssi.rawValue: self.rssi,
+            field(.code): self.code,
+            field(.range): self.range,
+            field(.accuracy): self.accuracy,
+            field(.rssi): self.rssi,
         ]) { (current, _) in current }
         return retval
     }

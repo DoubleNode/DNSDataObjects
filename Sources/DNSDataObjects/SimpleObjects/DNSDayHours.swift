@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case close, open
     }
@@ -33,7 +34,7 @@ open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
     }
     
     // MARK: - Initializers -
-    override public init() {
+    required override public init() {
         super.init()
     }
     public init(open: DNSTimeOfDay?,
@@ -54,19 +55,19 @@ open class DNSDayHours: DNSDataTranslation, Codable, NSCopying {
     }
     
     // MARK: - DAO translation methods -
-    public init(from dictionary: [String: Any?]) {
+    required public init(from data: DNSDataDictionary) {
         super.init()
-        _ = self.dao(from: dictionary)
+        _ = self.dao(from: data)
     }
-    open func dao(from dictionary: [String: Any?]) -> DNSDayHours {
-        self.close = self.timeOfDay(from: dictionary[CodingKeys.close.rawValue] as Any?) ?? self.close
-        self.open = self.timeOfDay(from: dictionary[CodingKeys.open.rawValue] as Any?) ?? self.open
+    open func dao(from data: DNSDataDictionary) -> DNSDayHours {
+        self.close = self.timeOfDay(from: data[field(.close)] as Any?) ?? self.close
+        self.open = self.timeOfDay(from: data[field(.open)] as Any?) ?? self.open
         return self
     }
-    open var asDictionary: [String: Any?] {
-        let retval: [String: Any?] = [
-            CodingKeys.close.rawValue: self.close,
-            CodingKeys.open.rawValue: self.open,
+    open var asDictionary: DNSDataDictionary {
+        let retval: DNSDataDictionary = [
+            field(.close): self.close,
+            field(.open): self.open,
         ]
         return retval
     }

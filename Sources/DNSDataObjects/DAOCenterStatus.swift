@@ -10,6 +10,7 @@ import DNSCore
 import UIKit
 
 open class DAOCenterStatus: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, message, scope, startTime, status
     }
@@ -18,18 +19,21 @@ open class DAOCenterStatus: DAOBaseObject {
     public var message: DNSString = DNSString(with: "")
     public var scope: DNSAlertScope = .center
     public var startTime = Date()
-    public var status: DNSCenterStatus = .open
+    public var status: DNSStatus = .open
 
     public var color: UIColor { utilityColor() }
     public var isOpen: Bool { utilityIsOpen() }
     
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOCenterStatus) {
+    required public init(from object: DAOCenterStatus) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -43,29 +47,28 @@ open class DAOCenterStatus: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCenterStatus {
-        _ = super.dao(from: dictionary)
-        self.endTime = self.time(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
-        self.message = self.dnsstring(from: dictionary[CodingKeys.message.rawValue] as Any?) ?? self.message
-        let scopeData = self.string(from: dictionary[CodingKeys.scope.rawValue] as Any?) ?? self.scope.rawValue
+    override open func dao(from data: DNSDataDictionary) -> DAOCenterStatus {
+        _ = super.dao(from: data)
+        self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
+        let scopeData = self.string(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
         self.scope = DNSAlertScope(rawValue: scopeData) ?? .center
-        self.startTime = self.time(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
-        let statusData = self.string(from: dictionary[CodingKeys.status.rawValue] as Any?) ?? self.status.rawValue
-        self.status = DNSCenterStatus(rawValue: statusData) ?? .open
+        self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
+        let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
+        self.status = DNSStatus(rawValue: statusData) ?? .open
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.endTime.rawValue: self.endTime,
-            CodingKeys.message.rawValue: self.message.asDictionary,
-            CodingKeys.scope.rawValue: self.scope.rawValue,
-            CodingKeys.startTime.rawValue: self.startTime,
-            CodingKeys.status.rawValue: self.status.rawValue,
+            field(.endTime): self.endTime,
+            field(.message): self.message.asDictionary,
+            field(.scope): self.scope.rawValue,
+            field(.startTime): self.startTime,
+            field(.status): self.status.rawValue,
         ]) { (current, _) in current }
         return retval
     }
@@ -77,7 +80,7 @@ open class DAOCenterStatus: DAOBaseObject {
         message = try container.decode(DNSString.self, forKey: .message)
         scope = DNSAlertScope(rawValue: try container.decode(String.self, forKey: .scope)) ?? .center
         startTime = try container.decode(Date.self, forKey: .startTime)
-        status = DNSCenterStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
+        status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

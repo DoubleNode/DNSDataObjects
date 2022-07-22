@@ -10,9 +10,10 @@ import DNSCore
 import Foundation
 
 open class DAOAlert: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, imageUrl, name, priority, scope
-        case startTime, tagLine, title
+        case startTime, status, tagLine, title
     }
 
     public static var defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
@@ -24,12 +25,16 @@ open class DAOAlert: DAOBaseObject {
     public var priority: Int = 100
     public var scope: DNSAlertScope = .all
     public var startTime = defaultStartTime
+    public var status: DNSStatus = .tempClosed
     public var tagLine = DNSString()
     public var title = DNSString()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
     public init(title: DNSString,
                 tagLine: DNSString,
@@ -43,7 +48,7 @@ open class DAOAlert: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOAlert) {
+    required public init(from object: DAOAlert) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -55,39 +60,42 @@ open class DAOAlert: DAOBaseObject {
         self.priority = object.priority
         self.scope = object.scope
         self.startTime = object.startTime
+        self.status = object.status
         self.tagLine = object.tagLine
         self.title = object.title
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOAlert {
-        _ = super.dao(from: dictionary)
-        self.endTime = self.time(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
-        self.imageUrl = self.dnsurl(from: dictionary[CodingKeys.imageUrl.rawValue] as Any?) ?? self.imageUrl
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        self.priority = self.int(from: dictionary[CodingKeys.priority.rawValue] as Any?) ?? self.priority
-        let scopeData = self.string(from: dictionary[CodingKeys.scope.rawValue] as Any?) ?? self.scope.rawValue
+    override open func dao(from data: DNSDataDictionary) -> DAOAlert {
+        _ = super.dao(from: data)
+        self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.imageUrl = self.dnsurl(from: data[field(.imageUrl)] as Any?) ?? self.imageUrl
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
+        let scopeData = self.string(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
         self.scope = DNSAlertScope(rawValue: scopeData) ?? .all
-        self.startTime = self.time(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
-        self.tagLine = self.dnsstring(from: dictionary[CodingKeys.tagLine.rawValue] as Any?) ?? self.tagLine
-        self.title = self.dnsstring(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
+        self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
+        let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
+        self.status = DNSStatus(rawValue: statusData) ?? .open
+        self.tagLine = self.dnsstring(from: data[field(.tagLine)] as Any?) ?? self.tagLine
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.endTime.rawValue: self.endTime,
-            CodingKeys.imageUrl.rawValue: self.imageUrl.asDictionary,
-            CodingKeys.name.rawValue: self.name,
-            CodingKeys.priority.rawValue: self.priority,
-            CodingKeys.scope.rawValue: self.scope.rawValue,
-            CodingKeys.startTime.rawValue: self.startTime,
-            CodingKeys.tagLine.rawValue: self.tagLine.asDictionary,
-            CodingKeys.title.rawValue: self.title.asDictionary,
+            field(.endTime): self.endTime,
+            field(.imageUrl): self.imageUrl.asDictionary,
+            field(.name): self.name,
+            field(.priority): self.priority,
+            field(.scope): self.scope.rawValue,
+            field(.startTime): self.startTime,
+            field(.status): self.status.rawValue,
+            field(.tagLine): self.tagLine.asDictionary,
+            field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -101,6 +109,7 @@ open class DAOAlert: DAOBaseObject {
         priority = try container.decode(Int.self, forKey: .priority)
         scope = try container.decode(DNSAlertScope.self, forKey: .scope)
         startTime = try container.decode(Date.self, forKey: .startTime)
+        status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .tempClosed
         tagLine = try container.decode(DNSString.self, forKey: .tagLine)
         title = try container.decode(DNSString.self, forKey: .title)
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -116,6 +125,7 @@ open class DAOAlert: DAOBaseObject {
         try container.encode(priority, forKey: .priority)
         try container.encode(scope, forKey: .scope)
         try container.encode(startTime, forKey: .startTime)
+        try container.encode(status.rawValue, forKey: .status)
         try container.encode(tagLine, forKey: .tagLine)
         try container.encode(title, forKey: .title)
     }
@@ -135,6 +145,7 @@ open class DAOAlert: DAOBaseObject {
             || lhs.priority != rhs.priority
             || lhs.scope != rhs.scope
             || lhs.startTime != rhs.startTime
+            || lhs.status != rhs.status
             || lhs.tagLine != rhs.tagLine
             || lhs.title != rhs.title
     }

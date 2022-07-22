@@ -10,22 +10,29 @@ import DNSCore
 import Foundation
 
 open class DAOMedia: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case type, url, preloadUrl
     }
 
     public var type: DNSMediaType = .unknown
-    public var url: DNSURL = DNSURL()
-    public var preloadUrl: DNSURL = DNSURL()
+    public var url = DNSURL()
+    public var preloadUrl = DNSURL()
 
     // MARK: - Initializers -
+    required public init() {
+        super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
+    }
     public init(type: DNSMediaType) {
         self.type = type
         super.init()
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOMedia) {
+    required public init(from object: DAOMedia) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -37,24 +44,23 @@ open class DAOMedia: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOMedia {
-        _ = super.dao(from: dictionary)
-        let typeData = self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? self.type.rawValue
+    override open func dao(from data: DNSDataDictionary) -> DAOMedia {
+        _ = super.dao(from: data)
+        let typeData = self.string(from: data[field(.type)] as Any?) ?? self.type.rawValue
         self.type = DNSMediaType(rawValue: typeData) ?? .unknown
-        self.url = self.dnsurl(from: dictionary[CodingKeys.url.rawValue] as Any?) ?? self.url
-        self.preloadUrl = self.dnsurl(from: dictionary[CodingKeys.preloadUrl.rawValue] as Any?) ?? self.preloadUrl
+        self.url = self.dnsurl(from: data[field(.url)] as Any?) ?? self.url
+        self.preloadUrl = self.dnsurl(from: data[field(.preloadUrl)] as Any?) ?? self.preloadUrl
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.type.rawValue: self.type.rawValue,
-            CodingKeys.url.rawValue: self.url.asDictionary,
-            CodingKeys.preloadUrl.rawValue: self.preloadUrl.asDictionary,
+            field(.type): self.type.rawValue,
+            field(.url): self.url.asDictionary,
+            field(.preloadUrl): self.preloadUrl.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

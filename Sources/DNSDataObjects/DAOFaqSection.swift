@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAOFaqSection: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case code, title, iconKey
     }
@@ -19,8 +20,11 @@ open class DAOFaqSection: DAOBaseObject {
     public var iconKey = ""
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
     public init(code: String, title: DNSString, iconKey: String) {
         self.code = code
@@ -30,7 +34,7 @@ open class DAOFaqSection: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOFaqSection) {
+    required public init(from object: DAOFaqSection) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -42,23 +46,22 @@ open class DAOFaqSection: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOFaqSection {
-        _ = super.dao(from: dictionary)
-        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
-        self.title = self.dnsstring(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
-        self.iconKey = self.string(from: dictionary[CodingKeys.iconKey.rawValue] as Any?) ?? self.iconKey
+    override open func dao(from data: DNSDataDictionary) -> DAOFaqSection {
+        _ = super.dao(from: data)
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
+        self.iconKey = self.string(from: data[field(.iconKey)] as Any?) ?? self.iconKey
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.code.rawValue: self.code,
-            CodingKeys.title.rawValue: self.title.asDictionary,
-            CodingKeys.iconKey.rawValue: self.iconKey,
+            field(.code): self.code,
+            field(.title): self.title.asDictionary,
+            field(.iconKey): self.iconKey,
         ]) { (current, _) in current }
         return retval
     }

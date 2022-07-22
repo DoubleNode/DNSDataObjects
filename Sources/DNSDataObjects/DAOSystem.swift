@@ -10,23 +10,40 @@ import DNSCore
 import Foundation
 
 open class DAOSystem: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var endPointType: DAOSystemEndPoint.Type { return DAOSystemEndPoint.self }
+    open class var stateType: DAOSystemState.Type { return DAOSystemState.self }
+
+    open class func createEndPoint() -> DAOSystemEndPoint { endPointType.init() }
+    open class func createEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { endPointType.init(from: object) }
+    open class func createEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint { endPointType.init(from: data) }
+
+    open class func createState() -> DAOSystemState { stateType.init() }
+    open class func createState(from object: DAOSystemState) -> DAOSystemState { stateType.init(from: object) }
+    open class func createState(from data: DNSDataDictionary) -> DAOSystemState { stateType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case message, name, currentState, endPoints, historyState
     }
 
     public var message = DNSString()
     public var name = DNSString()
-    public var currentState = DAOSystemState()
+    public var currentState = DAOSystem.createState()
     public var endPoints: [DAOSystemEndPoint] = []
     public var historyState: [DAOSystemState] = []
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOSystem) {
+    required public init(from object: DAOSystem) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -40,30 +57,29 @@ open class DAOSystem: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOSystem {
-        _ = super.dao(from: dictionary)
-        self.message = self.dnsstring(from: dictionary[CodingKeys.message.rawValue] as Any?) ?? self.message
-        self.name = self.dnsstring(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        let currentStateData = dictionary[CodingKeys.currentState.rawValue] as? [String: Any?] ?? [:]
-        self.currentState = DAOSystemState(from: currentStateData)
-        let endPointsData = dictionary[CodingKeys.endPoints.rawValue] as? [[String: Any?]] ?? []
-        self.endPoints = endPointsData.map { DAOSystemEndPoint(from: $0) }
-        let historyStateData = dictionary[CodingKeys.historyState.rawValue] as? [[String: Any?]] ?? []
-        self.historyState = historyStateData.map { DAOSystemState(from: $0) }
+    override open func dao(from data: DNSDataDictionary) -> DAOSystem {
+        _ = super.dao(from: data)
+        self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
+        let currentStateData = data[field(.currentState)] as? DNSDataDictionary ?? [:]
+        self.currentState = Self.createState(from: currentStateData)
+        let endPointsData = data[field(.endPoints)] as? [DNSDataDictionary] ?? []
+        self.endPoints = endPointsData.map { Self.createEndPoint(from: $0) }
+        let historyStateData = data[field(.historyState)] as? [DNSDataDictionary] ?? []
+        self.historyState = historyStateData.map { Self.createState(from: $0) }
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.message.rawValue: self.message,
-            CodingKeys.name.rawValue: self.name,
-            CodingKeys.currentState.rawValue: self.currentState.asDictionary,
-            CodingKeys.endPoints.rawValue: self.endPoints.map { $0.asDictionary },
-            CodingKeys.historyState.rawValue: self.historyState.map { $0.asDictionary },
+            field(.message): self.message,
+            field(.name): self.name,
+            field(.currentState): self.currentState.asDictionary,
+            field(.endPoints): self.endPoints.map { $0.asDictionary },
+            field(.historyState): self.historyState.map { $0.asDictionary },
         ]) { (current, _) in current }
         return retval
     }

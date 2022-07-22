@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAODocument: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case title, url
     }
@@ -18,8 +19,11 @@ open class DAODocument: DAOBaseObject {
     public var url = DNSURL()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
     public init(title: DNSString,
                 url: DNSURL) {
@@ -29,7 +33,7 @@ open class DAODocument: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAODocument) {
+    required public init(from object: DAODocument) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -40,21 +44,20 @@ open class DAODocument: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAODocument {
-        _ = super.dao(from: dictionary)
-        self.title = self.dnsstring(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
-        self.url = self.dnsurl(from: dictionary[CodingKeys.url.rawValue] as Any?) ?? self.url
+    override open func dao(from data: DNSDataDictionary) -> DAODocument {
+        _ = super.dao(from: data)
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
+        self.url = self.dnsurl(from: data[field(.url)] as Any?) ?? self.url
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.title.rawValue: self.title.asDictionary,
-            CodingKeys.url.rawValue: self.url.asDictionary,
+            field(.title): self.title.asDictionary,
+            field(.url): self.url.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

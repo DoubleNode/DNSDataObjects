@@ -1,5 +1,5 @@
 //
-//  DNSCenterStatus.swift
+//  DNSStatus.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,13 +9,16 @@
 import DNSCore
 import UIKit
 
-public enum DNSCenterStatus: String, CaseIterable, Codable {
+public enum DNSStatus: String, CaseIterable, Codable {
     case badWeather
     case closed
     case comingSoon
     case grandOpening
     case hidden
     case holiday
+    case maintenance
     case open
+    case privateEvent
     case tempClosed
+    case training
 }

@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAONotification: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case body, deepLink, title, type
     }
@@ -20,8 +21,11 @@ open class DAONotification: DAOBaseObject {
     public var type: DNSNotificationType = .unknown
     
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
     public init(type: DNSNotificationType) {
         self.type = type
@@ -29,7 +33,7 @@ open class DAONotification: DAOBaseObject {
     }
     
     // MARK: - DAO copy methods -
-    public init(from object: DAONotification) {
+    required public init(from object: DAONotification) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -42,25 +46,24 @@ open class DAONotification: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    public override init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAONotification {
-        _ = super.dao(from: dictionary)
-        self.body = self.string(from: dictionary[CodingKeys.body.rawValue] as Any?) ?? self.body
-        self.deepLink = self.url(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
-        self.title = self.string(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
-        self.type = DNSNotificationType(rawValue: self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? "") ?? .unknown
+    override open func dao(from data: DNSDataDictionary) -> DAONotification {
+        _ = super.dao(from: data)
+        self.body = self.string(from: data[field(.body)] as Any?) ?? self.body
+        self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
+        self.title = self.string(from: data[field(.title)] as Any?) ?? self.title
+        self.type = DNSNotificationType(rawValue: self.string(from: data[field(.type)] as Any?) ?? "") ?? .unknown
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.body.rawValue: self.body,
-            CodingKeys.deepLink.rawValue: self.deepLink,
-            CodingKeys.title.rawValue: self.title,
-            CodingKeys.type.rawValue: self.type,
+            field(.body): self.body,
+            field(.deepLink): self.deepLink,
+            field(.title): self.title,
+            field(.type): self.type,
         ]) { (current, _) in current }
         return retval
     }

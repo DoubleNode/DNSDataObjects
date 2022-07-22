@@ -10,6 +10,20 @@ import DNSCore
 import Foundation
 
 open class DAOCenter: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var activityType: DAOActivity.Type { return DAOActivity.self }
+    open class var districtType: DAODistrict.Type { return DAODistrict.self }
+
+    open class func createActivity() -> DAOActivity { activityType.init() }
+    open class func createActivity(from object: DAOActivity) -> DAOActivity { activityType.init(from: object) }
+    open class func createActivity(from data: DNSDataDictionary) -> DAOActivity { activityType.init(from: data) }
+
+    open class func createDistrict() -> DAODistrict { districtType.init() }
+    open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
+    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict { districtType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case activities, centerNum, code, district, name
     }
@@ -17,14 +31,14 @@ open class DAOCenter: DAOBaseObject {
     open var activities: [DAOActivity] = []
     public var centerNum: Int16 = 0
     public var code = ""
-    public var district = DAODistrict()
+    public var district = DAOCenter.createDistrict()
     public var name = DNSString()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
     public init(centerNum: Int16, code: String, name: DNSString) {
@@ -35,7 +49,7 @@ open class DAOCenter: DAOBaseObject {
     }
     
     // MARK: - DAO copy methods -
-    public init(from object: DAOCenter) {
+    required public init(from object: DAOCenter) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -49,33 +63,32 @@ open class DAOCenter: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCenter {
-        _ = super.dao(from: dictionary)
+    override open func dao(from data: DNSDataDictionary) -> DAOCenter {
+        _ = super.dao(from: data)
         var activities: [DAOActivity] = []
-        let activitiesData: [[String: Any?]] = (dictionary[CodingKeys.activities.rawValue] as? [[String: Any?]]) ?? []
+        let activitiesData: [DNSDataDictionary] = (data[field(.activities)] as? [DNSDataDictionary]) ?? []
         activitiesData.forEach { (activityData) in
-            activities.append(DAOActivity(from: activityData))
+            activities.append(Self.createActivity(from: activityData))
         }
         self.activities = activities
-        self.centerNum = Int16(self.int(from: dictionary[CodingKeys.centerNum.rawValue] as Any?) ?? Int(self.centerNum))
-        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
-        let districtData = dictionary[CodingKeys.district.rawValue] as? [String: Any?] ?? [:]
-        self.district = DAODistrict(from: districtData)
-        self.name = self.dnsstring(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+        self.centerNum = Int16(self.int(from: data[field(.centerNum)] as Any?) ?? Int(self.centerNum))
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        let districtData = data[field(.district)] as? DNSDataDictionary ?? [:]
+        self.district = Self.createDistrict(from: districtData)
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.activities.rawValue: self.activities.map { $0.asDictionary },
-            CodingKeys.centerNum.rawValue: self.centerNum,
-            CodingKeys.code.rawValue: self.code,
-            CodingKeys.district.rawValue: self.district.asDictionary,
-            CodingKeys.name.rawValue: self.name,
+            field(.activities): self.activities.map { $0.asDictionary },
+            field(.centerNum): self.centerNum,
+            field(.code): self.code,
+            field(.district): self.district.asDictionary,
+            field(.name): self.name,
         ]) { (current, _) in current }
         return retval
     }

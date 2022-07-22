@@ -10,17 +10,29 @@ import DNSCore
 import Foundation
 
 open class DAOFaq: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var sectionType: DAOFaqSection.Type { return DAOFaqSection.self }
+
+    open class func createSection() -> DAOFaqSection { sectionType.init() }
+    open class func createSection(from object: DAOFaqSection) -> DAOFaqSection { sectionType.init(from: object) }
+    open class func createSection(from data: DNSDataDictionary) -> DAOFaqSection { sectionType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case section, question, answer
     }
 
-    public var section = DAOFaqSection()
+    public var section = DAOFaq.createSection()
     public var question = DNSString()
     public var answer = DNSString()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
     public init(section: DAOFaqSection,
                 question: DNSString,
@@ -32,7 +44,7 @@ open class DAOFaq: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOFaq) {
+    required public init(from object: DAOFaq) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -44,24 +56,23 @@ open class DAOFaq: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOFaq {
-        _ = super.dao(from: dictionary)
-        let sectionData = dictionary[CodingKeys.section.rawValue] as? [String: Any?] ?? [:]
-        self.section = DAOFaqSection(from: sectionData)
-        self.question = self.dnsstring(from: dictionary[CodingKeys.question.rawValue] as Any?) ?? self.question
-        self.answer = self.dnsstring(from: dictionary[CodingKeys.answer.rawValue] as Any?) ?? self.answer
+    override open func dao(from data: DNSDataDictionary) -> DAOFaq {
+        _ = super.dao(from: data)
+        let sectionData = data[field(.section)] as? DNSDataDictionary ?? [:]
+        self.section = Self.createSection(from: sectionData)
+        self.question = self.dnsstring(from: data[field(.question)] as Any?) ?? self.question
+        self.answer = self.dnsstring(from: data[field(.answer)] as Any?) ?? self.answer
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.section.rawValue: self.section.asDictionary,
-            CodingKeys.question.rawValue: self.question.asDictionary,
-            CodingKeys.answer.rawValue: self.answer.asDictionary,
+            field(.section): self.section.asDictionary,
+            field(.question): self.question.asDictionary,
+            field(.answer): self.answer.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

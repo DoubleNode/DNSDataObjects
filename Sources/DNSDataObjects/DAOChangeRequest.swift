@@ -6,16 +6,20 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOChangeRequest: DAOBaseObject {
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOChangeRequest) {
+    required public init(from object: DAOChangeRequest) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -24,15 +28,14 @@ open class DAOChangeRequest: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOChangeRequest {
-        _ = super.dao(from: dictionary)
+    override open func dao(from data: DNSDataDictionary) -> DAOChangeRequest {
+        _ = super.dao(from: data)
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
         ]) { (current, _) in current }

@@ -10,29 +10,41 @@ import DNSCore
 import Foundation
 
 open class DAOAppAction: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var imagesType: DAOAppActionImages.Type { return DAOAppActionImages.self }
+    open class var stringsType: DAOAppActionStrings.Type { return DAOAppActionStrings.self }
+
+    open class func createImages() -> DAOAppActionImages { imagesType.init() }
+    open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { imagesType.init(from: object) }
+    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages { imagesType.init(from: data) }
+
+    open class func createStrings() -> DAOAppActionStrings { stringsType.init() }
+    open class func createStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { stringsType.init(from: object) }
+    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings { stringsType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case actionType, body, cancelLabel, deepLink, disclaimer,
-             topImageUrl, okayLabel, subTitle, title
-        case images, strings
+        case actionType, deepLink
+        case imagesSection = "images"
+        case stringsSection = "strings"
     }
 
     public var actionType: DNSActionType = .popup
-    public var body: DNSString = DNSString()
-    public var cancelLabel: DNSString = DNSString()
     public var deepLink: URL?
-    public var disclaimer: DNSString = DNSString()
-    public var okayLabel: DNSString = DNSString()
-    public var subTitle: DNSString = DNSString()
-    public var title: DNSString = DNSString()
-    public var topImageUrl: DNSURL = DNSURL()
+    public var images = DAOAppAction.createImages()
+    public var strings = DAOAppAction.createStrings()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOAppAction) {
+    required public init(from object: DAOAppAction) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -40,59 +52,37 @@ open class DAOAppAction: DAOBaseObject {
         super.update(from: object)
         // swiftlint:disable force_cast
         self.actionType = object.actionType
-        self.body = object.body.copy() as! DNSString
-        self.cancelLabel = object.cancelLabel.copy() as! DNSString
         self.deepLink = object.deepLink
-        self.disclaimer = object.disclaimer.copy() as! DNSString
-        self.okayLabel = object.okayLabel.copy() as! DNSString
-        self.subTitle = object.subTitle.copy() as! DNSString
-        self.title = object.title.copy() as! DNSString
-        self.topImageUrl = object.topImageUrl.copy() as! DNSURL
+        self.images = object.images
+        self.strings = object.strings
         // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOAppAction {
-        _ = super.dao(from: dictionary)
-        let typeString = self.string(from: dictionary[CodingKeys.actionType.rawValue] as Any?) ?? ""
+    override open func dao(from data: DNSDataDictionary) -> DAOAppAction {
+        _ = super.dao(from: data)
+        let typeString = self.string(from: data[field(.actionType)] as Any?) ?? ""
         self.actionType = DNSActionType(rawValue: typeString) ?? .popup
-        self.deepLink = self.url(from: dictionary[CodingKeys.deepLink.rawValue] as Any?) ?? self.deepLink
+        self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
 
-        var stringsData = dictionary[CodingKeys.strings.rawValue] as? [String: Any] ?? [:]
-        if stringsData.isEmpty {
-            stringsData = dictionary as [String : Any]
-        }
-        self.body = self.dnsstring(from: stringsData[CodingKeys.body.rawValue] as Any?) ?? self.body
-        self.cancelLabel = self.dnsstring(from: stringsData[CodingKeys.cancelLabel.rawValue] as Any?) ?? self.cancelLabel
-        self.disclaimer = self.dnsstring(from: stringsData[CodingKeys.disclaimer.rawValue] as Any?) ?? self.disclaimer
-        self.okayLabel = self.dnsstring(from: stringsData[CodingKeys.okayLabel.rawValue] as Any?) ?? self.okayLabel
-        self.subTitle = self.dnsstring(from: stringsData[CodingKeys.subTitle.rawValue] as Any?) ?? self.subTitle
-        self.title = self.dnsstring(from: stringsData[CodingKeys.title.rawValue] as Any?) ?? self.title
-
-        let imagesData = dictionary[CodingKeys.images.rawValue] as? [String: Any] ?? [:]
-        self.topImageUrl = self.dnsurl(from: imagesData[CodingKeys.topImageUrl.rawValue]) ?? self.topImageUrl
+        // images section
+        let imagesSection = data[field(.imagesSection)] as? DNSDataDictionary ?? [:]
+        self.images = Self.createImages(from: imagesSection)
+        // strings section
+        let stringsSection = data[field(.stringsSection)] as? DNSDataDictionary ?? [:]
+        self.strings = Self.createStrings(from: stringsSection)
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.deepLink.rawValue: self.deepLink,
-            CodingKeys.actionType.rawValue: self.actionType,
-            CodingKeys.strings.rawValue: [
-                CodingKeys.body.rawValue: self.body,
-                CodingKeys.cancelLabel.rawValue: self.cancelLabel,
-                CodingKeys.disclaimer.rawValue: self.disclaimer,
-                CodingKeys.okayLabel.rawValue: self.okayLabel,
-                CodingKeys.subTitle.rawValue: self.subTitle,
-                CodingKeys.title.rawValue: self.title,
-            ],
-            CodingKeys.images.rawValue: [
-                CodingKeys.topImageUrl.rawValue: self.topImageUrl,
-            ],
+            field(.actionType): self.actionType,
+            field(.deepLink): self.deepLink,
+            field(.imagesSection): self.images.asDictionary,
+            field(.stringsSection): self.strings.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -101,14 +91,9 @@ open class DAOAppAction: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         actionType = try container.decode(DNSActionType.self, forKey: .actionType)
-        body = try container.decode(DNSString.self, forKey: .body)
-        cancelLabel = try container.decode(DNSString.self, forKey: .cancelLabel)
         deepLink = try container.decode(URL.self, forKey: .deepLink)
-        disclaimer = try container.decode(DNSString.self, forKey: .disclaimer)
-        okayLabel = try container.decode(DNSString.self, forKey: .okayLabel)
-        subTitle = try container.decode(DNSString.self, forKey: .subTitle)
-        title = try container.decode(DNSString.self, forKey: .title)
-        topImageUrl = try container.decode(DNSURL.self, forKey: .topImageUrl)
+        images = try container.decode(DAOAppActionImages.self, forKey: .imagesSection)
+        strings = try container.decode(DAOAppActionStrings.self, forKey: .stringsSection)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -117,14 +102,9 @@ open class DAOAppAction: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(actionType, forKey: .actionType)
-        try container.encode(body, forKey: .body)
-        try container.encode(cancelLabel, forKey: .cancelLabel)
         try container.encode(deepLink, forKey: .deepLink)
-        try container.encode(disclaimer, forKey: .disclaimer)
-        try container.encode(okayLabel, forKey: .okayLabel)
-        try container.encode(subTitle, forKey: .subTitle)
-        try container.encode(title, forKey: .title)
-        try container.encode(topImageUrl, forKey: .topImageUrl)
+        try container.encode(images, forKey: .imagesSection)
+        try container.encode(strings, forKey: .stringsSection)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -137,13 +117,8 @@ open class DAOAppAction: DAOBaseObject {
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.actionType != rhs.actionType
-            || lhs.body != rhs.body
-            || lhs.cancelLabel != rhs.cancelLabel
             || lhs.deepLink != rhs.deepLink
-            || lhs.disclaimer != rhs.disclaimer
-            || lhs.okayLabel != rhs.okayLabel
-            || lhs.subTitle != rhs.subTitle
-            || lhs.title != rhs.title
-            || lhs.topImageUrl != rhs.topImageUrl
+            || lhs.images != rhs.images
+            || lhs.strings != rhs.strings
     }
 }

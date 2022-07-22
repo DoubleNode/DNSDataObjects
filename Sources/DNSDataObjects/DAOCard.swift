@@ -6,9 +6,11 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOCard: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case cardNumber, nickname, pinNumber
     }
@@ -18,10 +20,10 @@ open class DAOCard: DAOBaseObject {
     public var pinNumber: String = ""
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
     public init(cardNumber: String, nickname: String, pinNumber: String) {
@@ -32,7 +34,7 @@ open class DAOCard: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOCard) {
+    required public init(from object: DAOCard) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -44,23 +46,22 @@ open class DAOCard: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCard {
-        _ = super.dao(from: dictionary)
-        self.cardNumber = self.string(from: dictionary[CodingKeys.cardNumber.rawValue] as Any?) ?? self.cardNumber
-        self.nickname = self.string(from: dictionary[CodingKeys.nickname.rawValue] as Any?) ?? self.nickname
-        self.pinNumber = self.string(from: dictionary[CodingKeys.pinNumber.rawValue] as Any?) ?? self.pinNumber
+    override open func dao(from data: DNSDataDictionary) -> DAOCard {
+        _ = super.dao(from: data)
+        self.cardNumber = self.string(from: data[field(.cardNumber)] as Any?) ?? self.cardNumber
+        self.nickname = self.string(from: data[field(.nickname)] as Any?) ?? self.nickname
+        self.pinNumber = self.string(from: data[field(.pinNumber)] as Any?) ?? self.pinNumber
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.cardNumber.rawValue: self.cardNumber,
-            CodingKeys.nickname.rawValue: self.nickname,
-            CodingKeys.pinNumber.rawValue: self.pinNumber,
+            field(.cardNumber): self.cardNumber,
+            field(.nickname): self.nickname,
+            field(.pinNumber): self.pinNumber,
         ]) { (current, _) in current }
         return retval
     }

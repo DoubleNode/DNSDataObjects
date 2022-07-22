@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 public class DNSMetadata: DNSDataTranslation, Codable {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case uuid, created, synced, updated, status, createdBy, updatedBy
         case genericValues
@@ -25,10 +26,10 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     public var createdBy = ""
     public var updatedBy = ""
     
-    public var genericValues: [String: Any?] = [:]
+    public var genericValues: DNSDataDictionary = [:]
 
     // MARK: - Initializers -
-    override public init() {
+    required override public init() {
         super.init()
     }
 
@@ -49,33 +50,33 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     }
 
     // MARK: - DAO translation methods -
-    public init(from dictionary: [String: Any?]) {
+    required public init(from data: DNSDataDictionary) {
         super.init()
-        _ = self.dao(from: dictionary)
+        _ = self.dao(from: data)
     }
-    open func dao(from dictionary: [String: Any?]) -> DNSMetadata {
-        let uuidData = self.string(from: dictionary[CodingKeys.uuid.rawValue] as Any?) ?? self.uuid.uuidString
+    open func dao(from data: DNSDataDictionary) -> DNSMetadata {
+        let uuidData = self.string(from: data[field(.uuid)] as Any?) ?? self.uuid.uuidString
         self.uuid = UUID(uuidString: uuidData) ?? self.uuid
-        self.created = self.time(from: dictionary[CodingKeys.created.rawValue] as Any?) ?? self.created
-        self.synced = self.time(from: dictionary[CodingKeys.synced.rawValue] as Any?) ?? self.synced
-        self.updated = self.time(from: dictionary[CodingKeys.updated.rawValue] as Any?) ?? self.updated
-        self.status = self.string(from: dictionary[CodingKeys.status.rawValue] as Any?) ?? self.status
-        self.createdBy = self.string(from: dictionary[CodingKeys.createdBy.rawValue] as Any?) ?? self.createdBy
-        self.updatedBy = self.string(from: dictionary[CodingKeys.updatedBy.rawValue] as Any?) ?? self.updatedBy
-        let genericData = dictionary[CodingKeys.genericValues.rawValue] as? [String: Any?] ?? [:]
+        self.created = self.time(from: data[field(.created)] as Any?) ?? self.created
+        self.synced = self.time(from: data[field(.synced)] as Any?) ?? self.synced
+        self.updated = self.time(from: data[field(.updated)] as Any?) ?? self.updated
+        self.status = self.string(from: data[field(.status)] as Any?) ?? self.status
+        self.createdBy = self.string(from: data[field(.createdBy)] as Any?) ?? self.createdBy
+        self.updatedBy = self.string(from: data[field(.updatedBy)] as Any?) ?? self.updatedBy
+        let genericData = data[field(.genericValues)] as? DNSDataDictionary ?? [:]
         self.genericValues = genericData
         return self
     }
-    open var asDictionary: [String: Any?] {
-        let retval: [String: Any?] = [
-            CodingKeys.uuid.rawValue: self.uuid,
-            CodingKeys.created.rawValue: self.created,
-            CodingKeys.synced.rawValue: self.synced,
-            CodingKeys.updated.rawValue: self.updated,
-            CodingKeys.status.rawValue: self.status,
-            CodingKeys.createdBy.rawValue: self.createdBy,
-            CodingKeys.updatedBy.rawValue: self.updatedBy,
-            CodingKeys.genericValues.rawValue: self.genericValues,
+    open var asDictionary: DNSDataDictionary {
+        let retval: DNSDataDictionary = [
+            field(.uuid): self.uuid,
+            field(.created): self.created,
+            field(.synced): self.synced,
+            field(.updated): self.updated,
+            field(.status): self.status,
+            field(.createdBy): self.createdBy,
+            field(.updatedBy): self.updatedBy,
+            field(.genericValues): self.genericValues,
         ]
         return retval
     }

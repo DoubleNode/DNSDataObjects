@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case android, iOS, total
     }
@@ -19,7 +20,8 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     public var total: Double = 0.0
 
     // MARK: - Initializers -
-    override public init() {
+    required override public init() {
+        super.init()
     }
 
     // MARK: - DAO copy methods -
@@ -34,21 +36,21 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     }
 
     // MARK: - DAO translation methods -
-    public init(from dictionary: [String: Any?]) {
+    required public init(from data: DNSDataDictionary) {
         super.init()
-        _ = self.dao(from: dictionary)
+        _ = self.dao(from: data)
     }
-    open func dao(from dictionary: [String: Any?]) -> DNSSystemStateNumbers {
-        self.android = self.double(from: dictionary[CodingKeys.android.rawValue] as Any?) ?? self.android
-        self.iOS = self.double(from: dictionary[CodingKeys.iOS.rawValue] as Any?) ?? self.iOS
-        self.total = self.double(from: dictionary[CodingKeys.total.rawValue] as Any?) ?? self.total
+    open func dao(from data: DNSDataDictionary) -> DNSSystemStateNumbers {
+        self.android = self.double(from: data[field(.android)] as Any?) ?? self.android
+        self.iOS = self.double(from: data[field(.iOS)] as Any?) ?? self.iOS
+        self.total = self.double(from: data[field(.total)] as Any?) ?? self.total
         return self
     }
-    open var asDictionary: [String: Any?] {
-        let retval: [String: Any?] = [
-            CodingKeys.android.rawValue: self.android,
-            CodingKeys.iOS.rawValue: self.iOS,
-            CodingKeys.total.rawValue: self.total,
+    open var asDictionary: DNSDataDictionary {
+        let retval: DNSDataDictionary = [
+            field(.android): self.android,
+            field(.iOS): self.iOS,
+            field(.total): self.total,
         ]
         return retval
     }

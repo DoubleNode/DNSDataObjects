@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAOCenterEvent: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endDate, name, startDate, timeZone, type
     }
@@ -30,12 +31,15 @@ open class DAOCenterEvent: DAOBaseObject {
     }
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOCenterEvent) {
+    required public init(from object: DAOCenterEvent) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -49,28 +53,27 @@ open class DAOCenterEvent: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCenterEvent {
-        _ = super.dao(from: dictionary)
-        self.endDate = self.time(from: dictionary[CodingKeys.endDate.rawValue] as Any?) ?? self.endDate
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        self.startDate = self.time(from: dictionary[CodingKeys.startDate.rawValue] as Any?) ?? self.startDate
-        let timeZoneData = self.string(from: dictionary[CodingKeys.timeZone.rawValue] as Any?) ?? self.timeZone.identifier
+    override open func dao(from data: DNSDataDictionary) -> DAOCenterEvent {
+        _ = super.dao(from: data)
+        self.endDate = self.time(from: data[field(.endDate)] as Any?) ?? self.endDate
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.startDate = self.time(from: data[field(.startDate)] as Any?) ?? self.startDate
+        let timeZoneData = self.string(from: data[field(.timeZone)] as Any?) ?? self.timeZone.identifier
         self.timeZone = TimeZone(identifier: timeZoneData) ?? self.timeZone
-        self.type = self.string(from: dictionary[CodingKeys.type.rawValue] as Any?) ?? self.type
+        self.type = self.string(from: data[field(.type)] as Any?) ?? self.type
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.endDate.rawValue: self.endDate,
-            CodingKeys.name.rawValue: self.name,
-            CodingKeys.startDate.rawValue: self.startDate,
-            CodingKeys.timeZone.rawValue: self.timeZone.identifier,
-            CodingKeys.type.rawValue: self.type,
+            field(.endDate): self.endDate,
+            field(.name): self.name,
+            field(.startDate): self.startDate,
+            field(.timeZone): self.timeZone.identifier,
+            field(.type): self.type,
         ]) { (current, _) in current }
         return retval
     }

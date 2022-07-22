@@ -6,35 +6,50 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOActivity: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var baseType: DAOActivityType.Type { return DAOActivityType.self }
+    open class var blackoutType: DAOActivityBlackout.Type { return DAOActivityBlackout.self }
+
+    open class func createBase() -> DAOActivityType { baseType.init() }
+    open class func createBase(from object: DAOActivityType) -> DAOActivityType { baseType.init(from: object) }
+    open class func createBase(from data: DNSDataDictionary) -> DAOActivityType { baseType.init(from: data) }
+
+    open class func createBlackout() -> DAOActivityBlackout { blackoutType.init() }
+    open class func createBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { blackoutType.init(from: object) }
+    open class func createBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout { blackoutType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case baseType, blackouts, bookingEndTime, bookingStartTime, code, name
     }
 
-    public var baseType: DAOActivityType?
+    public var baseType = DAOActivity.createBase()
     public var blackouts: [DAOActivityBlackout] = []
     public var bookingEndTime: Date?
     public var bookingStartTime: Date?
-    public var code: String = ""
-    public var name: String = ""
+    public var code = ""
+    public var name = DNSString()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
-    public init(code: String, name: String) {
+    public init(code: String, name: DNSString) {
         self.code = code
         self.name = name
         super.init(id: code)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOActivity) {
+    required public init(from object: DAOActivity) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -49,29 +64,28 @@ open class DAOActivity: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOActivity {
-        _ = super.dao(from: dictionary)
+    override open func dao(from data: DNSDataDictionary) -> DAOActivity {
+        _ = super.dao(from: data)
         // TODO: Implement baseType import
-        let baseTypeData = dictionary[CodingKeys.baseType.rawValue] as? [String: Any?] ?? [:]
-        self.baseType = DAOActivityType(from: baseTypeData)
-        self.bookingEndTime = self.date(from: dictionary[CodingKeys.bookingEndTime.rawValue] as Any?)
-        self.bookingStartTime = self.date(from: dictionary[CodingKeys.bookingStartTime.rawValue] as Any?)
-        self.code = self.string(from: dictionary[CodingKeys.code.rawValue] as Any?) ?? self.code
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
+        let baseTypeData = data[field(.baseType)] as? DNSDataDictionary ?? [:]
+        self.baseType = Self.createBase(from: baseTypeData)
+        self.bookingEndTime = self.date(from: data[field(.bookingEndTime)] as Any?)
+        self.bookingStartTime = self.date(from: data[field(.bookingStartTime)] as Any?)
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.baseType.rawValue: self.baseType?.asDictionary,
-            CodingKeys.bookingEndTime.rawValue: self.bookingEndTime,
-            CodingKeys.bookingStartTime.rawValue: self.bookingStartTime,
-            CodingKeys.code.rawValue: self.code,
-            CodingKeys.name.rawValue: self.name,
+            field(.baseType): self.baseType.asDictionary,
+            field(.bookingEndTime): self.bookingEndTime,
+            field(.bookingStartTime): self.bookingStartTime,
+            field(.code): self.code,
+            field(.name): self.name.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -79,12 +93,12 @@ open class DAOActivity: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decode(DAOActivityType?.self, forKey: .baseType)
+        baseType = try container.decode(DAOActivityType.self, forKey: .baseType)
         blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)
         bookingEndTime = try container.decode(Date?.self, forKey: .bookingEndTime)
         bookingStartTime = try container.decode(Date?.self, forKey: .bookingStartTime)
         code = try container.decode(String.self, forKey: .code)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(DNSString.self, forKey: .name)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

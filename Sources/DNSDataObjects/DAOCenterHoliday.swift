@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAOCenterHoliday: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case date, hours
     }
@@ -18,12 +19,15 @@ open class DAOCenterHoliday: DAOBaseObject {
     public var hours = DNSDayHours()
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOCenterHoliday) {
+    required public init(from object: DAOCenterHoliday) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -36,22 +40,21 @@ open class DAOCenterHoliday: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCenterHoliday {
-        _ = super.dao(from: dictionary)
-        self.date = self.time(from: dictionary[CodingKeys.date.rawValue] as Any?) ?? self.date
-        let hoursData: [String: Any?] = dictionary[CodingKeys.hours.rawValue] as? [String: Any?] ?? [:]
+    override open func dao(from data: DNSDataDictionary) -> DAOCenterHoliday {
+        _ = super.dao(from: data)
+        self.date = self.time(from: data[field(.date)] as Any?) ?? self.date
+        let hoursData: DNSDataDictionary = data[field(.hours)] as? DNSDataDictionary ?? [:]
         self.hours = DNSDayHours(from: hoursData)
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.date.rawValue: self.date,
-            CodingKeys.hours.rawValue: self.hours.asDictionary,
+            field(.date): self.date,
+            field(.hours): self.hours.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAOAppEvent: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, priority, startTime, title
     }
@@ -31,6 +32,12 @@ open class DAOAppEvent: DAOBaseObject {
     public var title: DNSString = DNSString()
 
     // MARK: - Initializers -
+    required public init() {
+        super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
+    }
     public init(title: DNSString = DNSString(),
                 startTime: Date = DAOAppEvent.defaultStartTime,
                 endTime: Date = DAOAppEvent.defaultEndTime) {
@@ -41,7 +48,7 @@ open class DAOAppEvent: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOAppEvent) {
+    required public init(from object: DAOAppEvent) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -54,25 +61,24 @@ open class DAOAppEvent: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOAppEvent {
-        _ = super.dao(from: dictionary)
-        self.endTime = self.time(from: dictionary[CodingKeys.endTime.rawValue] as Any?) ?? self.endTime
-        self.priority = self.int(from: dictionary[CodingKeys.priority.rawValue] as Any?) ?? self.priority
-        self.startTime = self.time(from: dictionary[CodingKeys.startTime.rawValue] as Any?) ?? self.startTime
-        self.title = self.dnsstring(from: dictionary[CodingKeys.title.rawValue] as Any?) ?? self.title
+    override open func dao(from data: DNSDataDictionary) -> DAOAppEvent {
+        _ = super.dao(from: data)
+        self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
+        self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.endTime.rawValue: self.endTime,
-            CodingKeys.priority.rawValue: self.priority,
-            CodingKeys.startTime.rawValue: self.startTime,
-            CodingKeys.title.rawValue: self.title.asDictionary,
+            field(.endTime): self.endTime,
+            field(.priority): self.priority,
+            field(.startTime): self.startTime,
+            field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

@@ -10,6 +10,20 @@ import DNSCore
 import Foundation
 
 open class DAOCenterHours: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var eventType: DAOCenterEvent.Type { return DAOCenterEvent.self }
+    open class var holidayType: DAOCenterHoliday.Type { return DAOCenterHoliday.self }
+
+    open class func createEvent() -> DAOCenterEvent { eventType.init() }
+    open class func createEvent(from object: DAOCenterEvent) -> DAOCenterEvent { eventType.init(from: object) }
+    open class func createEvent(from data: DNSDataDictionary) -> DAOCenterEvent { eventType.init(from: data) }
+
+    open class func createHoliday() -> DAOCenterHoliday { holidayType.init() }
+    open class func createHoliday(from object: DAOCenterHoliday) -> DAOCenterHoliday { holidayType.init(from: object) }
+    open class func createHoliday(from data: DNSDataDictionary) -> DAOCenterHoliday { holidayType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case events, holidays
         case monday, tuesday, wednesday, thursday, friday, saturday, sunday
@@ -46,12 +60,15 @@ open class DAOCenterHours: DAOBaseObject {
     }
 
     // MARK: - Initializers -
-    override public required init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOCenterHours) {
+    required public init(from object: DAOCenterHours) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -71,44 +88,43 @@ open class DAOCenterHours: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOCenterHours {
-        _ = super.dao(from: dictionary)
-        let eventsData: [[String: Any?]] = dictionary[CodingKeys.events.rawValue] as? [[String: Any?]] ?? []
-        self.events = eventsData.map { DAOCenterEvent(from: $0) }
-        let holidaysData: [[String: Any?]] = dictionary[CodingKeys.holidays.rawValue] as? [[String: Any?]] ?? []
-        self.holidays = holidaysData.map { DAOCenterHoliday(from: $0) }
-        let mondayData: [String: Any?] = dictionary[CodingKeys.monday.rawValue] as? [String: Any?] ?? [:]
+    override open func dao(from data: DNSDataDictionary) -> DAOCenterHours {
+        _ = super.dao(from: data)
+        let eventsData: [DNSDataDictionary] = data[field(.events)] as? [DNSDataDictionary] ?? []
+        self.events = eventsData.map { Self.createEvent(from: $0) }
+        let holidaysData: [DNSDataDictionary] = data[field(.holidays)] as? [DNSDataDictionary] ?? []
+        self.holidays = holidaysData.map { Self.createHoliday(from: $0) }
+        let mondayData: DNSDataDictionary = data[field(.monday)] as? DNSDataDictionary ?? [:]
         self.monday = DNSDayHours(from: mondayData)
-        let tuesdayData: [String: Any?] = dictionary[CodingKeys.tuesday.rawValue] as? [String: Any?] ?? [:]
+        let tuesdayData: DNSDataDictionary = data[field(.tuesday)] as? DNSDataDictionary ?? [:]
         self.tuesday = DNSDayHours(from: tuesdayData)
-        let wednesdayData: [String: Any?] = dictionary[CodingKeys.wednesday.rawValue] as? [String: Any?] ?? [:]
+        let wednesdayData: DNSDataDictionary = data[field(.wednesday)] as? DNSDataDictionary ?? [:]
         self.wednesday = DNSDayHours(from: wednesdayData)
-        let thursdayData: [String: Any?] = dictionary[CodingKeys.thursday.rawValue] as? [String: Any?] ?? [:]
+        let thursdayData: DNSDataDictionary = data[field(.thursday)] as? DNSDataDictionary ?? [:]
         self.thursday = DNSDayHours(from: thursdayData)
-        let fridayData: [String: Any?] = dictionary[CodingKeys.friday.rawValue] as? [String: Any?] ?? [:]
+        let fridayData: DNSDataDictionary = data[field(.friday)] as? DNSDataDictionary ?? [:]
         self.friday = DNSDayHours(from: fridayData)
-        let saturdayData: [String: Any?] = dictionary[CodingKeys.saturday.rawValue] as? [String: Any?] ?? [:]
+        let saturdayData: DNSDataDictionary = data[field(.saturday)] as? DNSDataDictionary ?? [:]
         self.saturday = DNSDayHours(from: saturdayData)
-        let sundayData: [String: Any?] = dictionary[CodingKeys.sunday.rawValue] as? [String: Any?] ?? [:]
+        let sundayData: DNSDataDictionary = data[field(.sunday)] as? DNSDataDictionary ?? [:]
         self.sunday = DNSDayHours(from: sundayData)
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.events.rawValue: self.events.map { $0.asDictionary },
-            CodingKeys.holidays.rawValue: self.holidays.map { $0.asDictionary },
-            CodingKeys.monday.rawValue: self.monday.asDictionary,
-            CodingKeys.tuesday.rawValue: self.tuesday.asDictionary,
-            CodingKeys.wednesday.rawValue: self.wednesday.asDictionary,
-            CodingKeys.thursday.rawValue: self.thursday.asDictionary,
-            CodingKeys.friday.rawValue: self.friday.asDictionary,
-            CodingKeys.saturday.rawValue: self.saturday.asDictionary,
-            CodingKeys.sunday.rawValue: self.sunday.asDictionary,
+            field(.events): self.events.map { $0.asDictionary },
+            field(.holidays): self.holidays.map { $0.asDictionary },
+            field(.monday): self.monday.asDictionary,
+            field(.tuesday): self.tuesday.asDictionary,
+            field(.wednesday): self.wednesday.asDictionary,
+            field(.thursday): self.thursday.asDictionary,
+            field(.friday): self.friday.asDictionary,
+            field(.saturday): self.saturday.asDictionary,
+            field(.sunday): self.sunday.asDictionary,
         ]) { (current, _) in current }
         return retval
     }

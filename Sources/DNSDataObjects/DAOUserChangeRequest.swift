@@ -6,9 +6,19 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOUserChangeRequest: DAOChangeRequest {
+    // MARK: - Class Factory methods -
+    open class var userType: DAOUser.Type { return DAOUser.self }
+
+    open class func createUser() -> DAOUser { userType.init() }
+    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser { userType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case user, requestedRole
     }
@@ -17,13 +27,19 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     public var requestedRole: DNSUserRole = .user
     
     // MARK: - Initializers -
+    required public init() {
+        super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
+    }
     public init(user: DAOUser) {
         self.user = user
         super.init()
     }
     
     // MARK: - DAO copy methods -
-    public init(from object: DAOUserChangeRequest) {
+    required public init(from object: DAOChangeRequest) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -34,23 +50,22 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOChangeRequest {
-        _ = super.dao(from: dictionary)
-        let userData: [String: Any?] = dictionary[CodingKeys.user.rawValue] as? [String : Any?] ?? [:]
-        self.user = DAOUser(from: userData)
-        let roleData = self.int(from: dictionary[CodingKeys.requestedRole.rawValue] as Any?) ?? self.requestedRole.rawValue
+    override open func dao(from data: DNSDataDictionary) -> DAOChangeRequest {
+        _ = super.dao(from: data)
+        let userData: DNSDataDictionary = data[field(.user)] as? [String : Any?] ?? [:]
+        self.user = Self.createUser(from: userData)
+        let roleData = self.int(from: data[field(.requestedRole)] as Any?) ?? self.requestedRole.rawValue
         self.requestedRole = DNSUserRole(rawValue: roleData) ?? .user
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.user.rawValue: self.user?.asDictionary,
-            CodingKeys.requestedRole.rawValue: self.requestedRole.rawValue,
+            field(.user): self.user?.asDictionary,
+            field(.requestedRole): self.requestedRole.rawValue,
         ]) { (current, _) in current }
         return retval
     }

@@ -6,9 +6,11 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOSystemState: DAOBaseObject {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case failureCodes, failureRate, totalPoints, state, stateOverride
     }
@@ -20,12 +22,15 @@ open class DAOSystemState: DAOBaseObject {
     public var stateOverride: DNSSystemState = .none
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    
+    required public init(id: String) {
+        super.init(id: id)
+    }
+
     // MARK: - DAO copy methods -
-    public init(from object: DAOSystemState) {
+    required public init(from object: DAOSystemState) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -39,39 +44,38 @@ open class DAOSystemState: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOSystemState {
-        _ = super.dao(from: dictionary)
-        let failureCodesData: [String: [String: Any?]] = dictionary[CodingKeys.failureCodes.rawValue] as? [String: [String: Any?]] ?? [:]
+    override open func dao(from data: DNSDataDictionary) -> DAOSystemState {
+        _ = super.dao(from: data)
+        let failureCodesData: [String: DNSDataDictionary] = data[field(.failureCodes)] as? [String: DNSDataDictionary] ?? [:]
         self.failureCodes = [:]
         failureCodesData.forEach { key, value in
             self.failureCodes[key] = DNSSystemStateNumbers(from: value)
         }
-        let failureRateData: [String: Any?] = dictionary[CodingKeys.failureRate.rawValue] as? [String: Any?] ?? [:]
+        let failureRateData: DNSDataDictionary = data[field(.failureRate)] as? DNSDataDictionary ?? [:]
         self.failureRate = DNSSystemStateNumbers(from: failureRateData)
-        let totalPointsData: [String: Any?] = dictionary[CodingKeys.totalPoints.rawValue] as? [String: Any?] ?? [:]
+        let totalPointsData: DNSDataDictionary = data[field(.totalPoints)] as? DNSDataDictionary ?? [:]
         self.totalPoints = DNSSystemStateNumbers(from: totalPointsData)
-        let rawState = self.string(from: dictionary[CodingKeys.state.rawValue] as Any?) ?? self.state.rawValue
+        let rawState = self.string(from: data[field(.state)] as Any?) ?? self.state.rawValue
         self.state = DNSSystemState(rawValue: rawState) ?? self.state
-        let rawStateOverride = self.string(from: dictionary[CodingKeys.stateOverride.rawValue] as Any?) ?? self.state.rawValue
+        let rawStateOverride = self.string(from: data[field(.stateOverride)] as Any?) ?? self.state.rawValue
         self.stateOverride = DNSSystemState(rawValue: rawStateOverride) ?? self.stateOverride
         return self
     }
-    override open var asDictionary: [String: Any?] {
-        var failureCodesData: [String: [String: Any?]] = [:]
+    override open var asDictionary: DNSDataDictionary {
+        var failureCodesData: [String: DNSDataDictionary] = [:]
         self.failureCodes.forEach { key, value in
             failureCodesData[key] = value.asDictionary
         }
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.failureCodes.rawValue: failureCodesData,
-            CodingKeys.failureRate.rawValue: self.failureRate.asDictionary,
-            CodingKeys.totalPoints.rawValue: self.totalPoints.asDictionary,
-            CodingKeys.state.rawValue: self.state.rawValue,
-            CodingKeys.stateOverride.rawValue: self.stateOverride.rawValue,
+            field(.failureCodes): failureCodesData,
+            field(.failureRate): self.failureRate.asDictionary,
+            field(.totalPoints): self.totalPoints.asDictionary,
+            field(.state): self.state.rawValue,
+            field(.stateOverride): self.stateOverride.rawValue,
         ]) { (current, _) in current }
         return retval
     }

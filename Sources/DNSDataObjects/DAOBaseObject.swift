@@ -10,6 +10,7 @@ import DNSCore
 import Foundation
 
 open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case id, meta
     }
@@ -18,11 +19,11 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     public var meta: DNSMetadata = DNSMetadata()
 
     // MARK: - Initializers -
-    public override init() {
+    override required public init() {
         super.init()
         self.id = self.meta.uuid.uuidString
     }
-    public init(id: String) {
+    required public init(id: String) {
         super.init()
         self.id = id
     }
@@ -38,20 +39,20 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     }
 
     // MARK: - DAO translation methods -
-    public init(from dictionary: [String: Any?]) {
+    required public init(from data: DNSDataDictionary) {
         super.init()
-        _ = self.dao(from: dictionary)
+        _ = self.dao(from: data)
     }
-    open func dao(from dictionary: [String: Any?]) -> DAOBaseObject {
-        self.id = self.string(from: dictionary[CodingKeys.id.rawValue] as Any?) ?? self.id
-        let metaData: [String: Any?] = dictionary[CodingKeys.meta.rawValue] as? [String: Any?] ?? [:]
+    open func dao(from data: DNSDataDictionary) -> DAOBaseObject {
+        self.id = self.string(from: data[field(.id)] as Any?) ?? self.id
+        let metaData: DNSDataDictionary = data[field(.meta)] as? DNSDataDictionary ?? [:]
         self.meta = DNSMetadata(from: metaData)
         return self
     }
-    open var asDictionary: [String: Any?] {
-        let retval: [String: Any?] = [
-            CodingKeys.id.rawValue: self.id,
-            CodingKeys.meta.rawValue: self.meta.asDictionary,
+    open var asDictionary: DNSDataDictionary {
+        let retval: DNSDataDictionary = [
+            field(.id): self.id,
+            field(.meta): self.meta.asDictionary,
         ]
         return retval
     }

@@ -6,25 +6,43 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOSystemEndPoint: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var stateType: DAOSystemState.Type { return DAOSystemState.self }
+    open class var systemType: DAOSystem.Type { return DAOSystem.self }
+
+    open class func createState() -> DAOSystemState { stateType.init() }
+    open class func createState(from object: DAOSystemState) -> DAOSystemState { stateType.init(from: object) }
+    open class func createState(from data: DNSDataDictionary) -> DAOSystemState { stateType.init(from: data) }
+
+    open class func createSystem() -> DAOSystem { systemType.init() }
+    open class func createSystem(from object: DAOSystem) -> DAOSystem { systemType.init(from: object) }
+    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem { systemType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case currentState, historyState, name, system
     }
 
-    public var currentState = DAOSystemState()
+    public var currentState = DAOSystemEndPoint.createState()
     public var name: String = ""
-    public var system = DAOSystem()
+    public var system = DAOSystemEndPoint.createSystem()
     public var historyState: [DAOSystemState] = []
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
+    }
+    required public init(id: String) {
+        super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOSystemEndPoint) {
+    required public init(from object: DAOSystemEndPoint) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -37,28 +55,27 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOSystemEndPoint {
-        _ = super.dao(from: dictionary)
-        let currentStateData = dictionary[CodingKeys.currentState.rawValue] as? [String: Any?] ?? [:]
-        self.currentState = DAOSystemState(from: currentStateData)
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        let systemData = dictionary[CodingKeys.system.rawValue] as? [String: Any?] ?? [:]
-        self.system = DAOSystem(from: systemData)
-        let historyStateData = dictionary[CodingKeys.historyState.rawValue] as? [[String: Any?]] ?? []
-        self.historyState = historyStateData.map { DAOSystemState(from: $0) }
+    override open func dao(from data: DNSDataDictionary) -> DAOSystemEndPoint {
+        _ = super.dao(from: data)
+        let currentStateData = data[field(.currentState)] as? DNSDataDictionary ?? [:]
+        self.currentState = Self.createState(from: currentStateData)
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        let systemData = data[field(.system)] as? DNSDataDictionary ?? [:]
+        self.system = Self.createSystem(from: systemData)
+        let historyStateData = data[field(.historyState)] as? [DNSDataDictionary] ?? []
+        self.historyState = historyStateData.map { Self.createState(from: $0) }
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.currentState.rawValue: self.currentState.asDictionary,
-            CodingKeys.name.rawValue: self.name,
-            CodingKeys.system.rawValue: self.system.asDictionary,
-            CodingKeys.historyState.rawValue: self.historyState,
+            field(.currentState): self.currentState.asDictionary,
+            field(.name): self.name,
+            field(.system): self.system.asDictionary,
+            field(.historyState): self.historyState,
         ]) { (current, _) in current }
         return retval
     }

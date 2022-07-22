@@ -1,5 +1,5 @@
 //
-//  DAOApplication.swift
+//  DAOAppActionImages.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,24 +9,13 @@
 import DNSCore
 import Foundation
 
-open class DAOApplication: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var eventType: DAOAppEvent.Type { return DAOAppEvent.self }
-
-    open class func createEvent() -> DAOAppEvent { eventType.init() }
-    open class func createEvent(from object: DAOAppEvent) -> DAOAppEvent { eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOAppEvent { eventType.init(from: data) }
-
-    // MARK: - Properties -
+open class DAOAppActionImages: DAOBaseObject {
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case appEvents
+        case topUrl
     }
 
-    open var appEvents: [DAOAppEvent] = []
-    open var activeAppEvent: DAOAppEvent? {
-        self.utilityActiveAppEvent()
-    }
+    public var topUrl = DNSURL()
 
     // MARK: - Initializers -
     required public init() {
@@ -37,29 +26,30 @@ open class DAOApplication: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOApplication) {
+    required public init(from object: DAOAppActionImages) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOApplication) {
+    open func update(from object: DAOAppActionImages) {
         super.update(from: object)
-        self.appEvents = object.appEvents
+        // swiftlint:disable force_cast
+        self.topUrl = object.topUrl.copy() as! DNSURL
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOApplication {
+    override open func dao(from data: DNSDataDictionary) -> DAOAppActionImages {
         _ = super.dao(from: data)
-        let appEvents = data[field(.appEvents)] as? [DNSDataDictionary] ?? []
-        self.appEvents = appEvents.map { Self.createEvent(from: $0) }
+        self.topUrl = self.dnsurl(from: data[field(.topUrl)] as Any?) ?? self.topUrl
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.appEvents): self.appEvents.map { $0.asDictionary },
+            field(.topUrl): self.topUrl,
         ]) { (current, _) in current }
         return retval
     }
@@ -67,7 +57,7 @@ open class DAOApplication: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        appEvents = try container.decode([DAOAppEvent].self, forKey: .appEvents)
+        topUrl = try container.decode(DNSURL.self, forKey: .topUrl)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -75,26 +65,18 @@ open class DAOApplication: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(appEvents, forKey: .appEvents)
+        try container.encode(topUrl, forKey: .topUrl)
     }
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOApplication(from: self)
+        let copy = DAOAppActionImages(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOApplication else { return true }
+        guard let rhs = rhs as? DAOAppActionImages else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.appEvents != rhs.appEvents
-    }
-
-    // MARK: - Utility methods -
-    open func utilityActiveAppEvent() -> DAOAppEvent? {
-        let now = Date()
-        return appEvents
-            .filter { $0.startTime < now && $0.endTime > now }
-            .first
+        return lhs.topUrl != rhs.topUrl
     }
 }

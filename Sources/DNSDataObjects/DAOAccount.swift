@@ -6,25 +6,40 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSCore
 import Foundation
 
 open class DAOAccount: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var cardType: DAOCard.Type { return DAOCard.self }
+    open class var userType: DAOUser.Type { return DAOUser.self }
+
+    open class func createCard() -> DAOCard { cardType.init() }
+    open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
+
+    open class func createUser() -> DAOUser { userType.init() }
+    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser { userType.init(from: data) }
+
+    // MARK: - Properties -
+    private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case name, user, cards, emailNotifications, pushNotifications
     }
 
-    public var name: String = ""
-    public var user = DAOUser()
+    public var name = ""
+    public var user = DAOAccount.createUser()
     public var cards: [DAOCard] = []
 
-    public var emailNotifications: Bool = false
-    public var pushNotifications: Bool = false
+    public var emailNotifications = false
+    public var pushNotifications = false
 
     // MARK: - Initializers -
-    override public init() {
+    required public init() {
         super.init()
     }
-    override public init(id: String) {
+    required public init(id: String) {
         super.init(id: id)
     }
     public init(name: String = "", user: DAOUser? = nil) {
@@ -34,7 +49,7 @@ open class DAOAccount: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DAOAccount) {
+    required public init(from object: DAOAccount) {
         super.init(from: object)
         self.update(from: object)
     }
@@ -48,31 +63,30 @@ open class DAOAccount: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    override public init(from dictionary: [String: Any?]) {
-        super.init()
-        _ = self.dao(from: dictionary)
+    required public init(from data: DNSDataDictionary) {
+        super.init(from: data)
     }
-    override open func dao(from dictionary: [String: Any?]) -> DAOAccount {
-        _ = super.dao(from: dictionary)
-        self.name = self.string(from: dictionary[CodingKeys.name.rawValue] as Any?) ?? self.name
-        self.user = DAOUser(from: dictionary[CodingKeys.user.rawValue] as? [String: Any?] ?? [:])
+    override open func dao(from data: DNSDataDictionary) -> DAOAccount {
+        _ = super.dao(from: data)
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.user = Self.createUser(from: data[field(.user)] as? DNSDataDictionary ?? [:])
         
-        let cards = dictionary[CodingKeys.cards.rawValue] as? [[String: Any?]] ?? []
-        self.cards = cards.map { DAOCard(from: $0) }
-        self.emailNotifications = self.bool(from: dictionary[CodingKeys.emailNotifications.rawValue] ??
+        let cards = data[field(.cards)] as? [DNSDataDictionary] ?? []
+        self.cards = cards.map { Self.createCard(from: $0) }
+        self.emailNotifications = self.bool(from: data[field(.emailNotifications)] ??
                                             self.emailNotifications)!
-        self.pushNotifications = self.bool(from: dictionary[CodingKeys.pushNotifications.rawValue] ??
+        self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
         return self
     }
-    override open var asDictionary: [String: Any?] {
+    override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            CodingKeys.name.rawValue: self.name,
-            CodingKeys.user.rawValue: self.user.asDictionary,
-            CodingKeys.cards.rawValue: self.cards.map { $0.asDictionary },
-            CodingKeys.emailNotifications.rawValue: self.emailNotifications,
-            CodingKeys.pushNotifications.rawValue: self.pushNotifications,
+            field(.name): self.name,
+            field(.user): self.user.asDictionary,
+            field(.cards): self.cards.map { $0.asDictionary },
+            field(.emailNotifications): self.emailNotifications,
+            field(.pushNotifications): self.pushNotifications,
         ]) { (current, _) in current }
         return retval
     }
