@@ -17,17 +17,17 @@ open class DAOBeacon: DAOBaseObject {
         case code, range, accuracy, rssi, data
     }
 
-    public var code: String = ""
-    public var range: String?
-    public var accuracy: CLLocationAccuracy = 0 {
+    open var code: String = ""
+    open var range: String?
+    open var accuracy: CLLocationAccuracy = 0 {
         didSet {
             if accuracy < 0 {
                 accuracy = 50
             }
         }
     }
-    public var rssi: Int?
-    public var data: CLBeacon?
+    open var rssi: Int?
+    open var data: CLBeacon?
 
     // MARK: - Initializers -
     required public init() {

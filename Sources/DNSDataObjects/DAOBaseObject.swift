@@ -16,8 +16,8 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
         case id, meta
     }
 
-    public var id: String = ""
-    public var meta: DNSMetadata = DNSMetadata()
+    open var id: String = ""
+    open var meta: DNSMetadata = DNSMetadata()
 
     // MARK: - Initializers -
     override required public init() {

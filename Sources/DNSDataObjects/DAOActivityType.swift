@@ -16,8 +16,8 @@ open class DAOActivityType: DAOBaseObject {
         case code, name
     }
 
-    public var code = ""
-    public var name = ""
+    open var code = ""
+    open var name = ""
 
     // MARK: - Initializers -
     required public init() {

@@ -16,9 +16,9 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
         case android, iOS, total
     }
 
-    public var android: Double = 0.0
-    public var iOS: Double = 0.0
-    public var total: Double = 0.0
+    open var android: Double = 0.0
+    open var iOS: Double = 0.0
+    open var total: Double = 0.0
 
     // MARK: - Initializers -
     required override public init() {

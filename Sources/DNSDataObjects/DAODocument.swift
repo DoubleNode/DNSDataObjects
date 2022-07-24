@@ -16,8 +16,8 @@ open class DAODocument: DAOBaseObject {
         case title, url
     }
 
-    public var title = DNSString()
-    public var url = DNSURL()
+    open var title = DNSString()
+    open var url = DNSURL()
 
     // MARK: - Initializers -
     required public init() {

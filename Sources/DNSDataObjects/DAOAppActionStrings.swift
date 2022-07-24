@@ -16,12 +16,12 @@ open class DAOAppActionStrings: DAOBaseObject {
         case body, cancelLabel, disclaimer, okayLabel, subTitle, title
     }
 
-    public var body = DNSString()
-    public var cancelLabel = DNSString()
-    public var disclaimer = DNSString()
-    public var okayLabel = DNSString()
-    public var subTitle = DNSString()
-    public var title = DNSString()
+    open var body = DNSString()
+    open var cancelLabel = DNSString()
+    open var disclaimer = DNSString()
+    open var okayLabel = DNSString()
+    open var subTitle = DNSString()
+    open var title = DNSString()
 
     // MARK: - Initializers -
     required public init() {

@@ -29,16 +29,16 @@ open class DAOPlaceHours: DAOBaseObject {
         case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     }
 
-    public var events: [DAOPlaceEvent] = []
-    public var holidays: [DAOPlaceHoliday] = []
+    open var events: [DAOPlaceEvent] = []
+    open var holidays: [DAOPlaceHoliday] = []
 
-    public var monday = DNSDailyHours()
-    public var tuesday = DNSDailyHours()
-    public var wednesday = DNSDailyHours()
-    public var thursday = DNSDailyHours()
-    public var friday = DNSDailyHours()
-    public var saturday = DNSDailyHours()
-    public var sunday = DNSDailyHours()
+    open var monday = DNSDailyHours()
+    open var tuesday = DNSDailyHours()
+    open var wednesday = DNSDailyHours()
+    open var thursday = DNSDailyHours()
+    open var friday = DNSDailyHours()
+    open var saturday = DNSDailyHours()
+    open var sunday = DNSDailyHours()
 
     public var today: DNSDailyHours {
         switch Date().dnsDayOfWeek {

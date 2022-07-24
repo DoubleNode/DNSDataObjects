@@ -20,11 +20,11 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case user, requestedRole
+        case requestedRole, user
     }
     
-    public var user: DAOUser?
-    public var requestedRole: DNSUserRole = .user
+    open var requestedRole = DNSUserRole.user
+    open var user: DAOUser?
     
     // MARK: - Initializers -
     required public init() {
@@ -40,32 +40,35 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOChangeRequest) {
+        fatalError("init(from:) has not been implemented")
+    }
+    required public init(from object: DAOUserChangeRequest) {
         super.init(from: object)
         self.update(from: object)
     }
     open func update(from object: DAOUserChangeRequest) {
         super.update(from: object)
-        self.user = object.user
         self.requestedRole = object.requestedRole
+        self.user = object.user
     }
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOChangeRequest {
+    override open func dao(from data: DNSDataDictionary) -> DAOUserChangeRequest {
         _ = super.dao(from: data)
-        let userData: DNSDataDictionary = data[field(.user)] as? [String : Any?] ?? [:]
-        self.user = Self.createUser(from: userData)
         let roleData = self.int(from: data[field(.requestedRole)] as Any?) ?? self.requestedRole.rawValue
         self.requestedRole = DNSUserRole(rawValue: roleData) ?? .user
+        let userData = data[field(.user)] as? DNSDataDictionary ?? [:]
+        self.user = Self.createUser(from: userData)
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.user): self.user?.asDictionary,
             field(.requestedRole): self.requestedRole.rawValue,
+            field(.user): self.user?.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -73,24 +76,29 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        requestedRole = try container.decode(DNSUserRole.self, forKey: .requestedRole)
+        user = try container.decode(Self.userType.self, forKey: .user)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
-//        var container = encoder.container(keyedBy: CodingKeys.self)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(requestedRole, forKey: .requestedRole)
+        try container.encode(user, forKey: .user)
     }
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOChangeRequest(from: self)
+        let copy = DAOUserChangeRequest(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOChangeRequest else { return true }
+        guard let rhs = rhs as? DAOUserChangeRequest else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
-//        let lhs = self
-        return false
+        let lhs = self
+        return lhs.requestedRole != rhs.requestedRole
+            || lhs.user != rhs.user
     }
 }

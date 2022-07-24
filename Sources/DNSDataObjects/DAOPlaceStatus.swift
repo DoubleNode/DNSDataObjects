@@ -16,11 +16,11 @@ open class DAOPlaceStatus: DAOBaseObject {
         case endTime, message, scope, startTime, status
     }
 
-    public var endTime = Date()
-    public var message: DNSString = DNSString(with: "")
-    public var scope: DNSAlertScope = .place
-    public var startTime = Date()
-    public var status: DNSStatus = .open
+    open var endTime = Date()
+    open var message = DNSString(with: "")
+    open var scope = DNSAlertScope.place
+    open var startTime = Date()
+    open var status = DNSStatus.open
 
     public var isOpen: Bool { utilityIsOpen() }
     

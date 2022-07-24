@@ -10,15 +10,23 @@ import DNSCore
 import Foundation
 
 open class DAOFaqSection: DAOBaseObject {
+    // MARK: - Class Factory methods -
+    open class var faqType: DAOFaq.Type { return DAOFaq.self }
+
+    open class func createFaq() -> DAOFaq { faqType.init() }
+    open class func createFaq(from object: DAOFaq) -> DAOFaq { faqType.init(from: object) }
+    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq { faqType.init(from: data) }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case code, title, iconKey
+        case code, faqs, icon, title
     }
 
-    public var code = ""
-    public var title = DNSString()
-    public var iconKey = ""
+    open var code = ""
+    open var faqs: [DAOFaq] = []
+    open var icon = ""
+    open var title = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -27,10 +35,10 @@ open class DAOFaqSection: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(code: String, title: DNSString, iconKey: String) {
+    public init(code: String, title: DNSString, icon: String) {
         self.code = code
+        self.icon = icon
         self.title = title
-        self.iconKey = iconKey
         super.init()
     }
 
@@ -42,8 +50,9 @@ open class DAOFaqSection: DAOBaseObject {
     open func update(from object: DAOFaqSection) {
         super.update(from: object)
         self.code = object.code
+        self.faqs = object.faqs
+        self.icon = object.icon
         self.title = object.title
-        self.iconKey = object.iconKey
     }
 
     // MARK: - DAO translation methods -
@@ -53,16 +62,19 @@ open class DAOFaqSection: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOFaqSection {
         _ = super.dao(from: data)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        let faqsData = data[field(.faqs)] as? [DNSDataDictionary] ?? []
+        self.faqs = faqsData.map { Self.createFaq(from: $0) }
+        self.icon = self.string(from: data[field(.icon)] as Any?) ?? self.icon
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
-        self.iconKey = self.string(from: data[field(.iconKey)] as Any?) ?? self.iconKey
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
             field(.code): self.code,
+            field(.faqs): self.faqs.map { $0.asDictionary },
+            field(.icon): self.icon,
             field(.title): self.title.asDictionary,
-            field(.iconKey): self.iconKey,
         ]) { (current, _) in current }
         return retval
     }
@@ -71,8 +83,9 @@ open class DAOFaqSection: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = try container.decode(String.self, forKey: .code)
+        faqs = try container.decode([DAOFaq].self, forKey: .faqs)
+        icon = try container.decode(String.self, forKey: .icon)
         title = try container.decode(DNSString.self, forKey: .title)
-        iconKey = try container.decode(String.self, forKey: .iconKey)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -81,8 +94,9 @@ open class DAOFaqSection: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(code, forKey: .code)
+        try container.encode(faqs, forKey: .faqs)
+        try container.encode(icon, forKey: .icon)
         try container.encode(title, forKey: .title)
-        try container.encode(iconKey, forKey: .iconKey)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -95,7 +109,8 @@ open class DAOFaqSection: DAOBaseObject {
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return lhs.code != rhs.code
+            || lhs.faqs != rhs.faqs
+            || lhs.icon != rhs.icon
             || lhs.title != rhs.title
-            || lhs.iconKey != rhs.iconKey
     }
 }

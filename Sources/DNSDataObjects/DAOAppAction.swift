@@ -30,10 +30,10 @@ open class DAOAppAction: DAOBaseObject {
         case stringsSection = "strings"
     }
 
-    public var actionType: DNSActionType = .popup
-    public var deepLink: URL?
-    public var images = DAOAppAction.createImages()
-    public var strings = DAOAppAction.createStrings()
+    open var actionType: DNSActionType = .popup
+    open var deepLink: URL?
+    open var images = DAOAppAction.createImages()
+    open var strings = DAOAppAction.createStrings()
 
     // MARK: - Initializers -
     required public init() {
@@ -92,8 +92,8 @@ open class DAOAppAction: DAOBaseObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         actionType = try container.decode(DNSActionType.self, forKey: .actionType)
         deepLink = try container.decode(URL.self, forKey: .deepLink)
-        images = try container.decode(DAOAppActionImages.self, forKey: .imagesSection)
-        strings = try container.decode(DAOAppActionStrings.self, forKey: .stringsSection)
+        images = try container.decode(Self.imagesType.self, forKey: .imagesSection)
+        strings = try container.decode(Self.stringsType.self, forKey: .stringsSection)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

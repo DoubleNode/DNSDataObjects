@@ -16,10 +16,10 @@ open class DAONotification: DAOBaseObject {
         case body, deepLink, title, type
     }
 
-    public var body = ""
-    public var deepLink: URL?
-    public var title = ""
-    public var type: DNSNotificationType = .unknown
+    open var body = ""
+    open var deepLink: URL?
+    open var title = ""
+    open var type: DNSNotificationType = .unknown
     
     // MARK: - Initializers -
     required public init() {
@@ -55,7 +55,8 @@ open class DAONotification: DAOBaseObject {
         self.body = self.string(from: data[field(.body)] as Any?) ?? self.body
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         self.title = self.string(from: data[field(.title)] as Any?) ?? self.title
-        self.type = DNSNotificationType(rawValue: self.string(from: data[field(.type)] as Any?) ?? "") ?? .unknown
+        let typeData = self.string(from: data[field(.type)] as Any?) ?? ""
+        self.type = DNSNotificationType(rawValue: typeData) ?? .unknown
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -64,7 +65,7 @@ open class DAONotification: DAOBaseObject {
             field(.body): self.body,
             field(.deepLink): self.deepLink,
             field(.title): self.title,
-            field(.type): self.type,
+            field(.type): self.type.rawValue,
         ]) { (current, _) in current }
         return retval
     }

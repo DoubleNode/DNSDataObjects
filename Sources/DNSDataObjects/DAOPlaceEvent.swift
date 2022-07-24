@@ -16,11 +16,11 @@ open class DAOPlaceEvent: DAOBaseObject {
         case endDate, name, startDate, timeZone, type
     }
 
-    public var endDate = Date()
-    public var name = ""
-    public var startDate = Date()
-    public var timeZone = TimeZone.current
-    public var type = ""
+    open var endDate = Date()
+    open var name = ""
+    open var startDate = Date()
+    open var timeZone = TimeZone.current
+    open var type = ""
 
     public var endTime: DNSTimeOfDay {
         let endTimeStr = self.endDate.dnsTime(as: .shortMilitary, in: timeZone).dnsSplit(every: 2).joined(separator: ":")

@@ -16,9 +16,9 @@ open class DAOMedia: DAOBaseObject {
         case type, url, preloadUrl
     }
 
-    public var type: DNSMediaType = .unknown
-    public var url = DNSURL()
-    public var preloadUrl = DNSURL()
+    open var type: DNSMediaType = .unknown
+    open var url = DNSURL()
+    open var preloadUrl = DNSURL()
 
     // MARK: - Initializers -
     required public init() {

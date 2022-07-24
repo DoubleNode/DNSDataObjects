@@ -23,8 +23,8 @@ public class DAORegion: DAOBaseObject {
         case districts, name
     }
 
-    public var districts: [DAODistrict] = []
-    public var name = DNSString()
+    open var districts: [DAODistrict] = []
+    open var name = DNSString()
 
     // MARK: - Initializers -
     required public init() {

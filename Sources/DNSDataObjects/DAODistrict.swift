@@ -11,12 +11,12 @@ import UIKit
 
 open class DAODistrict: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var centerType: DAOPlace.Type { return DAOPlace.self }
+    open class var placeType: DAOPlace.Type { return DAOPlace.self }
     open class var regionType: DAORegion.Type { return DAORegion.self }
 
-    open class func createCenter() -> DAOPlace { centerType.init() }
-    open class func createCenter(from object: DAOPlace) -> DAOPlace { centerType.init(from: object) }
-    open class func createCenter(from data: DNSDataDictionary) -> DAOPlace { centerType.init(from: data) }
+    open class func createPlace() -> DAOPlace { placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace { placeType.init(from: data) }
 
     open class func createRegion() -> DAORegion { regionType.init() }
     open class func createRegion(from object: DAORegion) -> DAORegion { regionType.init(from: object) }
@@ -28,9 +28,9 @@ open class DAODistrict: DAOBaseObject {
         case centers, name, region
     }
 
-    public var centers: [DAOPlace] = []
-    public var name = DNSString()
-    public var region = DAODistrict.createRegion()
+    open var centers: [DAOPlace] = []
+    open var name = DNSString()
+    open var region = DAODistrict.createRegion()
 
     // MARK: - Initializers -
     required public init() {
@@ -59,7 +59,7 @@ open class DAODistrict: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAODistrict {
         _ = super.dao(from: data)
         let centersData: [DNSDataDictionary] = data[field(.centers)] as? [DNSDataDictionary] ?? []
-        self.centers = centersData.map { Self.createCenter(from: $0) }
+        self.centers = centersData.map { Self.createPlace(from: $0) }
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let regionData = data[field(.region)] as? DNSDataDictionary ?? [:]
         self.region = Self.createRegion(from: regionData)
@@ -80,7 +80,7 @@ open class DAODistrict: DAOBaseObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         centers = try container.decode([DAOPlace].self, forKey: .centers)
         name = try container.decode(DNSString.self, forKey: .name)
-        region = try container.decode(DAORegion.self, forKey: .region)
+        region = try container.decode(Self.regionType.self, forKey: .region)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

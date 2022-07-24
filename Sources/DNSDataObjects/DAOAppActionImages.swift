@@ -16,7 +16,7 @@ open class DAOAppActionImages: DAOBaseObject {
         case topUrl
     }
 
-    public var topUrl = DNSURL()
+    open var topUrl = DNSURL()
 
     // MARK: - Initializers -
     required public init() {

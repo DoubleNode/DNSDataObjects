@@ -1,5 +1,5 @@
 //
-//  DAOActivityBlackout.swift
+//  DAOProduct.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,17 +9,18 @@
 import DNSCore
 import Foundation
 
-open class DAOActivityBlackout: DAOBaseObject {
+open class DAOProduct: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case endTime, message, startTime
+        case about, price, sku, title
     }
-
-    open var endTime: Date?
-    open var message = DNSString()
-    open var startTime: Date?
-
+    
+    open var about = ""
+    open var price: Float = 0
+    open var sku = ""
+    open var title = ""
+    
     // MARK: - Initializers -
     required public init() {
         super.init()
@@ -29,34 +30,37 @@ open class DAOActivityBlackout: DAOBaseObject {
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOActivityBlackout) {
+    required public init(from object: DAOProduct) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOActivityBlackout) {
+    open func update(from object: DAOProduct) {
         super.update(from: object)
-        self.endTime = object.endTime
-        self.message = object.message
-        self.startTime = object.startTime
+        self.about = object.about
+        self.price = object.price
+        self.sku = object.sku
+        self.title = object.title
     }
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
         super.init(from: data)
     }
-    open override func dao(from data: DNSDataDictionary) -> DAOActivityBlackout {
+    override open func dao(from data: DNSDataDictionary) -> DAOProduct {
         _ = super.dao(from: data)
-        self.endTime = self.date(from: data[field(.endTime)] as Any?) ?? self.endTime
-        self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
-        self.startTime = self.date(from: data[field(.startTime)] as Any?) ?? self.startTime
+        self.about = self.string(from: data[field(.about)] as Any?) ?? self.about
+        self.price = self.float(from: data[field(.price)] as Any?) ?? self.price
+        self.sku = self.string(from: data[field(.sku)] as Any?) ?? self.sku
+        self.title = self.string(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.endTime): self.endTime,
-            field(.message): self.message.asDictionary,
-            field(.startTime): self.startTime,
+            field(.about): self.about,
+            field(.price): self.price,
+            field(.sku): self.sku,
+            field(.title): self.title,
         ]) { (current, _) in current }
         return retval
     }
@@ -64,9 +68,10 @@ open class DAOActivityBlackout: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decode(Date?.self, forKey: .endTime)
-        message = try container.decode(DNSString.self, forKey: .message)
-        startTime = try container.decode(Date?.self, forKey: .startTime)
+        about = try container.decode(String.self, forKey: .about)
+        price = try container.decode(Float.self, forKey: .price)
+        sku = try container.decode(String.self, forKey: .sku)
+        title = try container.decode(String.self, forKey: .title)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -74,22 +79,24 @@ open class DAOActivityBlackout: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(endTime, forKey: .endTime)
-        try container.encode(message, forKey: .message)
-        try container.encode(startTime, forKey: .startTime)
+        try container.encode(about, forKey: .about)
+        try container.encode(price, forKey: .price)
+        try container.encode(sku, forKey: .sku)
+        try container.encode(title, forKey: .title)
     }
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOActivityBlackout(from: self)
+        let copy = DAOProduct(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOActivityBlackout else { return true }
+        guard let rhs = rhs as? DAOProduct else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endTime != rhs.endTime
-            || lhs.message != rhs.message
-            || lhs.startTime != rhs.startTime
+        return lhs.about != rhs.about
+            || lhs.price != rhs.price
+            || lhs.sku != rhs.sku
+            || lhs.title != rhs.title
     }
 }

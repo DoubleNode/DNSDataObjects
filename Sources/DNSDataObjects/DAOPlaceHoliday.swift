@@ -16,8 +16,8 @@ open class DAOPlaceHoliday: DAOBaseObject {
         case date, hours
     }
 
-    public var date = Date.today
-    public var hours = DNSDailyHours()
+    open var date = Date.today
+    open var hours = DNSDailyHours()
 
     // MARK: - Initializers -
     required public init() {

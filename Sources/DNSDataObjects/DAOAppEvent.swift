@@ -10,17 +10,19 @@ import DNSCore
 import Foundation
 
 open class DAOAppEvent: DAOBaseObject {
+    public enum C {
+        public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
+        public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
+    }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, priority, startTime, title
     }
 
-    public static var defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
-    public static var defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
-
-    public var endTime: Date = DAOAppEvent.defaultEndTime
-    public var priority: Int = DNSPriority.normal {
+    open var endTime = C.defaultEndTime
+    open var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
                 priority = DNSPriority.highest
@@ -29,8 +31,8 @@ open class DAOAppEvent: DAOBaseObject {
             }
         }
     }
-    public var startTime: Date = DAOAppEvent.defaultStartTime
-    public var title: DNSString = DNSString()
+    open var startTime = C.defaultStartTime
+    open var title = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -40,8 +42,8 @@ open class DAOAppEvent: DAOBaseObject {
         super.init(id: id)
     }
     public init(title: DNSString = DNSString(),
-                startTime: Date = DAOAppEvent.defaultStartTime,
-                endTime: Date = DAOAppEvent.defaultEndTime) {
+                startTime: Date = C.defaultStartTime,
+                endTime: Date = C.defaultEndTime) {
         self.title = title
         self.startTime = startTime
         self.endTime = endTime

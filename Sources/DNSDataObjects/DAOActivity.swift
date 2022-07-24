@@ -28,12 +28,12 @@ open class DAOActivity: DAOBaseObject {
         case baseType, blackouts, bookingEndTime, bookingStartTime, code, name
     }
 
-    public var baseType = DAOActivity.createBase()
-    public var blackouts: [DAOActivityBlackout] = []
-    public var bookingEndTime: Date?
-    public var bookingStartTime: Date?
-    public var code = ""
-    public var name = DNSString()
+    open var baseType = DAOActivity.createBase()
+    open var blackouts: [DAOActivityBlackout] = []
+    open var bookingEndTime: Date?
+    open var bookingStartTime: Date?
+    open var code = ""
+    open var name = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -93,7 +93,7 @@ open class DAOActivity: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decode(DAOActivityType.self, forKey: .baseType)
+        baseType = try container.decode(Self.baseType.self, forKey: .baseType)
         blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)
         bookingEndTime = try container.decode(Date?.self, forKey: .bookingEndTime)
         bookingStartTime = try container.decode(Date?.self, forKey: .bookingStartTime)

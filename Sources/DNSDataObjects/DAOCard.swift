@@ -16,9 +16,9 @@ open class DAOCard: DAOBaseObject {
         case cardNumber, nickname, pinNumber
     }
 
-    public var cardNumber: String = ""
-    public var nickname: String = ""
-    public var pinNumber: String = ""
+    open var cardNumber = ""
+    open var nickname = ""
+    open var pinNumber = ""
 
     // MARK: - Initializers -
     required public init() {

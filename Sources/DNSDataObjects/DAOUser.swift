@@ -13,7 +13,7 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var activityType: DAOActivityType.Type { return DAOActivityType.self }
     open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var centerType: DAOPlace.Type { return DAOPlace.self }
+    open class var placeType: DAOPlace.Type { return DAOPlace.self }
 
     open class func createActivity() -> DAOActivityType { activityType.init() }
     open class func createActivity(from object: DAOActivityType) -> DAOActivityType { activityType.init(from: object) }
@@ -23,25 +23,24 @@ open class DAOUser: DAOBaseObject {
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
     open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
 
-    open class func createCenter() -> DAOPlace { centerType.init() }
-    open class func createCenter(from object: DAOPlace) -> DAOPlace { centerType.init(from: object) }
-    open class func createCenter(from data: DNSDataDictionary) -> DAOPlace { centerType.init(from: data) }
+    open class func createPlace() -> DAOPlace { placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace { placeType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case email, firstName, lastName, phone, dob
-        case cards, favorites, myCenter
+        case cards, dob, email, favorites, firstName, lastName, myPlace, phone
     }
 
-    public var email: String = ""
-    public var firstName: String = ""
-    public var lastName: String = ""
-    public var phone: String = ""
-    public var dob: Date?
-    public var cards: [DAOCard] = []
-    public var favorites: [DAOActivityType] = []
-    open var myCenter: DAOPlace?
+    open var cards: [DAOCard] = []
+    open var dob: Date?
+    open var email: String = ""
+    open var favorites: [DAOActivityType] = []
+    open var firstName: String = ""
+    open var lastName: String = ""
+    open var myPlace: DAOPlace?
+    open var phone: String = ""
 
     // MARK: - Initializers -
     required public init() {
@@ -51,11 +50,11 @@ open class DAOUser: DAOBaseObject {
         super.init(id: id)
     }
     public init(id: String, email: String, firstName: String, lastName: String) {
+        self.dob = nil
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
         self.phone = ""
-        self.dob = nil
         super.init(id: id)
     }
 
@@ -66,14 +65,14 @@ open class DAOUser: DAOBaseObject {
     }
     open func update(from object: DAOUser) {
         super.update(from: object)
+        self.cards = object.cards
+        self.dob = object.dob
         self.email = object.email
+        self.favorites = object.favorites
         self.firstName = object.firstName
         self.lastName = object.lastName
+        self.myPlace = object.myPlace
         self.phone = object.phone
-        self.dob = object.dob
-        self.cards = object.cards
-        self.favorites = object.favorites
-        self.myCenter = object.myCenter
     }
 
     // MARK: - DAO translation methods -
@@ -82,33 +81,30 @@ open class DAOUser: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOUser {
         _ = super.dao(from: data)
-        self.email = self.string(from: data[field(.email)]  as Any?) ?? self.email
-        self.firstName = self.string(from: data[field(.firstName)] as Any?) ?? self.firstName
-        self.lastName = self.string(from: data[field(.lastName)] as Any?) ?? self.lastName
-        self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
-        self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
-
         let cardsData = data[field(.cards)] as? [DNSDataDictionary] ?? []
         self.cards = cardsData.map { Self.createCard(from: $0) }
-
+        self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
+        self.email = self.string(from: data[field(.email)]  as Any?) ?? self.email
         let favoritesData = data[field(.favorites)] as? [DNSDataDictionary] ?? []
         self.favorites = favoritesData.map { Self.createActivity(from: $0) }
-
-        let myCenterData = data[field(.myCenter)] as? DNSDataDictionary ?? [:]
-        self.myCenter = Self.createCenter(from: myCenterData)
+        self.firstName = self.string(from: data[field(.firstName)] as Any?) ?? self.firstName
+        self.lastName = self.string(from: data[field(.lastName)] as Any?) ?? self.lastName
+        let myPlaceData = data[field(.myPlace)] as? DNSDataDictionary ?? [:]
+        self.myPlace = Self.createPlace(from: myPlaceData)
+        self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
+            field(.cards): self.cards.map { $0.asDictionary },
+            field(.dob): self.dob,
             field(.email): self.email,
+            field(.favorites): self.favorites.map { $0.asDictionary },
             field(.firstName): self.firstName,
             field(.lastName): self.lastName,
+            field(.myPlace): self.myPlace?.asDictionary,
             field(.phone): self.phone,
-            field(.dob): self.dob,
-            field(.cards): self.cards.map { $0.asDictionary },
-            field(.favorites): self.favorites.map { $0.asDictionary },
-            field(.myCenter): self.myCenter?.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -116,14 +112,14 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        cards = try container.decode([DAOCard].self, forKey: .cards)
+        dob = try container.decode(Date?.self, forKey: .dob)
         email = try container.decode(String.self, forKey: .email)
+        favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
+        myPlace = try container.decode(Self.placeType.self, forKey: .myPlace)
         phone = try container.decode(String.self, forKey: .phone)
-        dob = try container.decode(Date?.self, forKey: .dob)
-        cards = try container.decode([DAOCard].self, forKey: .cards)
-        favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
-        myCenter = try container.decode(DAOPlace.self, forKey: .myCenter)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -131,14 +127,14 @@ open class DAOUser: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(cards, forKey: .cards)
+        try container.encode(dob, forKey: .dob)
         try container.encode(email, forKey: .email)
+        try container.encode(favorites, forKey: .favorites)
         try container.encode(firstName, forKey: .firstName)
         try container.encode(lastName, forKey: .lastName)
+        try container.encode(myPlace, forKey: .myPlace)
         try container.encode(phone, forKey: .phone)
-        try container.encode(dob, forKey: .dob)
-        try container.encode(cards, forKey: .cards)
-        try container.encode(favorites, forKey: .favorites)
-        try container.encode(myCenter, forKey: .myCenter)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -150,13 +146,13 @@ open class DAOUser: DAOBaseObject {
         guard let rhs = rhs as? DAOUser else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.email != rhs.email
+        return lhs.cards != rhs.cards
+            || lhs.dob != rhs.dob
+            || lhs.email != rhs.email
+            || lhs.favorites != rhs.favorites
             || lhs.firstName != rhs.firstName
             || lhs.lastName != rhs.lastName
+            || lhs.myPlace != rhs.myPlace
             || lhs.phone != rhs.phone
-            || lhs.dob != rhs.dob
-            || lhs.cards != rhs.cards
-            || lhs.favorites != rhs.favorites
-            || lhs.myCenter != rhs.myCenter
     }
 }

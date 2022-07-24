@@ -10,13 +10,13 @@ import DNSCore
 import Foundation
 
 open class DNSDayOfWeekFlags: Codable, Hashable, NSCopying {
-    public var sunday: Bool = true
-    public var monday: Bool = true
-    public var tuesday: Bool = true
-    public var wednesday: Bool = true
-    public var thursday: Bool = true
-    public var friday: Bool = true
-    public var saturday: Bool = true
+    open var sunday: Bool = true
+    open var monday: Bool = true
+    open var tuesday: Bool = true
+    open var wednesday: Bool = true
+    open var thursday: Bool = true
+    open var friday: Bool = true
+    open var saturday: Bool = true
     
     public init() { }
     

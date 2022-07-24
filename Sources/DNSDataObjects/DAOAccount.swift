@@ -28,12 +28,12 @@ open class DAOAccount: DAOBaseObject {
         case name, user, cards, emailNotifications, pushNotifications
     }
 
-    public var name = ""
-    public var user = DAOAccount.createUser()
-    public var cards: [DAOCard] = []
+    open var name = ""
+    open var user = DAOAccount.createUser()
+    open var cards: [DAOCard] = []
 
-    public var emailNotifications = false
-    public var pushNotifications = false
+    open var emailNotifications = false
+    open var pushNotifications = false
 
     // MARK: - Initializers -
     required public init() {
@@ -95,7 +95,7 @@ open class DAOAccount: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
-        user = try container.decode(DAOUser.self, forKey: .user)
+        user = try container.decode(Self.userType.self, forKey: .user)
         cards = try container.decode([DAOCard].self, forKey: .cards)
         emailNotifications = try container.decode(Bool.self, forKey: .emailNotifications)
         pushNotifications = try container.decode(Bool.self, forKey: .pushNotifications)

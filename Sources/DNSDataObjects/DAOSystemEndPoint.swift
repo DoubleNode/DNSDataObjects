@@ -28,10 +28,10 @@ open class DAOSystemEndPoint: DAOBaseObject {
         case currentState, historyState, name, system
     }
 
-    public var currentState = DAOSystemEndPoint.createState()
-    public var name: String = ""
-    public var system = DAOSystemEndPoint.createSystem()
-    public var historyState: [DAOSystemState] = []
+    open var currentState = DAOSystemEndPoint.createState()
+    open var name: String = ""
+    open var system = DAOSystemEndPoint.createSystem()
+    open var historyState: [DAOSystemState] = []
 
     // MARK: - Initializers -
     required public init() {
@@ -83,9 +83,9 @@ open class DAOSystemEndPoint: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = try container.decode(DAOSystemState.self, forKey: .currentState)
+        currentState = try container.decode(Self.stateType.self, forKey: .currentState)
         name = try container.decode(String.self, forKey: .name)
-        system = try container.decode(DAOSystem.self, forKey: .system)
+        system = try container.decode(Self.systemType.self, forKey: .system)
         historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()

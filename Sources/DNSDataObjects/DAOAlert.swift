@@ -10,6 +10,11 @@ import DNSCore
 import Foundation
 
 open class DAOAlert: DAOBaseObject {
+    public enum C {
+        public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
+        public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
+    }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -17,18 +22,15 @@ open class DAOAlert: DAOBaseObject {
         case startTime, status, tagLine, title
     }
 
-    public static var defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
-    public static var defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
-
-    public var endTime = defaultEndTime
-    public var imageUrl = DNSURL()
-    public var name = ""
-    public var priority: Int = 100
-    public var scope: DNSAlertScope = .all
-    public var startTime = defaultStartTime
-    public var status: DNSStatus = .tempClosed
-    public var tagLine = DNSString()
-    public var title = DNSString()
+    open var endTime = C.defaultEndTime
+    open var imageUrl = DNSURL()
+    open var name = ""
+    open var priority: Int = 100
+    open var scope: DNSAlertScope = .all
+    open var startTime = C.defaultStartTime
+    open var status: DNSStatus = .tempClosed
+    open var tagLine = DNSString()
+    open var title = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -40,8 +42,8 @@ open class DAOAlert: DAOBaseObject {
     public init(status: DNSStatus,
                 title: DNSString,
                 tagLine: DNSString,
-                startTime: Date = defaultStartTime,
-                endTime: Date = defaultEndTime) {
+                startTime: Date = C.defaultStartTime,
+                endTime: Date = C.defaultEndTime) {
         self.status = status
         self.title = title
         self.tagLine = tagLine

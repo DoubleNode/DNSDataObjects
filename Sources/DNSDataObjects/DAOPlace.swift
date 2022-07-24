@@ -46,16 +46,16 @@ open class DAOPlace: DAOBaseObject {
     }
 
     open var activities: [DAOActivity] = []
-    public var address = ""
-    public var alerts: [DAOAlert] = []
-    public var code = ""
-    public var district = DAOPlace.createDistrict()
-    public var geohashes: [String] = []
-    public var geopoint: CLLocation?
-    public var hours = DAOPlace.createHours()
-    public var name = DNSString()
-    public var phone = ""
-    public var statuses: [DAOPlaceStatus] = [] {
+    open var address = ""
+    open var alerts: [DAOAlert] = []
+    open var code = ""
+    open var district = DAOPlace.createDistrict()
+    open var geohashes: [String] = []
+    open var geopoint: CLLocation?
+    open var hours = DAOPlace.createHours()
+    open var name = DNSString()
+    open var phone = ""
+    open var statuses: [DAOPlaceStatus] = [] {
         didSet {
             self.statuses.filter { $0.id.isEmpty }
                 .forEach {
@@ -63,7 +63,7 @@ open class DAOPlace: DAOBaseObject {
                 }
         }
     }
-    public var timeZone: TimeZone = TimeZone.current
+    open var timeZone: TimeZone = TimeZone.current
 
     // MARK: - Initializers -
     required public init() {
@@ -161,11 +161,11 @@ open class DAOPlace: DAOBaseObject {
         address = try container.decode(String.self, forKey: .address)
         alerts = try container.decode([DAOAlert].self, forKey: .alerts)
         code = try container.decode(String.self, forKey: .code)
-        district = try container.decode(DAODistrict.self, forKey: .district)
+        district = try container.decode(Self.districtType.self, forKey: .district)
         geohashes = try container.decode([String].self, forKey: .geohashes)
         let geopointData = try container.decode([String: Double].self, forKey: .geopoint)
         geopoint = CLLocation(from: geopointData)
-        hours = try container.decode(DAOPlaceHours.self, forKey: .hours)
+        hours = try container.decode(Self.hoursType.self, forKey: .hours)
         name = try container.decode(DNSString.self, forKey: .name)
         phone = try container.decode(String.self, forKey: .phone)
         statuses = try container.decode([DAOPlaceStatus].self, forKey: .statuses)

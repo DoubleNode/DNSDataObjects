@@ -23,9 +23,9 @@ open class DAOFaq: DAOBaseObject {
         case section, question, answer
     }
 
-    public var section = DAOFaq.createSection()
-    public var question = DNSString()
-    public var answer = DNSString()
+    open var section = DAOFaq.createSection()
+    open var question = DNSString()
+    open var answer = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -80,7 +80,7 @@ open class DAOFaq: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        section = try container.decode(DAOFaqSection.self, forKey: .section)
+        section = try container.decode(Self.sectionType.self, forKey: .section)
         question = try container.decode(DNSString.self, forKey: .question)
         answer = try container.decode(DNSString.self, forKey: .answer)
         // Get superDecoder for superclass and call super.init(from:) with it

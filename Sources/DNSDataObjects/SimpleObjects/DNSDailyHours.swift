@@ -16,8 +16,8 @@ open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
         case close, open
     }
     
-    public var close: DNSTimeOfDay?
-    public var open: DNSTimeOfDay?
+    open var close: DNSTimeOfDay?
+    open var open: DNSTimeOfDay?
     
     open var openTime: Date { open() ?? Date() }
     open var closeTime: Date { close() ?? Date() }

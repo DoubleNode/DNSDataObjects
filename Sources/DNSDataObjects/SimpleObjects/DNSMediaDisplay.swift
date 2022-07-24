@@ -10,9 +10,9 @@ import DNSCore
 import UIKit
 
 open class DNSMediaDisplay {
-    public var imageView: UIImageView
-    public var progressView: UIProgressView?
-    public var secondaryImageViews: [UIImageView] = []
+    open var imageView: UIImageView
+    open var progressView: UIProgressView?
+    open var secondaryImageViews: [UIImageView] = []
     
     public init(imageView: UIImageView,
                 progressView: UIProgressView? = nil,
