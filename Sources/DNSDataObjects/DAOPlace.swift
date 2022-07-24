@@ -42,7 +42,7 @@ open class DAOPlace: DAOBaseObject {
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case activities, address, alerts, code, district
-        case geohash, geopoint, hours, name, phone, statuses, timeZone
+        case geohashes, geopoint, hours, name, phone, statuses, timeZone
     }
 
     open var activities: [DAOActivity] = []
@@ -50,7 +50,7 @@ open class DAOPlace: DAOBaseObject {
     public var alerts: [DAOAlert] = []
     public var code = ""
     public var district = DAOPlace.createDistrict()
-    public var geohash = ""
+    public var geohashes: [String] = []
     public var geopoint: CLLocation?
     public var hours = DAOPlace.createHours()
     public var name = DNSString()
@@ -90,7 +90,7 @@ open class DAOPlace: DAOBaseObject {
         self.alerts = object.alerts
         self.code = object.code
         self.district = object.district
-        self.geohash = object.geohash
+        self.geohashes = object.geohashes
         self.geopoint = object.geopoint
         self.hours = object.hours
         self.name = object.name
@@ -121,8 +121,8 @@ open class DAOPlace: DAOBaseObject {
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
         let districtData = data[field(.district)] as? DNSDataDictionary ?? [:]
         self.district = Self.createDistrict(from: districtData)
-        self.geohash = self.string(from: data[field(.geohash)] as Any?) ?? self.geohash
-        self.geopoint = self.location(from: data[field(.geopoint)] as Any?) ?? self.geopoint
+        let geohashesData = data[field(.geohashes)] as? [DNSDataDictionary] ?? []
+        self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
         let hoursData = data[field(.hours)] as? DNSDataDictionary ?? [:]
         self.hours = Self.createHours(from: hoursData)
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
@@ -143,7 +143,7 @@ open class DAOPlace: DAOBaseObject {
             field(.alerts): self.alerts.map { $0.asDictionary },
             field(.code): self.code,
             field(.district): self.district.asDictionary,
-            field(.geohash): self.geohash,
+            field(.geohashes): self.geohashes.map { $0 },
             field(.geopoint): self.geopoint?.asDictionary,
             field(.hours): self.hours.asDictionary,
             field(.name): self.name,
@@ -162,7 +162,7 @@ open class DAOPlace: DAOBaseObject {
         alerts = try container.decode([DAOAlert].self, forKey: .alerts)
         code = try container.decode(String.self, forKey: .code)
         district = try container.decode(DAODistrict.self, forKey: .district)
-        geohash = try container.decode(String.self, forKey: .geohash)
+        geohashes = try container.decode([String].self, forKey: .geohashes)
         let geopointData = try container.decode([String: Double].self, forKey: .geopoint)
         geopoint = CLLocation(from: geopointData)
         hours = try container.decode(DAOPlaceHours.self, forKey: .hours)
@@ -182,7 +182,7 @@ open class DAOPlace: DAOBaseObject {
         try container.encode(alerts, forKey: .alerts)
         try container.encode(code, forKey: .code)
         try container.encode(district, forKey: .district)
-        try container.encode(geohash, forKey: .geohash)
+        try container.encode(geohashes, forKey: .geohashes)
         try container.encode(geopoint?.asDictionary as? [String: Double], forKey: .geopoint)
         try container.encode(hours, forKey: .hours)
         try container.encode(name, forKey: .name)
@@ -205,56 +205,12 @@ open class DAOPlace: DAOBaseObject {
             || lhs.alerts != rhs.alerts
             || lhs.code != rhs.code
             || lhs.district != rhs.district
-            || lhs.geohash != rhs.geohash
+            || lhs.geohashes != rhs.geohashes
             || lhs.geopoint != rhs.geopoint
             || lhs.hours != rhs.hours
             || lhs.name != rhs.name
             || lhs.phone != rhs.phone
             || lhs.statuses != rhs.statuses
             || lhs.timeZone != rhs.timeZone
-    }
-}
-
-extension DAOPlace {
-    public var status: DNSStatus {
-        return self.statusNow().status
-    }
-    public var statusMessage: DNSString {
-        return self.statusNow().message
-    }
-
-    public func isStatusOpen(for date: Date = Date()) -> Bool {
-        guard !self.statuses.isEmpty else { return true }
-        return status(for: date)?.isOpen ?? true
-    }
-    public func statusMessage(for date: Date = Date()) -> DNSString {
-        return self.status(for: date)?.message ?? DNSString(with: "")
-    }
-    public func status(for date: Date = Date()) -> DAOPlaceStatus? {
-        let status = self.statuses
-            .filter { date.isSameDate(as: $0.startTime) ||
-                date.isSameDate(as: $0.endTime) ||
-                ($0.startTime < date && $0.endTime > date)
-            }
-            .sorted { $0.startTime >= $1.startTime }
-            .sorted { $0.scope.rawValue < $1.scope.rawValue }
-            .first
-        return status
-    }
-
-    public func isStatusOpenNow() -> Bool {
-        return statusNow().isOpen
-    }
-    public func statusNow() -> DAOPlaceStatus {
-        let date = Date()
-        let status = statuses
-            .filter { ($0.startTime < date && $0.endTime > date) }
-            .sorted { $0.startTime >= $1.startTime }
-            .sorted { $0.scope.rawValue < $1.scope.rawValue }
-            .first
-        guard let status else {
-            return DAOPlaceStatus(status: .open)
-        }
-        return status
     }
 }
