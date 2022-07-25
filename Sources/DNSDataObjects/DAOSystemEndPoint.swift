@@ -29,7 +29,7 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
 
     open var currentState = DAOSystemEndPoint.createState()
-    open var name: String = ""
+    open var name = DNSString()
     open var system = DAOSystemEndPoint.createSystem()
     open var historyState: [DAOSystemState] = []
 
@@ -62,7 +62,7 @@ open class DAOSystemEndPoint: DAOBaseObject {
         _ = super.dao(from: data)
         let currentStateData = self.datadictionary(from: data[field(.currentState)] as Any?) ?? [:]
         self.currentState = Self.createState(from: currentStateData)
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let systemData = self.datadictionary(from: data[field(.system)] as Any?) ?? [:]
         self.system = Self.createSystem(from: systemData)
         let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?) ?? []
@@ -73,7 +73,7 @@ open class DAOSystemEndPoint: DAOBaseObject {
         var retval = super.asDictionary
         retval.merge([
             field(.currentState): self.currentState.asDictionary,
-            field(.name): self.name,
+            field(.name): self.name.asDictionary,
             field(.system): self.system.asDictionary,
             field(.historyState): self.historyState,
         ]) { (current, _) in current }
@@ -84,7 +84,7 @@ open class DAOSystemEndPoint: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         currentState = try container.decode(Self.stateType.self, forKey: .currentState)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(DNSString.self, forKey: .name)
         system = try container.decode(Self.systemType.self, forKey: .system)
         historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
         // Get superDecoder for superclass and call super.init(from:) with it

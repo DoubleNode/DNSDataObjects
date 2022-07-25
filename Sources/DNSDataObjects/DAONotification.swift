@@ -16,9 +16,9 @@ open class DAONotification: DAOBaseObject {
         case body, deepLink, title, type
     }
 
-    open var body = ""
+    open var body = DNSString()
     open var deepLink: URL?
-    open var title = ""
+    open var title = DNSString()
     open var type: DNSNotificationType = .unknown
     
     // MARK: - Initializers -
@@ -52,9 +52,9 @@ open class DAONotification: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAONotification {
         _ = super.dao(from: data)
-        self.body = self.string(from: data[field(.body)] as Any?) ?? self.body
+        self.body = self.dnsstring(from: data[field(.body)] as Any?) ?? self.body
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
-        self.title = self.string(from: data[field(.title)] as Any?) ?? self.title
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         let typeData = self.string(from: data[field(.type)] as Any?) ?? ""
         self.type = DNSNotificationType(rawValue: typeData) ?? .unknown
         return self
@@ -62,9 +62,9 @@ open class DAONotification: DAOBaseObject {
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.body): self.body,
+            field(.body): self.body.asDictionary,
             field(.deepLink): self.deepLink,
-            field(.title): self.title,
+            field(.title): self.title.asDictionary,
             field(.type): self.type.rawValue,
         ]) { (current, _) in current }
         return retval

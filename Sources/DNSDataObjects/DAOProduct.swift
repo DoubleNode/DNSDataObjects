@@ -16,10 +16,10 @@ open class DAOProduct: DAOBaseObject {
         case about, price, sku, title
     }
     
-    open var about = ""
+    open var about = DNSString()
     open var price: Float = 0
     open var sku = ""
-    open var title = ""
+    open var title = DNSString()
     
     // MARK: - Initializers -
     required public init() {
@@ -48,19 +48,19 @@ open class DAOProduct: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOProduct {
         _ = super.dao(from: data)
-        self.about = self.string(from: data[field(.about)] as Any?) ?? self.about
+        self.about = self.dnsstring(from: data[field(.about)] as Any?) ?? self.about
         self.price = self.float(from: data[field(.price)] as Any?) ?? self.price
         self.sku = self.string(from: data[field(.sku)] as Any?) ?? self.sku
-        self.title = self.string(from: data[field(.title)] as Any?) ?? self.title
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.about): self.about,
+            field(.about): self.about.asDictionary,
             field(.price): self.price,
             field(.sku): self.sku,
-            field(.title): self.title,
+            field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -68,10 +68,10 @@ open class DAOProduct: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        about = try container.decode(String.self, forKey: .about)
+        about = try container.decode(DNSString.self, forKey: .about)
         price = try container.decode(Float.self, forKey: .price)
         sku = try container.decode(String.self, forKey: .sku)
-        title = try container.decode(String.self, forKey: .title)
+        title = try container.decode(DNSString.self, forKey: .title)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
