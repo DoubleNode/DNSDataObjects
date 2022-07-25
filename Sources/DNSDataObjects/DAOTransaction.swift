@@ -25,13 +25,15 @@ open class DAOTransaction: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case amount, card, confirmation, order, type
+        case amount, card, confirmation, order, tax, tip, type
     }
 
     open var amount: Float = 0
     open var card: DAOCard?
     open var confirmation = ""
     open var order: DAOOrder?
+    open var tax: Float = 0
+    open var tip: Float = 0
     open var type = ""
 
     // MARK: - Initializers -
@@ -53,6 +55,8 @@ open class DAOTransaction: DAOBaseObject {
         self.card = object.card
         self.confirmation = object.confirmation
         self.order = object.order
+        self.tax = object.tax
+        self.tip = object.tip
         self.type = object.type
     }
 
@@ -68,6 +72,8 @@ open class DAOTransaction: DAOBaseObject {
         self.confirmation = self.string(from: data[field(.confirmation)] as Any?) ?? self.confirmation
         let orderData = data[field(.order)] as? DNSDataDictionary ?? [:]
         self.order = Self.createOrder(from: orderData)
+        self.tax = self.float(from: data[field(.tax)] as Any?) ?? self.tax
+        self.tip = self.float(from: data[field(.tip)] as Any?) ?? self.tip
         self.type = self.string(from: data[field(.type)] as Any?) ?? self.type
         return self
     }
@@ -78,6 +84,8 @@ open class DAOTransaction: DAOBaseObject {
             field(.card): self.card?.asDictionary ?? [:],
             field(.confirmation): self.confirmation,
             field(.order): self.order?.asDictionary ?? [:],
+            field(.tax): self.tax,
+            field(.tip): self.tip,
             field(.type): self.type,
         ]) { (current, _) in current }
         return retval
@@ -90,6 +98,8 @@ open class DAOTransaction: DAOBaseObject {
         card = try container.decode(Self.cardType.self, forKey: .card)
         confirmation = try container.decode(String.self, forKey: .confirmation)
         order = try container.decode(Self.orderType.self, forKey: .order)
+        tax = try container.decode(Float.self, forKey: .tax)
+        tip = try container.decode(Float.self, forKey: .tip)
         type = try container.decode(String.self, forKey: .type)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
@@ -102,6 +112,8 @@ open class DAOTransaction: DAOBaseObject {
         try container.encode(card, forKey: .card)
         try container.encode(confirmation, forKey: .confirmation)
         try container.encode(order, forKey: .order)
+        try container.encode(tax, forKey: .tax)
+        try container.encode(tip, forKey: .tip)
         try container.encode(type, forKey: .type)
     }
 
@@ -118,6 +130,8 @@ open class DAOTransaction: DAOBaseObject {
             || lhs.card != rhs.card
             || lhs.confirmation != rhs.confirmation
             || lhs.order != rhs.order
+            || lhs.tax != rhs.tax
+            || lhs.tip != rhs.tip
             || lhs.type != rhs.type
     }
 }
