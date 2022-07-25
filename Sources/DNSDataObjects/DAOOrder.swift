@@ -35,12 +35,13 @@ open class DAOOrder: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case account, items, place, transaction
+        case account, items, place, state, transaction
     }
 
     open var account: DAOAccount?
     open var items: [DAOOrderItem] = []
     open var place: DAOPlace?
+    open var state = DNSOrderState.unknown
     open var transaction: DAOTransaction?
 
     // MARK: - Initializers -
@@ -61,6 +62,7 @@ open class DAOOrder: DAOBaseObject {
        self.account = object.account
        self.items = object.items
        self.place = object.place
+       self.state = object.state
        self.transaction = object.transaction
    }
 
@@ -76,6 +78,8 @@ open class DAOOrder: DAOBaseObject {
        self.items = itemsData.map { Self.createItem(from: $0) }
        let placeData = data[field(.place)] as? DNSDataDictionary ?? [:]
        self.place = Self.createPlace(from: placeData)
+       let stateData = self.string(from: data[field(.state)] as Any?) ?? ""
+       self.state = DNSOrderState(rawValue: stateData) ?? self.state
        let transactionData = data[field(.transaction)] as? DNSDataDictionary ?? [:]
        self.transaction = Self.createTransaction(from: transactionData)
        return self
@@ -86,6 +90,7 @@ open class DAOOrder: DAOBaseObject {
            field(.account): self.account?.asDictionary,
            field(.items): self.items.map { $0.asDictionary },
            field(.place): self.place?.asDictionary,
+           field(.state): self.state.rawValue,
            field(.transaction): self.transaction?.asDictionary,
        ]) { (current, _) in current }
        return retval
@@ -97,6 +102,7 @@ open class DAOOrder: DAOBaseObject {
         account = try container.decode(Self.accountType.self, forKey: .account)
         items = try container.decode([DAOOrderItem].self, forKey: .items)
         place = try container.decode(Self.placeType.self, forKey: .place)
+        state = try container.decode(DNSOrderState.self, forKey: .state)
         transaction = try container.decode(Self.transactionType.self, forKey: .transaction)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
@@ -108,6 +114,7 @@ open class DAOOrder: DAOBaseObject {
         try container.encode(account, forKey: .account)
         try container.encode(items, forKey: .items)
         try container.encode(place, forKey: .place)
+        try container.encode(state, forKey: .state)
         try container.encode(transaction, forKey: .transaction)
     }
 
@@ -123,6 +130,7 @@ open class DAOOrder: DAOBaseObject {
         return lhs.account != rhs.account
             || lhs.items != rhs.items
             || lhs.place != rhs.place
+            || lhs.state != rhs.state
             || lhs.transaction != rhs.transaction
     }
 }
