@@ -17,7 +17,7 @@ open class DAOActivityType: DAOBaseObject {
     }
 
     open var code = ""
-    open var name = ""
+    open var name = DNSString()
 
     // MARK: - Initializers -
     required public init() {
@@ -26,7 +26,7 @@ open class DAOActivityType: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(code: String, name: String) {
+    public init(code: String, name: DNSString) {
         self.code = code
         self.name = name
         super.init(id: code)
@@ -50,14 +50,14 @@ open class DAOActivityType: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOActivityType {
         _ = super.dao(from: data)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
             field(.code): self.code,
-            field(.name): self.name,
+            field(.name): self.name.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -66,7 +66,7 @@ open class DAOActivityType: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = try container.decode(String.self, forKey: .code)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(DNSString.self, forKey: .name)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

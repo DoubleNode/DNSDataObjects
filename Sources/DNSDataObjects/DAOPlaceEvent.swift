@@ -17,7 +17,7 @@ open class DAOPlaceEvent: DAOBaseObject {
     }
 
     open var endDate = Date()
-    open var name = ""
+    open var name = DNSString()
     open var startDate = Date()
     open var timeZone = TimeZone.current
     open var type = ""
@@ -60,7 +60,7 @@ open class DAOPlaceEvent: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceEvent {
         _ = super.dao(from: data)
         self.endDate = self.time(from: data[field(.endDate)] as Any?) ?? self.endDate
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.startDate = self.time(from: data[field(.startDate)] as Any?) ?? self.startDate
         let timeZoneData = self.string(from: data[field(.timeZone)] as Any?) ?? self.timeZone.identifier
         self.timeZone = TimeZone(identifier: timeZoneData) ?? self.timeZone
@@ -71,7 +71,7 @@ open class DAOPlaceEvent: DAOBaseObject {
         var retval = super.asDictionary
         retval.merge([
             field(.endDate): self.endDate,
-            field(.name): self.name,
+            field(.name): self.name.asDictionary,
             field(.startDate): self.startDate,
             field(.timeZone): self.timeZone.identifier,
             field(.type): self.type,
@@ -83,7 +83,7 @@ open class DAOPlaceEvent: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endDate = try container.decode(Date.self, forKey: .endDate)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(DNSString.self, forKey: .name)
         startDate = try container.decode(Date.self, forKey: .startDate)
         timeZone = try container.decode(TimeZone.self, forKey: .timeZone)
         type = try container.decode(String.self, forKey: .type)

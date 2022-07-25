@@ -29,7 +29,7 @@ open class DAOBeacon: DAOBaseObject {
     open var distance = DNSBeaconDistance.unknown
     open var major: Int = 0
     open var minor: Int = 0
-    open var name = ""
+    open var name = DNSString()
     open var range: String?
     open var rssi: Int?
 
@@ -72,7 +72,7 @@ open class DAOBeacon: DAOBaseObject {
         self.distance = DNSBeaconDistance(rawValue: distanceData) ?? self.distance
         self.major = self.int(from: data[field(.major)] as Any?) ?? self.major
         self.minor = self.int(from: data[field(.minor)] as Any?) ?? self.minor
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.range = self.string(from: data[field(.range)] as Any?) ?? self.range
         self.rssi = self.int(from: data[field(.rssi)] as Any?) ?? self.rssi
         return self
@@ -86,7 +86,7 @@ open class DAOBeacon: DAOBaseObject {
             field(.distance): self.distance.rawValue,
             field(.major): self.major,
             field(.minor): self.minor,
-            field(.name): self.name,
+            field(.name): self.name.asDictionary,
             field(.range): self.range,
             field(.rssi): self.rssi,
         ]) { (current, _) in current }
@@ -102,7 +102,7 @@ open class DAOBeacon: DAOBaseObject {
         distance = try container.decode(DNSBeaconDistance.self, forKey: .distance)
         major = try container.decode(Int.self, forKey: .major)
         minor = try container.decode(Int.self, forKey: .minor)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(DNSString.self, forKey: .name)
         range = try container.decode(String?.self, forKey: .range)
         rssi = try container.decode(Int?.self, forKey: .rssi)
         // Get superDecoder for superclass and call super.init(from:) with it
