@@ -14,11 +14,9 @@ open class DAOBeacon: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case code, range, accuracy, rssi, data
+        case accuracy, code, data, distance, range, rssi
     }
 
-    open var code: String = ""
-    open var range: String?
     open var accuracy: CLLocationAccuracy = 0 {
         didSet {
             if accuracy < 0 {
@@ -26,8 +24,11 @@ open class DAOBeacon: DAOBaseObject {
             }
         }
     }
-    open var rssi: Int?
+    open var code = ""
     open var data: CLBeacon?
+    open var distance = DNSBeaconDistance.unknown
+    open var range: String?
+    open var rssi: Int?
 
     // MARK: - Initializers -
     required public init() {
@@ -43,12 +44,13 @@ open class DAOBeacon: DAOBaseObject {
         self.update(from: object)
     }
     open func update(from object: DAOBeacon) {
-        self.code = object.code
-        self.range = object.range
-        self.accuracy = object.accuracy
-        self.data = object.data
-        self.rssi = object.rssi
         super.update(from: object)
+        self.accuracy = object.accuracy
+        self.code = object.code
+        self.data = object.data
+        self.distance = object.distance
+        self.range = object.range
+        self.rssi = object.rssi
     }
 
     // MARK: - DAO translation methods -
@@ -57,18 +59,23 @@ open class DAOBeacon: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOBeacon {
         _ = super.dao(from: data)
-        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        self.range = self.string(from: data[field(.range)] as Any?) ?? self.range
         self.accuracy = self.double(from: data[field(.accuracy)] as Any?) ?? self.accuracy
+        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+//        self.data = self.string(from: data[field(.data)] as Any?) ?? self.data
+        let distanceData = self.string(from: data[field(.distance)] as Any?) ?? ""
+        self.distance = DNSBeaconDistance(rawValue: distanceData) ?? self.distance
+        self.range = self.string(from: data[field(.range)] as Any?) ?? self.range
         self.rssi = self.int(from: data[field(.rssi)] as Any?) ?? self.rssi
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.code): self.code,
-            field(.range): self.range,
             field(.accuracy): self.accuracy,
+            field(.code): self.code,
+//            field(.data): self.data,
+            field(.distance): self.distance.rawValue,
+            field(.range): self.range,
             field(.rssi): self.rssi,
         ]) { (current, _) in current }
         return retval
@@ -77,11 +84,12 @@ open class DAOBeacon: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = try container.decode(String.self, forKey: .code)
-        range = try container.decode(String?.self, forKey: .range)
         accuracy = try container.decode(CLLocationAccuracy.self, forKey: .accuracy)
+        code = try container.decode(String.self, forKey: .code)
+//        data = try container.decode(CLBeacon.self, forKey: .data)
+        distance = try container.decode(DNSBeaconDistance.self, forKey: .distance)
+        range = try container.decode(String?.self, forKey: .range)
         rssi = try container.decode(Int?.self, forKey: .rssi)
-        // FIXME: data = try container.decode(CLBeacon.self, forKey: .data)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -89,11 +97,12 @@ open class DAOBeacon: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(code, forKey: .code)
-        try container.encode(range, forKey: .range)
         try container.encode(accuracy, forKey: .accuracy)
+        try container.encode(code, forKey: .code)
+//        try container.encode(data, forKey: .data)
+        try container.encode(distance, forKey: .distance)
+        try container.encode(range, forKey: .range)
         try container.encode(rssi, forKey: .rssi)
-        // FIXME: if data != nil { try container.encode(data, forKey: .data) }
     }
 
     // MARK: - NSCopying protocol methods -
@@ -105,10 +114,11 @@ open class DAOBeacon: DAOBaseObject {
         guard let rhs = rhs as? DAOBeacon else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.code != rhs.code
-            || lhs.range != rhs.range
-            || lhs.accuracy != rhs.accuracy
-            || lhs.rssi != rhs.rssi
+        return lhs.accuracy != rhs.accuracy
+            || lhs.code != rhs.code
             || lhs.data != rhs.data
+            || lhs.distance != rhs.distance
+            || lhs.range != rhs.range
+            || lhs.rssi != rhs.rssi
     }
 }
