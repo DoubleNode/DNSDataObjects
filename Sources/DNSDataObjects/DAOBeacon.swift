@@ -14,7 +14,7 @@ open class DAOBeacon: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case accuracy, code, data, distance, range, rssi
+        case accuracy, code, data, distance, major, minor, name, range, rssi
     }
 
     open var accuracy: CLLocationAccuracy = 0 {
@@ -27,6 +27,9 @@ open class DAOBeacon: DAOBaseObject {
     open var code = ""
     open var data: CLBeacon?
     open var distance = DNSBeaconDistance.unknown
+    open var major: Int = 0
+    open var minor: Int = 0
+    open var name = ""
     open var range: String?
     open var rssi: Int?
 
@@ -49,6 +52,9 @@ open class DAOBeacon: DAOBaseObject {
         self.code = object.code
         self.data = object.data
         self.distance = object.distance
+        self.major = object.major
+        self.minor = object.minor
+        self.name = object.name
         self.range = object.range
         self.rssi = object.rssi
     }
@@ -64,6 +70,9 @@ open class DAOBeacon: DAOBaseObject {
 //        self.data = self.string(from: data[field(.data)] as Any?) ?? self.data
         let distanceData = self.string(from: data[field(.distance)] as Any?) ?? ""
         self.distance = DNSBeaconDistance(rawValue: distanceData) ?? self.distance
+        self.major = self.int(from: data[field(.major)] as Any?) ?? self.major
+        self.minor = self.int(from: data[field(.minor)] as Any?) ?? self.minor
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.range = self.string(from: data[field(.range)] as Any?) ?? self.range
         self.rssi = self.int(from: data[field(.rssi)] as Any?) ?? self.rssi
         return self
@@ -75,6 +84,9 @@ open class DAOBeacon: DAOBaseObject {
             field(.code): self.code,
 //            field(.data): self.data,
             field(.distance): self.distance.rawValue,
+            field(.major): self.major,
+            field(.minor): self.minor,
+            field(.name): self.name,
             field(.range): self.range,
             field(.rssi): self.rssi,
         ]) { (current, _) in current }
@@ -88,6 +100,9 @@ open class DAOBeacon: DAOBaseObject {
         code = try container.decode(String.self, forKey: .code)
 //        data = try container.decode(CLBeacon.self, forKey: .data)
         distance = try container.decode(DNSBeaconDistance.self, forKey: .distance)
+        major = try container.decode(Int.self, forKey: .major)
+        minor = try container.decode(Int.self, forKey: .minor)
+        name = try container.decode(String.self, forKey: .name)
         range = try container.decode(String?.self, forKey: .range)
         rssi = try container.decode(Int?.self, forKey: .rssi)
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -101,6 +116,9 @@ open class DAOBeacon: DAOBaseObject {
         try container.encode(code, forKey: .code)
 //        try container.encode(data, forKey: .data)
         try container.encode(distance, forKey: .distance)
+        try container.encode(major, forKey: .major)
+        try container.encode(minor, forKey: .minor)
+        try container.encode(name, forKey: .name)
         try container.encode(range, forKey: .range)
         try container.encode(rssi, forKey: .rssi)
     }
@@ -118,6 +136,9 @@ open class DAOBeacon: DAOBaseObject {
             || lhs.code != rhs.code
             || lhs.data != rhs.data
             || lhs.distance != rhs.distance
+            || lhs.major != rhs.major
+            || lhs.minor != rhs.minor
+            || lhs.name != rhs.name
             || lhs.range != rhs.range
             || lhs.rssi != rhs.rssi
     }
