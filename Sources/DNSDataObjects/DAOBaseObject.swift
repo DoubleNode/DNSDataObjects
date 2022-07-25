@@ -46,7 +46,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     }
     open func dao(from data: DNSDataDictionary) -> DAOBaseObject {
         self.id = self.string(from: data[field(.id)] as Any?) ?? self.id
-        let metaData: DNSDataDictionary = data[field(.meta)] as? DNSDataDictionary ?? [:]
+        let metaData = self.datadictionary(from: data[field(.meta)] as Any?) ?? [:]
         self.meta = DNSMetadata(from: metaData)
         return self
     }

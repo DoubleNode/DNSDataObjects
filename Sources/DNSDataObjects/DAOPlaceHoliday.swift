@@ -47,7 +47,7 @@ open class DAOPlaceHoliday: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceHoliday {
         _ = super.dao(from: data)
         self.date = self.time(from: data[field(.date)] as Any?) ?? self.date
-        let hoursData: DNSDataDictionary = data[field(.hours)] as? DNSDataDictionary ?? [:]
+        let hoursData = self.datadictionary(from: data[field(.hours)] as Any?) ?? [:]
         self.hours = DNSDailyHours(from: hoursData)
         return self
     }

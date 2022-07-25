@@ -60,7 +60,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
         _ = super.dao(from: data)
         let roleData = self.int(from: data[field(.requestedRole)] as Any?) ?? self.requestedRole.rawValue
         self.requestedRole = DNSUserRole(rawValue: roleData) ?? .user
-        let userData = data[field(.user)] as? DNSDataDictionary ?? [:]
+        let userData = self.datadictionary(from: data[field(.user)] as Any?) ?? [:]
         self.user = Self.createUser(from: userData)
         return self
     }

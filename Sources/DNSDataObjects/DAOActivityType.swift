@@ -50,7 +50,7 @@ open class DAOActivityType: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOActivityType {
         _ = super.dao(from: data)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-                                                 self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         return self
     }
     override open var asDictionary: DNSDataDictionary {

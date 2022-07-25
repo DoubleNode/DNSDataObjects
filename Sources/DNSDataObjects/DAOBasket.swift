@@ -63,11 +63,11 @@ open class DAOBasket: DAOBaseObject {
    }
    override open func dao(from data: DNSDataDictionary) -> DAOBasket {
        _ = super.dao(from: data)
-       let accountData = data[field(.account)] as? DNSDataDictionary ?? [:]
+       let accountData = self.datadictionary(from: data[field(.account)] as Any?) ?? [:]
        self.account = Self.createAccount(from: accountData)
-       let itemsData = data[field(.items)] as? [DNSDataDictionary] ?? []
+       let itemsData = self.dataarray(from: data[field(.items)] as Any?) ?? []
        self.items = itemsData.map { Self.createItem(from: $0) }
-       let placeData = data[field(.place)] as? DNSDataDictionary ?? [:]
+       let placeData = self.datadictionary(from: data[field(.place)] as Any?) ?? [:]
        self.place = Self.createPlace(from: placeData)
        return self
    }

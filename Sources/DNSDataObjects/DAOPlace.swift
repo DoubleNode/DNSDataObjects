@@ -105,33 +105,22 @@ open class DAOPlace: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlace {
         _ = super.dao(from: data)
-        var activities: [DAOActivity] = []
-        let activitiesData: [DNSDataDictionary] = (data[field(.activities)] as? [DNSDataDictionary]) ?? []
-        activitiesData.forEach { (activityData) in
-            activities.append(Self.createActivity(from: activityData))
-        }
-        self.activities = activities
+        let activitiesData = self.dataarray(from: data[field(.activities)] as Any?) ?? []
+        self.activities = activitiesData.map { Self.createActivity(from: $0) }
         self.address = self.string(from: data[field(.address)] as Any?) ?? self.address
-        var alerts: [DAOAlert] = []
-        let alertsData: [DNSDataDictionary] = (data[field(.alerts)] as? [DNSDataDictionary]) ?? []
-        alertsData.forEach { (alertData) in
-            alerts.append(Self.createAlert(from: alertData))
-        }
-        self.alerts = alerts
+        let alertsData = self.dataarray(from: data[field(.alerts)] as Any?) ?? []
+        self.alerts = alertsData.map { Self.createAlert(from: $0) }
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        let districtData = data[field(.district)] as? DNSDataDictionary ?? [:]
+        let districtData = self.datadictionary(from: data[field(.district)] as Any?) ?? [:]
         self.district = Self.createDistrict(from: districtData)
-        let geohashesData = data[field(.geohashes)] as? [DNSDataDictionary] ?? []
+        let geohashesData = self.dataarray(from: data[field(.geohashes)] as Any?) ?? []
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
-        let hoursData = data[field(.hours)] as? DNSDataDictionary ?? [:]
+        let hoursData = self.datadictionary(from: data[field(.hours)] as Any?) ?? [:]
         self.hours = Self.createHours(from: hoursData)
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
-        var statuses: [DAOPlaceStatus] = []
-        let statusesData: [DNSDataDictionary] = (data[field(.statuses)] as? [DNSDataDictionary]) ?? []
-        statusesData.forEach { (statusData) in
-            statuses.append(Self.createStatus(from: statusData))
-        }
+        let statusesData = self.dataarray(from: data[field(.statuses)] as Any?) ?? []
+        self.statuses = statusesData.map { Self.createStatus(from: $0) }
         self.timeZone = self.timeZone(from: data[field(.timeZone)] as Any?) ?? self.timeZone
         return self
     }

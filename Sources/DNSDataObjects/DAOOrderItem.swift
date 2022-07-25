@@ -68,11 +68,11 @@ open class DAOOrderItem: DAOProduct {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOOrderItem {
         _ = super.dao(from: data)
-        let accountData = data[field(.account)] as? DNSDataDictionary ?? [:]
+        let accountData = self.datadictionary(from: data[field(.account)] as Any?) ?? [:]
         self.account = Self.createAccount(from: accountData)
-        let orderData = data[field(.order)] as? DNSDataDictionary ?? [:]
+        let orderData = self.datadictionary(from: data[field(.order)] as Any?) ?? [:]
         self.order = Self.createOrder(from: orderData)
-        let placeData = data[field(.place)] as? DNSDataDictionary ?? [:]
+        let placeData = self.datadictionary(from: data[field(.place)] as Any?) ?? [:]
         self.place = Self.createPlace(from: placeData)
         self.quantity = self.int(from: data[field(.quantity)] as Any?) ?? self.quantity
         return self

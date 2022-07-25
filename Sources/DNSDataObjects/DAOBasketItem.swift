@@ -68,11 +68,11 @@ open class DAOBasketItem: DAOProduct {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOBasketItem {
         _ = super.dao(from: data)
-        let accountData = data[field(.account)] as? DNSDataDictionary ?? [:]
+        let accountData = self.datadictionary(from: data[field(.account)] as Any?) ?? [:]
         self.account = Self.createAccount(from: accountData)
-        let basketData = data[field(.basket)] as? DNSDataDictionary ?? [:]
+        let basketData = self.datadictionary(from: data[field(.basket)] as Any?) ?? [:]
         self.basket = Self.createBasket(from: basketData)
-        let placeData = data[field(.place)] as? DNSDataDictionary ?? [:]
+        let placeData = self.datadictionary(from: data[field(.place)] as Any?) ?? [:]
         self.place = Self.createPlace(from: placeData)
         self.quantity = self.int(from: data[field(.quantity)] as Any?) ?? self.quantity
         return self

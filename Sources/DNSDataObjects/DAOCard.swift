@@ -67,7 +67,7 @@ open class DAOCard: DAOBaseObject {
         self.expiration = self.time(from: data[field(.expiration)] as Any?) ?? self.expiration
         self.nickname = self.string(from: data[field(.nickname)] as Any?) ?? self.nickname
         self.pinNumber = self.string(from: data[field(.pinNumber)] as Any?) ?? self.pinNumber
-        let transactionsData = data[field(.transactions)] as? [DNSDataDictionary] ?? []
+        let transactionsData = self.dataarray(from: data[field(.transactions)] as Any?) ?? []
         self.transactions = transactionsData.map { Self.createTransaction(from: $0) }
         return self
     }

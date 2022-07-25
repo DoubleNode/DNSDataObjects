@@ -55,13 +55,13 @@ open class DAOSystemState: DAOBaseObject {
         failureCodesData.forEach { key, value in
             self.failureCodes[key] = DNSSystemStateNumbers(from: value)
         }
-        let failureRateData: DNSDataDictionary = data[field(.failureRate)] as? DNSDataDictionary ?? [:]
+        let failureRateData = self.datadictionary(from: data[field(.failureRate)] as Any?) ?? [:]
         self.failureRate = DNSSystemStateNumbers(from: failureRateData)
         let rawState = self.string(from: data[field(.state)] as Any?) ?? self.state.rawValue
         self.state = DNSSystemState(rawValue: rawState) ?? self.state
         let rawStateOverride = self.string(from: data[field(.stateOverride)] as Any?) ?? self.state.rawValue
         self.stateOverride = DNSSystemState(rawValue: rawStateOverride) ?? self.stateOverride
-        let totalPointsData: DNSDataDictionary = data[field(.totalPoints)] as? DNSDataDictionary ?? [:]
+        let totalPointsData = self.datadictionary(from: data[field(.totalPoints)] as Any?) ?? [:]
         self.totalPoints = DNSSystemStateNumbers(from: totalPointsData)
         return self
     }

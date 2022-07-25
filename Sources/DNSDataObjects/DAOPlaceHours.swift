@@ -93,23 +93,23 @@ open class DAOPlaceHours: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceHours {
         _ = super.dao(from: data)
-        let eventsData: [DNSDataDictionary] = data[field(.events)] as? [DNSDataDictionary] ?? []
+        let eventsData = self.dataarray(from: data[field(.events)] as Any?) ?? []
         self.events = eventsData.map { Self.createEvent(from: $0) }
-        let holidaysData: [DNSDataDictionary] = data[field(.holidays)] as? [DNSDataDictionary] ?? []
+        let holidaysData = self.dataarray(from: data[field(.holidays)] as Any?) ?? []
         self.holidays = holidaysData.map { Self.createHoliday(from: $0) }
-        let mondayData: DNSDataDictionary = data[field(.monday)] as? DNSDataDictionary ?? [:]
+        let mondayData = self.datadictionary(from: data[field(.monday)] as Any?) ?? [:]
         self.monday = DNSDailyHours(from: mondayData)
-        let tuesdayData: DNSDataDictionary = data[field(.tuesday)] as? DNSDataDictionary ?? [:]
+        let tuesdayData = self.datadictionary(from: data[field(.tuesday)] as Any?) ?? [:]
         self.tuesday = DNSDailyHours(from: tuesdayData)
-        let wednesdayData: DNSDataDictionary = data[field(.wednesday)] as? DNSDataDictionary ?? [:]
+        let wednesdayData = self.datadictionary(from: data[field(.wednesday)] as Any?) ?? [:]
         self.wednesday = DNSDailyHours(from: wednesdayData)
-        let thursdayData: DNSDataDictionary = data[field(.thursday)] as? DNSDataDictionary ?? [:]
+        let thursdayData = self.datadictionary(from: data[field(.thursday)] as Any?) ?? [:]
         self.thursday = DNSDailyHours(from: thursdayData)
-        let fridayData: DNSDataDictionary = data[field(.friday)] as? DNSDataDictionary ?? [:]
+        let fridayData = self.datadictionary(from: data[field(.friday)] as Any?) ?? [:]
         self.friday = DNSDailyHours(from: fridayData)
-        let saturdayData: DNSDataDictionary = data[field(.saturday)] as? DNSDataDictionary ?? [:]
+        let saturdayData = self.datadictionary(from: data[field(.saturday)] as Any?) ?? [:]
         self.saturday = DNSDailyHours(from: saturdayData)
-        let sundayData: DNSDataDictionary = data[field(.sunday)] as? DNSDataDictionary ?? [:]
+        let sundayData = self.datadictionary(from: data[field(.sunday)] as Any?) ?? [:]
         self.sunday = DNSDailyHours(from: sundayData)
         return self
     }
