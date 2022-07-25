@@ -25,15 +25,14 @@ open class DAOAccount: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case name, user, cards, emailNotifications, pushNotifications
+        case cards, emailNotifications, name, pushNotifications, users
     }
 
-    open var name = ""
-    open var user = DAOAccount.createUser()
     open var cards: [DAOCard] = []
-
     open var emailNotifications = false
+    open var name = ""
     open var pushNotifications = false
+    open var users: [DAOUser] = []
 
     // MARK: - Initializers -
     required public init() {
@@ -42,9 +41,8 @@ open class DAOAccount: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(name: String = "", user: DAOUser? = nil) {
+    public init(name: String = "") {
         self.name = name
-        self.user = user ?? self.user
         super.init()
     }
 
@@ -55,11 +53,11 @@ open class DAOAccount: DAOBaseObject {
     }
     open func update(from object: DAOAccount) {
         super.update(from: object)
-        self.name = object.name
-        self.user = object.user
         self.cards = object.cards
         self.emailNotifications = object.emailNotifications
+        self.name = object.name
         self.pushNotifications = object.pushNotifications
+        self.users = object.users
     }
 
     // MARK: - DAO translation methods -
@@ -68,25 +66,25 @@ open class DAOAccount: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAccount {
         _ = super.dao(from: data)
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
-        self.user = Self.createUser(from: data[field(.user)] as? DNSDataDictionary ?? [:])
-        
         let cards = data[field(.cards)] as? [DNSDataDictionary] ?? []
         self.cards = cards.map { Self.createCard(from: $0) }
         self.emailNotifications = self.bool(from: data[field(.emailNotifications)] ??
                                             self.emailNotifications)!
+        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
+        let usersData = data[field(.users)] as? [DNSDataDictionary] ?? []
+        self.users = usersData.map { Self.createUser(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.name): self.name,
-            field(.user): self.user.asDictionary,
             field(.cards): self.cards.map { $0.asDictionary },
             field(.emailNotifications): self.emailNotifications,
+            field(.name): self.name,
             field(.pushNotifications): self.pushNotifications,
+            field(.users): self.users.map { $0.asDictionary },
         ]) { (current, _) in current }
         return retval
     }
@@ -94,11 +92,11 @@ open class DAOAccount: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decode(String.self, forKey: .name)
-        user = try container.decode(Self.userType.self, forKey: .user)
         cards = try container.decode([DAOCard].self, forKey: .cards)
         emailNotifications = try container.decode(Bool.self, forKey: .emailNotifications)
+        name = try container.decode(String.self, forKey: .name)
         pushNotifications = try container.decode(Bool.self, forKey: .pushNotifications)
+        users = try container.decode([DAOUser].self, forKey: .users)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -106,11 +104,11 @@ open class DAOAccount: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(name, forKey: .name)
-        try container.encode(user, forKey: .user)
         try container.encode(cards, forKey: .cards)
         try container.encode(emailNotifications, forKey: .emailNotifications)
+        try container.encode(name, forKey: .name)
         try container.encode(pushNotifications, forKey: .pushNotifications)
+        try container.encode(users, forKey: .users)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -122,10 +120,10 @@ open class DAOAccount: DAOBaseObject {
         guard let rhs = rhs as? DAOAccount else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.name != rhs.name
-            || lhs.user != rhs.user
-            || lhs.cards != rhs.cards
+        return lhs.cards != rhs.cards
             || lhs.emailNotifications != rhs.emailNotifications
+            || lhs.name != rhs.name
             || lhs.pushNotifications != rhs.pushNotifications
+            || lhs.users != rhs.users
     }
 }

@@ -11,9 +11,14 @@ import Foundation
 
 open class DAOUser: DAOBaseObject {
     // MARK: - Class Factory methods -
+    open class var accountType: DAOAccount.Type { return DAOAccount.self }
     open class var activityType: DAOActivityType.Type { return DAOActivityType.self }
     open class var cardType: DAOCard.Type { return DAOCard.self }
     open class var placeType: DAOPlace.Type { return DAOPlace.self }
+
+    open class func createAccount() -> DAOAccount { accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount { accountType.init(from: data) }
 
     open class func createActivity() -> DAOActivityType { activityType.init() }
     open class func createActivity(from object: DAOActivityType) -> DAOActivityType { activityType.init(from: object) }
@@ -30,9 +35,10 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case cards, dob, email, favorites, firstName, lastName, myPlace, phone
+        case accounts, cards, dob, email, favorites, firstName, lastName, myPlace, phone
     }
 
+    open var accounts: [DAOAccount] = []
     open var cards: [DAOCard] = []
     open var dob: Date?
     open var email: String = ""
@@ -65,6 +71,7 @@ open class DAOUser: DAOBaseObject {
     }
     open func update(from object: DAOUser) {
         super.update(from: object)
+        self.accounts = object.accounts
         self.cards = object.cards
         self.dob = object.dob
         self.email = object.email
@@ -81,6 +88,8 @@ open class DAOUser: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOUser {
         _ = super.dao(from: data)
+        let accountsData = data[field(.accounts)] as? [DNSDataDictionary] ?? []
+        self.accounts = accountsData.map { Self.createAccount(from: $0) }
         let cardsData = data[field(.cards)] as? [DNSDataDictionary] ?? []
         self.cards = cardsData.map { Self.createCard(from: $0) }
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
@@ -97,6 +106,7 @@ open class DAOUser: DAOBaseObject {
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
+            field(.accounts): self.accounts.map { $0.asDictionary },
             field(.cards): self.cards.map { $0.asDictionary },
             field(.dob): self.dob,
             field(.email): self.email,
@@ -112,6 +122,7 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        accounts = try container.decode([DAOAccount].self, forKey: .accounts)
         cards = try container.decode([DAOCard].self, forKey: .cards)
         dob = try container.decode(Date?.self, forKey: .dob)
         email = try container.decode(String.self, forKey: .email)
@@ -127,6 +138,7 @@ open class DAOUser: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(accounts, forKey: .accounts)
         try container.encode(cards, forKey: .cards)
         try container.encode(dob, forKey: .dob)
         try container.encode(email, forKey: .email)
@@ -146,7 +158,8 @@ open class DAOUser: DAOBaseObject {
         guard let rhs = rhs as? DAOUser else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.cards != rhs.cards
+        return lhs.accounts != rhs.accounts
+            || lhs.cards != rhs.cards
             || lhs.dob != rhs.dob
             || lhs.email != rhs.email
             || lhs.favorites != rhs.favorites
