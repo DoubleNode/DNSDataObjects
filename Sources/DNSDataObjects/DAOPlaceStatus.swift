@@ -18,7 +18,7 @@ open class DAOPlaceStatus: DAOBaseObject {
 
     open var endTime = Date()
     open var message = DNSString(with: "")
-    open var scope = DNSAlertScope.place
+    open var scope = DNSScope.place
     open var startTime = Date()
     open var status = DNSStatus.open
 
@@ -59,7 +59,7 @@ open class DAOPlaceStatus: DAOBaseObject {
         self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
         self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
         let scopeData = self.int(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
-        self.scope = DNSAlertScope(rawValue: scopeData) ?? .place
+        self.scope = DNSScope(rawValue: scopeData) ?? .place
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
         self.status = DNSStatus(rawValue: statusData) ?? .open
@@ -82,7 +82,7 @@ open class DAOPlaceStatus: DAOBaseObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = try container.decode(Date.self, forKey: .endTime)
         message = try container.decode(DNSString.self, forKey: .message)
-        scope = DNSAlertScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .place
+        scope = DNSScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .place
         startTime = try container.decode(Date.self, forKey: .startTime)
         status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
         // Get superDecoder for superclass and call super.init(from:) with it

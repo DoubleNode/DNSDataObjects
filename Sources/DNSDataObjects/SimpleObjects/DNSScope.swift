@@ -1,5 +1,5 @@
 //
-//  DNSActionType.swift
+//  DNSScope.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,6 +9,9 @@
 import DNSCore
 import Foundation
 
-public enum DNSActionType: String, CaseIterable, Codable {
-    case popup
+public enum DNSScope: Int, CaseIterable, Codable {
+    case place = 1000
+    case district = 3000
+    case region = 5000
+    case all = 10000
 }

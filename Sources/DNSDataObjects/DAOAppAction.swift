@@ -30,7 +30,7 @@ open class DAOAppAction: DAOBaseObject {
         case stringsSection = "strings"
     }
 
-    open var actionType: DNSActionType = .popup
+    open var actionType: DNSAppActionType = .popup
     open var deepLink: URL?
     open var images = DAOAppAction.createImages()
     open var strings = DAOAppAction.createStrings()
@@ -65,7 +65,7 @@ open class DAOAppAction: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOAppAction {
         _ = super.dao(from: data)
         let typeString = self.string(from: data[field(.actionType)] as Any?) ?? ""
-        self.actionType = DNSActionType(rawValue: typeString) ?? .popup
+        self.actionType = DNSAppActionType(rawValue: typeString) ?? .popup
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
         let imagesSection = self.datadictionary(from: data[field(.imagesSection)] as Any?) ?? [:]
@@ -89,7 +89,7 @@ open class DAOAppAction: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        actionType = try container.decode(DNSActionType.self, forKey: .actionType)
+        actionType = try container.decode(DNSAppActionType.self, forKey: .actionType)
         deepLink = try container.decode(URL.self, forKey: .deepLink)
         images = try container.decode(Self.imagesType.self, forKey: .imagesSection)
         strings = try container.decode(Self.stringsType.self, forKey: .stringsSection)

@@ -26,7 +26,7 @@ open class DAOAlert: DAOBaseObject {
     open var imageUrl = DNSURL()
     open var name = ""
     open var priority: Int = 100
-    open var scope: DNSAlertScope = .all
+    open var scope: DNSScope = .all
     open var startTime = C.defaultStartTime
     open var status: DNSStatus = .tempClosed
     open var tagLine = DNSString()
@@ -81,7 +81,7 @@ open class DAOAlert: DAOBaseObject {
         self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         let scopeData = self.int(from: data[field(.scope)] as Any?) ?? self.scope.rawValue
-        self.scope = DNSAlertScope(rawValue: scopeData) ?? .all
+        self.scope = DNSScope(rawValue: scopeData) ?? .all
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         let statusData = self.string(from: data[field(.status)] as Any?) ?? self.status.rawValue
         self.status = DNSStatus(rawValue: statusData) ?? .open
@@ -112,7 +112,7 @@ open class DAOAlert: DAOBaseObject {
         imageUrl = try container.decode(DNSURL.self, forKey: .imageUrl)
         name = try container.decode(String.self, forKey: .name)
         priority = try container.decode(Int.self, forKey: .priority)
-        scope = try container.decode(DNSAlertScope.self, forKey: .scope)
+        scope = try container.decode(DNSScope.self, forKey: .scope)
         startTime = try container.decode(Date.self, forKey: .startTime)
         status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .tempClosed
         tagLine = try container.decode(DNSString.self, forKey: .tagLine)

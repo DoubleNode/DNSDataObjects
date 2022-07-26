@@ -1,5 +1,5 @@
 //
-//  DNSAlertScope.swift
+//  DNSAppActionType.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,9 +9,9 @@
 import DNSCore
 import Foundation
 
-public enum DNSAlertScope: Int, CaseIterable, Codable {
-    case place = 1000
-    case district = 3000
-    case region = 5000
-    case all = 10000
+public enum DNSAppActionType: String, CaseIterable, Codable {
+    case drawer
+    case fullScreen
+    case popup
+    case stage
 }
