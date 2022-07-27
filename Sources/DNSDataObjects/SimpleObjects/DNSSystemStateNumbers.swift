@@ -24,6 +24,14 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     required override public init() {
         super.init()
     }
+    public init(android: Double,
+                iOS: Double,
+                total: Double) {
+        super.init()
+        self.android = android
+        self.iOS = iOS
+        self.total = total
+    }
 
     // MARK: - DAO copy methods -
     public init(from object: DNSSystemStateNumbers) {
