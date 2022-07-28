@@ -78,11 +78,11 @@ open class DAOOrder: DAOBaseObject {
    }
    override open func dao(from data: DNSDataDictionary) -> DAOOrder {
        _ = super.dao(from: data)
-       let accountData = self.datadictionary(from: data[field(.account)] as Any?) ?? [:]
+       let accountData = self.dictionary(from: data[field(.account)] as Any?)
        self.account = Self.createAccount(from: accountData)
-       let itemsData = self.dataarray(from: data[field(.items)] as Any?) ?? []
+       let itemsData = self.array(from: data[field(.items)] as Any?)
        self.items = itemsData.map { Self.createItem(from: $0) }
-       let placeData = self.datadictionary(from: data[field(.place)] as Any?) ?? [:]
+       let placeData = self.dictionary(from: data[field(.place)] as Any?)
        self.place = Self.createPlace(from: placeData)
        let stateData = self.string(from: data[field(.state)] as Any?) ?? ""
        self.state = DNSOrderState(rawValue: stateData) ?? self.state

@@ -64,7 +64,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.status = self.string(from: data[field(.status)] as Any?) ?? self.status
         self.createdBy = self.string(from: data[field(.createdBy)] as Any?) ?? self.createdBy
         self.updatedBy = self.string(from: data[field(.updatedBy)] as Any?) ?? self.updatedBy
-        self.genericValues = self.datadictionary(from: data[field(.genericValues)] as Any?) ?? self.genericValues
+        self.genericValues = self.dictionary(from: data[field(.genericValues)] as Any?)
         return self
     }
     open var asDictionary: DNSDataDictionary {

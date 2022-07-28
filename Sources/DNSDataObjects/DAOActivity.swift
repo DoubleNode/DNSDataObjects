@@ -70,7 +70,7 @@ open class DAOActivity: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOActivity {
         _ = super.dao(from: data)
         // TODO: Implement baseType import
-        let baseTypeData = self.datadictionary(from: data[field(.baseType)] as Any?) ?? [:]
+        let baseTypeData = self.dictionary(from: data[field(.baseType)] as Any?)
         self.baseType = Self.createBase(from: baseTypeData)
         self.bookingEndTime = self.date(from: data[field(.bookingEndTime)] as Any?)
         self.bookingStartTime = self.date(from: data[field(.bookingStartTime)] as Any?)

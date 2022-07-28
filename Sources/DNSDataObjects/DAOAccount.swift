@@ -66,14 +66,14 @@ open class DAOAccount: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAccount {
         _ = super.dao(from: data)
-        let cardsData = self.dataarray(from: data[field(.cards)] as Any?) ?? []
+        let cardsData = self.array(from: data[field(.cards)] as Any?)
         self.cards = cardsData.map { Self.createCard(from: $0) }
         self.emailNotifications = self.bool(from: data[field(.emailNotifications)] ??
                                             self.emailNotifications)!
         self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
-        let usersData = self.dataarray(from: data[field(.users)] as Any?) ?? []
+        let usersData = self.array(from: data[field(.users)] as Any?)
         self.users = usersData.map { Self.createUser(from: $0) }
         return self
     }

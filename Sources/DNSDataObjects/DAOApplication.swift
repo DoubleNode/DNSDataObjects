@@ -52,7 +52,7 @@ open class DAOApplication: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAOApplication {
         _ = super.dao(from: data)
-        let appEventsData = self.dataarray(from: data[field(.appEvents)] as Any?) ?? []
+        let appEventsData = self.array(from: data[field(.appEvents)] as Any?)
         self.appEvents = appEventsData.map { Self.createEvent(from: $0) }
         return self
     }

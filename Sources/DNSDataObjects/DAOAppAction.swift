@@ -68,10 +68,10 @@ open class DAOAppAction: DAOBaseObject {
         self.actionType = DNSAppActionType(rawValue: typeString) ?? .popup
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
-        let imagesSection = self.datadictionary(from: data[field(.imagesSection)] as Any?) ?? [:]
+        let imagesSection = self.dictionary(from: data[field(.imagesSection)] as Any?)
         self.images = Self.createImages(from: imagesSection)
         // strings section
-        let stringsSection = self.datadictionary(from: data[field(.stringsSection)] as Any?) ?? [:]
+        let stringsSection = self.dictionary(from: data[field(.stringsSection)] as Any?)
         self.strings = Self.createStrings(from: stringsSection)
         return self
     }

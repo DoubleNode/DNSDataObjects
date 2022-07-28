@@ -67,10 +67,10 @@ open class DAOTransaction: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOTransaction {
         _ = super.dao(from: data)
         self.amount = self.float(from: data[field(.amount)] as Any?) ?? self.amount
-        let cardData = self.datadictionary(from: data[field(.card)] as Any?) ?? [:]
+        let cardData = self.dictionary(from: data[field(.card)] as Any?)
         self.card = Self.createCard(from: cardData)
         self.confirmation = self.string(from: data[field(.confirmation)] as Any?) ?? self.confirmation
-        let orderData = self.datadictionary(from: data[field(.order)] as Any?) ?? [:]
+        let orderData = self.dictionary(from: data[field(.order)] as Any?)
         self.order = Self.createOrder(from: orderData)
         self.tax = self.float(from: data[field(.tax)] as Any?) ?? self.tax
         self.tip = self.float(from: data[field(.tip)] as Any?) ?? self.tip
