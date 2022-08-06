@@ -52,4 +52,28 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
         case .blocked:  return "blocked"
         }
     }
+    public static func userRole(from code: String) -> DNSUserRole {
+        switch code {
+        case "superUser":  return .superUser
+        case "supportAdmin":  return .supportAdmin
+        case "supportOperation":  return .supportOperation
+        case "supportStaff":  return .supportStaff
+        case "supportViewer":  return .supportViewer
+        case "regionalAdmin":  return .regionalAdmin
+        case "regionalOperation":  return .regionalOperation
+        case "regionalStaff":  return .regionalStaff
+        case "regionalViewer":  return .regionalViewer
+        case "districtAdmin":  return .districtAdmin
+        case "districtOperation":  return .districtOperation
+        case "districtStaff":  return .districtStaff
+        case "districtViewer":  return .districtViewer
+        case "placeAdmin":  return .placeAdmin
+        case "placeOperation":  return .placeOperation
+        case "placeStaff":  return .placeStaff
+        case "placeViewer":  return .placeViewer
+        case "endUser":  return .endUser
+        case "blocked":  return .blocked
+        default: return .blocked
+        }
+    }
 }
