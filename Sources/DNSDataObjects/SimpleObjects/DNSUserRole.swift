@@ -22,10 +22,34 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
     case districtOperation = 3250
     case districtStaff = 3500
     case districtViewer = 3750
-    case centerAdmin = 4000
-    case centerOperation = 4250
-    case centerStaff = 4500
-    case centerViewer = 4750
-    case user = 9000
+    case placeAdmin = 4000
+    case placeOperation = 4250
+    case placeStaff = 4500
+    case placeViewer = 4750
+    case endUser = 9000
     case blocked = 10000
+    
+    public var code: String {
+        switch self {
+        case .superUser:  return "superUser"
+        case .supportAdmin:  return "supportAdmin"
+        case .supportOperation:  return "supportOperation"
+        case .supportStaff:  return "supportStaff"
+        case .supportViewer:  return "supportViewer"
+        case .regionalAdmin:  return "regionalAdmin"
+        case .regionalOperation:  return "regionalOperation"
+        case .regionalStaff:  return "regionalStaff"
+        case .regionalViewer:  return "regionalViewer"
+        case .districtAdmin:  return "districtAdmin"
+        case .districtOperation:  return "districtOperation"
+        case .districtStaff:  return "districtStaff"
+        case .districtViewer:  return "districtViewer"
+        case .placeAdmin:  return "placeAdmin"
+        case .placeOperation:  return "placeOperation"
+        case .placeStaff:  return "placeStaff"
+        case .placeViewer:  return "placeViewer"
+        case .endUser:  return "endUser"
+        case .blocked:  return "blocked"
+        }
+    }
 }
