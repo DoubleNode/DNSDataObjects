@@ -23,7 +23,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
         case requestedRole, user
     }
     
-    open var requestedRole = DNSUserRole.user
+    open var requestedRole = DNSUserRole.endUser
     open var user: DAOUser?
     
     // MARK: - Initializers -
@@ -59,7 +59,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     override open func dao(from data: DNSDataDictionary) -> DAOUserChangeRequest {
         _ = super.dao(from: data)
         let roleData = self.int(from: data[field(.requestedRole)] as Any?) ?? self.requestedRole.rawValue
-        self.requestedRole = DNSUserRole(rawValue: roleData) ?? .user
+        self.requestedRole = DNSUserRole(rawValue: roleData) ?? .endUser
         let userData = self.dictionary(from: data[field(.user)] as Any?)
         self.user = Self.createUser(from: userData)
         return self
