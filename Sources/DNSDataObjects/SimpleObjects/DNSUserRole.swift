@@ -28,7 +28,16 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
     case placeViewer = 4750
     case endUser = 9000
     case blocked = 10000
-    
+
+    public var isSuperUser: Bool { self.rawValue == DNSUserRole.superUser.rawValue }
+    public func isAdmin(for scope: DNSScope = .place) -> Bool {
+        switch scope {
+        case .all: return self.rawValue <= DNSUserRole.supportViewer.rawValue
+        case .region: return self.rawValue <= DNSUserRole.regionalViewer.rawValue
+        case .district: return self.rawValue <= DNSUserRole.districtViewer.rawValue
+        case .place: return self.rawValue <= DNSUserRole.placeViewer.rawValue
+        }
+    }
     public var code: String {
         switch self {
         case .superUser:  return "superUser"
@@ -50,6 +59,30 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
         case .placeViewer:  return "placeViewer"
         case .endUser:  return "endUser"
         case .blocked:  return "blocked"
+        }
+    }
+    public static func userRole(from code: String) -> DNSUserRole {
+        switch code {
+        case "superUser":  return .superUser
+        case "supportAdmin":  return .supportAdmin
+        case "supportOperation":  return .supportOperation
+        case "supportStaff":  return .supportStaff
+        case "supportViewer":  return .supportViewer
+        case "regionalAdmin":  return .regionalAdmin
+        case "regionalOperation":  return .regionalOperation
+        case "regionalStaff":  return .regionalStaff
+        case "regionalViewer":  return .regionalViewer
+        case "districtAdmin":  return .districtAdmin
+        case "districtOperation":  return .districtOperation
+        case "districtStaff":  return .districtStaff
+        case "districtViewer":  return .districtViewer
+        case "placeAdmin":  return .placeAdmin
+        case "placeOperation":  return .placeOperation
+        case "placeStaff":  return .placeStaff
+        case "placeViewer":  return .placeViewer
+        case "endUser":  return .endUser
+        case "blocked":  return .blocked
+        default: return .blocked
         }
     }
 }
