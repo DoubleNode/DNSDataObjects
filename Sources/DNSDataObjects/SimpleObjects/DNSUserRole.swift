@@ -9,79 +9,79 @@
 import Foundation
 
 public enum DNSUserRole: Int, CaseIterable, Codable {
-    case superUser = 0
-    case supportAdmin = 1000
-    case supportOperation = 1250
-    case supportStaff = 1500
-    case supportViewer = 1750
-    case regionalAdmin = 2000
-    case regionalOperation = 2250
-    case regionalStaff = 2500
-    case regionalViewer = 2750
-    case districtAdmin = 3000
-    case districtOperation = 3250
-    case districtStaff = 3500
-    case districtViewer = 3750
-    case placeAdmin = 4000
-    case placeOperation = 4250
-    case placeStaff = 4500
-    case placeViewer = 4750
-    case endUser = 9000
-    case blocked = 10000
+    case blocked = -1
+    case endUser = 0
+    case placeViewer = 6000
+    case placeStaff = 7000
+    case placeOperation = 8000
+    case placeAdmin = 9000
+    case districtViewer = 60000
+    case districtStaff = 70000
+    case districtOperation = 80000
+    case districtAdmin = 90000
+    case regionalViewer = 100000
+    case regionalStaff = 200000
+    case regionalOperation = 300000
+    case regionalAdmin = 400000
+    case supportViewer = 500000
+    case supportStaff = 600000
+    case supportOperation = 700000
+    case supportAdmin = 800000
+    case superUser = 900000
 
     public var isSuperUser: Bool { self.rawValue == DNSUserRole.superUser.rawValue }
     public func isAdmin(for scope: DNSScope = .place) -> Bool {
         switch scope {
-        case .all: return self.rawValue <= DNSUserRole.supportViewer.rawValue
-        case .region: return self.rawValue <= DNSUserRole.regionalViewer.rawValue
-        case .district: return self.rawValue <= DNSUserRole.districtViewer.rawValue
-        case .place: return self.rawValue <= DNSUserRole.placeViewer.rawValue
+        case .all: return self.rawValue >= DNSUserRole.supportViewer.rawValue
+        case .region: return self.rawValue >= DNSUserRole.regionalViewer.rawValue
+        case .district: return self.rawValue >= DNSUserRole.districtViewer.rawValue
+        case .place: return self.rawValue >= DNSUserRole.placeViewer.rawValue
         }
     }
     public var code: String {
         switch self {
-        case .superUser:  return "superUser"
-        case .supportAdmin:  return "supportAdmin"
-        case .supportOperation:  return "supportOperation"
-        case .supportStaff:  return "supportStaff"
-        case .supportViewer:  return "supportViewer"
-        case .regionalAdmin:  return "regionalAdmin"
-        case .regionalOperation:  return "regionalOperation"
-        case .regionalStaff:  return "regionalStaff"
-        case .regionalViewer:  return "regionalViewer"
-        case .districtAdmin:  return "districtAdmin"
-        case .districtOperation:  return "districtOperation"
-        case .districtStaff:  return "districtStaff"
-        case .districtViewer:  return "districtViewer"
-        case .placeAdmin:  return "placeAdmin"
-        case .placeOperation:  return "placeOperation"
-        case .placeStaff:  return "placeStaff"
-        case .placeViewer:  return "placeViewer"
-        case .endUser:  return "endUser"
-        case .blocked:  return "blocked"
+        case .superUser:  return "SuperUser"
+        case .supportAdmin:  return "SupportAdmin"
+        case .supportOperation:  return "SupportOperation"
+        case .supportStaff:  return "SupportStaff"
+        case .supportViewer:  return "SupportViewer"
+        case .regionalAdmin:  return "RegionalAdmin"
+        case .regionalOperation:  return "RegionalOperation"
+        case .regionalStaff:  return "RegionalStaff"
+        case .regionalViewer:  return "RegionalViewer"
+        case .districtAdmin:  return "DistrictAdmin"
+        case .districtOperation:  return "DistrictOperation"
+        case .districtStaff:  return "DistrictStaff"
+        case .districtViewer:  return "DistrictViewer"
+        case .placeAdmin:  return "PlaceAdmin"
+        case .placeOperation:  return "PlaceOperation"
+        case .placeStaff:  return "PlaceStaff"
+        case .placeViewer:  return "PlaceViewer"
+        case .endUser:  return "EndUser"
+        case .blocked:  return "Blocked"
         }
     }
     public static func userRole(from code: String) -> DNSUserRole {
         switch code {
-        case "superUser":  return .superUser
-        case "supportAdmin":  return .supportAdmin
-        case "supportOperation":  return .supportOperation
-        case "supportStaff":  return .supportStaff
-        case "supportViewer":  return .supportViewer
-        case "regionalAdmin":  return .regionalAdmin
-        case "regionalOperation":  return .regionalOperation
-        case "regionalStaff":  return .regionalStaff
-        case "regionalViewer":  return .regionalViewer
-        case "districtAdmin":  return .districtAdmin
-        case "districtOperation":  return .districtOperation
-        case "districtStaff":  return .districtStaff
-        case "districtViewer":  return .districtViewer
-        case "placeAdmin":  return .placeAdmin
-        case "placeOperation":  return .placeOperation
-        case "placeStaff":  return .placeStaff
-        case "placeViewer":  return .placeViewer
-        case "endUser":  return .endUser
-        case "blocked":  return .blocked
+        case "SuperUser":  return .superUser
+        case "SupportAdmin":  return .supportAdmin
+        case "SupportOperation":  return .supportOperation
+        case "SupportStaff":  return .supportStaff
+        case "SupportViewer":  return .supportViewer
+        case "RegionalAdmin":  return .regionalAdmin
+        case "RegionalOperation":  return .regionalOperation
+        case "RegionalStaff":  return .regionalStaff
+        case "RegionalViewer":  return .regionalViewer
+        case "DistrictAdmin":  return .districtAdmin
+        case "DistrictOperation":  return .districtOperation
+        case "DistrictStaff":  return .districtStaff
+        case "DistrictViewer":  return .districtViewer
+        case "PlaceAdmin":  return .placeAdmin
+        case "PlaceOperation":  return .placeOperation
+        case "PlaceStaff":  return .placeStaff
+        case "PlaceViewer":  return .placeViewer
+        case "EndUser":  return .endUser
+        case "Blocked":  return .blocked
         default: return .blocked
         }
     }
