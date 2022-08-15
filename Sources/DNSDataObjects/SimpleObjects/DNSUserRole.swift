@@ -13,19 +13,19 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
     case endUser = 0
     case placeViewer = 6000
     case placeStaff = 7000
-    case placeOperation = 8000
+    case placeOperations = 8000
     case placeAdmin = 9000
     case districtViewer = 60000
     case districtStaff = 70000
-    case districtOperation = 80000
+    case districtOperations = 80000
     case districtAdmin = 90000
     case regionalViewer = 100000
     case regionalStaff = 200000
-    case regionalOperation = 300000
+    case regionalOperations = 300000
     case regionalAdmin = 400000
     case supportViewer = 500000
     case supportStaff = 600000
-    case supportOperation = 700000
+    case supportOperations = 700000
     case supportAdmin = 800000
     case superUser = 900000
 
@@ -42,19 +42,19 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
         switch self {
         case .superUser:  return "SuperUser"
         case .supportAdmin:  return "SupportAdmin"
-        case .supportOperation:  return "SupportOperation"
+        case .supportOperations:  return "SupportOperations"
         case .supportStaff:  return "SupportStaff"
         case .supportViewer:  return "SupportViewer"
         case .regionalAdmin:  return "RegionalAdmin"
-        case .regionalOperation:  return "RegionalOperation"
+        case .regionalOperations:  return "RegionalOperations"
         case .regionalStaff:  return "RegionalStaff"
         case .regionalViewer:  return "RegionalViewer"
         case .districtAdmin:  return "DistrictAdmin"
-        case .districtOperation:  return "DistrictOperation"
+        case .districtOperations:  return "DistrictOperations"
         case .districtStaff:  return "DistrictStaff"
         case .districtViewer:  return "DistrictViewer"
         case .placeAdmin:  return "PlaceAdmin"
-        case .placeOperation:  return "PlaceOperation"
+        case .placeOperations:  return "PlaceOperations"
         case .placeStaff:  return "PlaceStaff"
         case .placeViewer:  return "PlaceViewer"
         case .endUser:  return "EndUser"
@@ -65,19 +65,19 @@ public enum DNSUserRole: Int, CaseIterable, Codable {
         switch code {
         case "SuperUser":  return .superUser
         case "SupportAdmin":  return .supportAdmin
-        case "SupportOperation":  return .supportOperation
+        case "SupportOperations":  return .supportOperations
         case "SupportStaff":  return .supportStaff
         case "SupportViewer":  return .supportViewer
         case "RegionalAdmin":  return .regionalAdmin
-        case "RegionalOperation":  return .regionalOperation
+        case "RegionalOperations":  return .regionalOperations
         case "RegionalStaff":  return .regionalStaff
         case "RegionalViewer":  return .regionalViewer
         case "DistrictAdmin":  return .districtAdmin
-        case "DistrictOperation":  return .districtOperation
+        case "DistrictOperations":  return .districtOperations
         case "DistrictStaff":  return .districtStaff
         case "DistrictViewer":  return .districtViewer
         case "PlaceAdmin":  return .placeAdmin
-        case "PlaceOperation":  return .placeOperation
+        case "PlaceOperations":  return .placeOperations
         case "PlaceStaff":  return .placeStaff
         case "PlaceViewer":  return .placeViewer
         case "EndUser":  return .endUser
