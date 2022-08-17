@@ -28,7 +28,7 @@ open class DAOSystem: DAOBaseObject {
         case currentState, endPoints, historyState, message, name
     }
 
-    open var currentState = DAOSystem.createState()
+    open var currentState: DAOSystemState
     open var endPoints: [DAOSystemEndPoint] = []
     open var historyState: [DAOSystemState] = []
     open var message = DNSString()
@@ -36,14 +36,17 @@ open class DAOSystem: DAOBaseObject {
 
     // MARK: - Initializers -
     required public init() {
+        currentState = Self.createState()
         super.init()
     }
     required public init(id: String) {
+        currentState = Self.createState()
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOSystem) {
+        currentState = Self.createState()
         super.init(from: object)
         self.update(from: object)
     }
@@ -58,6 +61,7 @@ open class DAOSystem: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        currentState = Self.createState()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOSystem {
@@ -85,6 +89,7 @@ open class DAOSystem: DAOBaseObject {
     }
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        currentState = Self.createState()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         currentState = try container.decode(Self.stateType.self, forKey: .currentState)
         endPoints = try container.decode([DAOSystemEndPoint].self, forKey: .endPoints)

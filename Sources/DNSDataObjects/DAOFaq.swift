@@ -23,15 +23,17 @@ open class DAOFaq: DAOBaseObject {
         case section, question, answer
     }
 
-    open var section = DAOFaq.createSection()
+    open var section: DAOFaqSection
     open var question = DNSString()
     open var answer = DNSString()
 
     // MARK: - Initializers -
     required public init() {
+        section = Self.createSection()
         super.init()
     }
     required public init(id: String) {
+        section = Self.createSection()
         super.init(id: id)
     }
     public init(section: DAOFaqSection,
@@ -45,6 +47,7 @@ open class DAOFaq: DAOBaseObject {
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOFaq) {
+        section = Self.createSection()
         super.init(from: object)
         self.update(from: object)
     }
@@ -57,6 +60,7 @@ open class DAOFaq: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        section = Self.createSection()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOFaq {
@@ -79,6 +83,7 @@ open class DAOFaq: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        section = Self.createSection()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         section = try container.decode(Self.sectionType.self, forKey: .section)
         question = try container.decode(DNSString.self, forKey: .question)

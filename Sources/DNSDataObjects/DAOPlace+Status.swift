@@ -48,7 +48,9 @@ extension DAOPlace {
             .sorted { $0.scope.rawValue < $1.scope.rawValue }
             .first
         guard let status else {
-            return DAOPlaceStatus(status: .open)
+            let retval = Self.createStatus()
+            retval.status = .open
+            return retval
         }
         return status
     }

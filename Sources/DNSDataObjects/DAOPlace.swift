@@ -49,10 +49,10 @@ open class DAOPlace: DAOBaseObject {
     open var address = ""
     open var alerts: [DAOAlert] = []
     open var code = ""
-    open var district = DAOPlace.createDistrict()
+    open var district: DAODistrict
     open var geohashes: [String] = []
     open var geopoint: CLLocation?
-    open var hours = DAOPlace.createHours()
+    open var hours: DAOPlaceHours
     open var name = DNSString()
     open var phone = ""
     open var statuses: [DAOPlaceStatus] = [] {
@@ -64,15 +64,20 @@ open class DAOPlace: DAOBaseObject {
         }
     }
     open var timeZone: TimeZone = TimeZone.current
-
     // MARK: - Initializers -
     required public init() {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         super.init()
     }
     required public init(id: String) {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         self.code = code
         self.name = name
         super.init(id: code)
@@ -80,6 +85,8 @@ open class DAOPlace: DAOBaseObject {
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOPlace) {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         super.init(from: object)
         self.update(from: object)
     }
@@ -101,6 +108,8 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlace {
@@ -145,6 +154,8 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        district = Self.createDistrict()
+        hours = Self.createHours()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activities = try container.decode([DAOActivity].self, forKey: .activities)
         address = try container.decode(String.self, forKey: .address)

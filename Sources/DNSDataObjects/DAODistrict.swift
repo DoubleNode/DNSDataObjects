@@ -30,18 +30,21 @@ open class DAODistrict: DAOBaseObject {
 
     open var centers: [DAOPlace] = []
     open var name = DNSString()
-    open var region = DAODistrict.createRegion()
+    open var region: DAORegion
 
     // MARK: - Initializers -
     required public init() {
+        region = Self.createRegion()
         super.init()
     }
     required public init(id: String) {
+        region = Self.createRegion()
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAODistrict) {
+        region = Self.createRegion()
         super.init(from: object)
         self.update(from: object)
     }
@@ -54,6 +57,7 @@ open class DAODistrict: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        region = Self.createRegion()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAODistrict {
@@ -77,6 +81,7 @@ open class DAODistrict: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        region = Self.createRegion()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         centers = try container.decode([DAOPlace].self, forKey: .centers)
         name = try container.decode(DNSString.self, forKey: .name)
