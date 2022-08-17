@@ -64,22 +64,31 @@ open class DAOPlace: DAOBaseObject {
         }
     }
     open var timeZone: TimeZone = TimeZone.current
-
     // MARK: - Initializers -
     required public init() {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         super.init()
     }
     required public init(id: String) {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         self.code = code
         self.name = name
         super.init(id: code)
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
     }
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOPlace) {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         super.init(from: object)
         self.update(from: object)
     }
@@ -101,6 +110,8 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlace {
@@ -145,6 +156,8 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        district = DAOPlace.createDistrict()
+        hours = DAOPlace.createHours()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activities = try container.decode([DAOActivity].self, forKey: .activities)
         address = try container.decode(String.self, forKey: .address)
