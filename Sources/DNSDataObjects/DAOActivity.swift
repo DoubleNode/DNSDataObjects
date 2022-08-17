@@ -37,12 +37,15 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - Initializers -
     required public init() {
+        baseType = Self.createBase()
         super.init()
     }
     required public init(id: String) {
+        baseType = Self.createBase()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
+        baseType = Self.createBase()
         self.code = code
         self.name = name
         super.init(id: code)
@@ -50,6 +53,7 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOActivity) {
+        baseType = Self.createBase()
         super.init(from: object)
         self.update(from: object)
     }
@@ -65,6 +69,7 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        baseType = Self.createBase()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOActivity {
@@ -92,6 +97,7 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        baseType = Self.createBase()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         baseType = try container.decode(Self.baseType.self, forKey: .baseType)
         blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)

@@ -37,14 +37,20 @@ open class DAOAppAction: DAOBaseObject {
 
     // MARK: - Initializers -
     required public init() {
+        images = Self.createImages()
+        strings = Self.createStrings()
         super.init()
     }
     required public init(id: String) {
+        images = Self.createImages()
+        strings = Self.createStrings()
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOAppAction) {
+        images = Self.createImages()
+        strings = Self.createStrings()
         super.init(from: object)
         self.update(from: object)
     }
@@ -60,6 +66,8 @@ open class DAOAppAction: DAOBaseObject {
 
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
+        images = Self.createImages()
+        strings = Self.createStrings()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAppAction {
@@ -88,6 +96,8 @@ open class DAOAppAction: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        images = Self.createImages()
+        strings = Self.createStrings()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         actionType = try container.decode(DNSAppActionType.self, forKey: .actionType)
         deepLink = try container.decode(URL.self, forKey: .deepLink)
