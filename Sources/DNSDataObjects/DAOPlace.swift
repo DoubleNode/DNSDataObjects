@@ -92,18 +92,20 @@ open class DAOPlace: DAOBaseObject {
     }
     open func update(from object: DAOPlace) {
         super.update(from: object)
-        self.activities = object.activities
         self.address = object.address
-        self.alerts = object.alerts
         self.code = object.code
-        self.district = object.district
         self.geohashes = object.geohashes
         self.geopoint = object.geopoint
-        self.hours = object.hours
         self.name = object.name
         self.phone = object.phone
-        self.statuses = object.statuses
         self.timeZone = object.timeZone
+        // swiftlint:disable force_cast
+        self.activities = object.activities.map { $0.copy() as! DAOActivity }
+        self.alerts = object.alerts.map { $0.copy() as! DAOAlert }
+        self.statuses = object.statuses.map { $0.copy() as! DAOPlaceStatus }
+        self.district = object.district.copy() as! DAODistrict
+        self.hours = object.hours.copy() as! DAOPlaceHours
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

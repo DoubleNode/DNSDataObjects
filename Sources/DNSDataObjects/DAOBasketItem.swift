@@ -56,10 +56,12 @@ open class DAOBasketItem: DAOProduct {
     }
     open func update(from object: DAOBasketItem) {
         super.update(from: object)
-        self.account = object.account
-        self.basket = object.basket
-        self.place = object.place
         self.quantity = object.quantity
+        // swiftlint:disable force_cast
+        self.account = object.account?.copy() as? DAOAccount
+        self.basket = object.basket?.copy() as? DAOBasket
+        self.place = object.place?.copy() as? DAOPlace
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

@@ -60,6 +60,11 @@ open class DAOOrderItem: DAOProduct {
         self.order = object.order
         self.place = object.place
         self.quantity = object.quantity
+        // swiftlint:disable force_cast
+        self.account = object.account?.copy() as? DAOAccount
+        self.order = object.order?.copy() as? DAOOrder
+        self.place = object.place?.copy() as? DAOPlace
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

@@ -62,14 +62,16 @@ open class DAOOrder: DAOBaseObject {
    }
    open func update(from object: DAOOrder) {
        super.update(from: object)
-       self.account = object.account
-       self.items = object.items
-       self.place = object.place
        self.state = object.state
        self.subtotal = object.subtotal
        self.tax = object.tax
        self.total = object.total
-       self.transaction = object.transaction
+       // swiftlint:disable force_cast
+       self.items = object.items.map { $0.copy() as! DAOOrderItem }
+       self.account = object.account?.copy() as? DAOAccount
+       self.place = object.place?.copy() as? DAOPlace
+       self.transaction = object.transaction?.copy() as? DAOTransaction
+       // swiftlint:enable force_cast
    }
 
     // MARK: - DAO translation methods -

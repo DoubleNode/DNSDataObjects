@@ -52,12 +52,14 @@ open class DAOTransaction: DAOBaseObject {
     open func update(from object: DAOTransaction) {
         super.update(from: object)
         self.amount = object.amount
-        self.card = object.card
         self.confirmation = object.confirmation
-        self.order = object.order
         self.tax = object.tax
         self.tip = object.tip
         self.type = object.type
+        // swiftlint:disable force_cast
+        self.card = object.card?.copy() as? DAOCard
+        self.order = object.order?.copy() as? DAOOrder
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

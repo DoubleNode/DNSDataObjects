@@ -56,11 +56,11 @@ open class DAOAppAction: DAOBaseObject {
     }
     open func update(from object: DAOAppAction) {
         super.update(from: object)
-        // swiftlint:disable force_cast
         self.actionType = object.actionType
         self.deepLink = object.deepLink
-        self.images = object.images
-        self.strings = object.strings
+        // swiftlint:disable force_cast
+        self.images = object.images.copy() as! DAOAppActionImages
+        self.strings = object.strings.copy() as! DAOAppActionStrings
         // swiftlint:enable force_cast
     }
 

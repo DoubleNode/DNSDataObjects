@@ -52,11 +52,13 @@ open class DAOSystem: DAOBaseObject {
     }
     open func update(from object: DAOSystem) {
         super.update(from: object)
-        self.currentState = object.currentState
-        self.endPoints = object.endPoints
-        self.historyState = object.historyState
         self.message = object.message
         self.name = object.name
+        // swiftlint:disable force_cast
+        self.endPoints = object.endPoints.map { $0.copy() as! DAOSystemEndPoint }
+        self.historyState = object.historyState.map { $0.copy() as! DAOSystemState }
+        self.currentState = object.currentState.copy() as! DAOSystemState
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

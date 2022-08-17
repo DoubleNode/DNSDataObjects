@@ -41,8 +41,10 @@ public class DAORegion: DAOBaseObject {
     }
     open func update(from object: DAORegion) {
         super.update(from: object)
-        self.districts = object.districts
         self.name = object.name
+        // swiftlint:disable force_cast
+        self.districts = object.districts.map { $0.copy() as! DAODistrict }
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

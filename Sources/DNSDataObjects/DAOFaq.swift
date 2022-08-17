@@ -53,9 +53,11 @@ open class DAOFaq: DAOBaseObject {
     }
     open func update(from object: DAOFaq) {
         super.update(from: object)
-        self.section = object.section
         self.question = object.question
         self.answer = object.answer
+        // swiftlint:disable force_cast
+        self.section = object.section.copy() as! DAOFaqSection
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

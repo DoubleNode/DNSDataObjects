@@ -53,11 +53,13 @@ open class DAOAccount: DAOBaseObject {
     }
     open func update(from object: DAOAccount) {
         super.update(from: object)
-        self.cards = object.cards
         self.emailNotifications = object.emailNotifications
         self.name = object.name
         self.pushNotifications = object.pushNotifications
-        self.users = object.users
+        // swiftlint:disable force_cast
+        self.cards = object.cards.map { $0.copy() as! DAOCard }
+        self.users = object.users.map { $0.copy() as! DAOUser }
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

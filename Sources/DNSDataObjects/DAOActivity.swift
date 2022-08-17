@@ -59,12 +59,14 @@ open class DAOActivity: DAOBaseObject {
     }
     open func update(from object: DAOActivity) {
         super.update(from: object)
-        self.baseType = object.baseType
-        self.blackouts = object.blackouts
         self.bookingEndTime = object.bookingEndTime
         self.bookingStartTime = object.bookingStartTime
         self.code = object.code
         self.name = object.name
+        // swiftlint:disable force_cast
+        self.blackouts = object.blackouts.map { $0.copy() as! DAOActivityBlackout }
+        self.baseType = object.baseType.copy() as! DAOActivityType
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

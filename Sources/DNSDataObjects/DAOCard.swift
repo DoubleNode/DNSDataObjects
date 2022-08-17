@@ -54,7 +54,9 @@ open class DAOCard: DAOBaseObject {
         self.expiration = object.expiration
         self.nickname = object.nickname
         self.pinNumber = object.pinNumber
-        self.transactions = object.transactions
+        // swiftlint:disable force_cast
+        self.transactions = object.transactions.map { $0.copy() as! DAOTransaction }
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

@@ -43,7 +43,9 @@ open class DAOApplication: DAOBaseObject {
     }
     open func update(from object: DAOApplication) {
         super.update(from: object)
-        self.appEvents = object.appEvents
+        // swiftlint:disable force_cast
+        self.appEvents = object.appEvents.map { $0.copy() as! DAOAppEvent }
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

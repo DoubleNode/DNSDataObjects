@@ -74,9 +74,9 @@ open class DAOPlaceHours: DAOBaseObject {
     }
     open func update(from object: DAOPlaceHours) {
         super.update(from: object)
-        self.events = object.events
-        self.holidays = object.holidays
         // swiftlint:disable force_cast
+        self.events = object.events.map { $0.copy() as! DAOPlaceEvent }
+        self.holidays = object.holidays.map { $0.copy() as! DAOPlaceHoliday }
         self.monday = object.monday.copy() as! DNSDailyHours
         self.tuesday = object.tuesday.copy() as! DNSDailyHours
         self.wednesday = object.wednesday.copy() as! DNSDailyHours

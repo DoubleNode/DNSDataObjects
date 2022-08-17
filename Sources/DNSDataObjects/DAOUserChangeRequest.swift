@@ -50,6 +50,9 @@ open class DAOUserChangeRequest: DAOChangeRequest {
         super.update(from: object)
         self.requestedRole = object.requestedRole
         self.user = object.user
+        // swiftlint:disable force_cast
+        self.user = object.user?.copy() as? DAOUser
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -
