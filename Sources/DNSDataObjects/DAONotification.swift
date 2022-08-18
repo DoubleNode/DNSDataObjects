@@ -99,9 +99,18 @@ open class DAONotification: DAOBaseObject {
         guard let rhs = rhs as? DAONotification else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.body != rhs.body
-            || lhs.deepLink != rhs.deepLink
-            || lhs.title != rhs.title
-            || lhs.type != rhs.type
+        return super.isDiffFrom(rhs) ||
+            lhs.body != rhs.body ||
+            lhs.deepLink != rhs.deepLink ||
+            lhs.title != rhs.title ||
+            lhs.type != rhs.type
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAONotification, rhs: DAONotification) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAONotification, rhs: DAONotification) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

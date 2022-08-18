@@ -85,7 +85,16 @@ open class DAOPlaceHoliday: DAOBaseObject {
         guard let rhs = rhs as? DAOPlaceHoliday else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.date != rhs.date
-            || lhs.hours != rhs.hours
+        return super.isDiffFrom(rhs) ||
+            lhs.date != rhs.date ||
+            lhs.hours != rhs.hours
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOPlaceHoliday, rhs: DAOPlaceHoliday) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOPlaceHoliday, rhs: DAOPlaceHoliday) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

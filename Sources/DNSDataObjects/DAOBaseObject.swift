@@ -58,11 +58,6 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
         return retval
     }
 
-    // MARK: - Equatable protocol methods -
-    static func == (lhs: DAOBaseObject, rhs: DAOBaseObject) -> Bool {
-        return lhs.id == rhs.id
-    }
-
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -83,7 +78,15 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOBaseObject else { return true }
         let lhs = self
-        return lhs.id != rhs.id
-            || lhs.meta != rhs.meta
+        return lhs.id != rhs.id ||
+            lhs.meta != rhs.meta
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOBaseObject, rhs: DAOBaseObject) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOBaseObject, rhs: DAOBaseObject) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

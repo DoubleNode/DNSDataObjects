@@ -101,7 +101,16 @@ open class DAOUserChangeRequest: DAOChangeRequest {
         guard let rhs = rhs as? DAOUserChangeRequest else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.requestedRole != rhs.requestedRole
-            || lhs.user != rhs.user
+        return super.isDiffFrom(rhs) ||
+            lhs.requestedRole != rhs.requestedRole ||
+            lhs.user != rhs.user
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOUserChangeRequest, rhs: DAOUserChangeRequest) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOUserChangeRequest, rhs: DAOUserChangeRequest) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

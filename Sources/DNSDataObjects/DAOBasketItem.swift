@@ -119,9 +119,18 @@ open class DAOBasketItem: DAOProduct {
         guard let rhs = rhs as? DAOBasketItem else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.account != rhs.account
-            || lhs.basket != rhs.basket
-            || lhs.place != rhs.place
-            || lhs.quantity != rhs.quantity
+        return super.isDiffFrom(rhs) ||
+            lhs.account != rhs.account ||
+            lhs.basket != rhs.basket ||
+            lhs.place != rhs.place ||
+            lhs.quantity != rhs.quantity
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOBasketItem, rhs: DAOBasketItem) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOBasketItem, rhs: DAOBasketItem) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

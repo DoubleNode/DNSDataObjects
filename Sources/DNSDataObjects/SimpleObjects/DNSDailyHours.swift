@@ -93,8 +93,16 @@ open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DNSDailyHours else { return true }
         let lhs = self
-        return lhs.close != rhs.close
-        || lhs.open != rhs.open
+        return lhs.close != rhs.close ||
+            lhs.open != rhs.open
+    }
+    
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }
 extension DNSDailyHours {
@@ -128,14 +136,6 @@ extension DNSDailyHours {
         }
         return retval
     }
-
-    // MARK: - Equatable protocol methods -
-//    static public func !=(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
-//        !(lhs == rhs)
-//    }
-//    static public func ==(lhs: DNSDailyHours, rhs: DNSDailyHours) -> Bool {
-//        lhs.open == rhs.open && lhs.close == rhs.close
-//    }
 
     // MARK: - Localizations -
     public enum Localizations {

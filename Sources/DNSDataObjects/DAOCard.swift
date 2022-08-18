@@ -116,10 +116,19 @@ open class DAOCard: DAOBaseObject {
         guard let rhs = rhs as? DAOCard else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.cardNumber != rhs.cardNumber
-            || lhs.expiration != rhs.expiration
-            || lhs.nickname != rhs.nickname
-            || lhs.pinNumber != rhs.pinNumber
-            || lhs.transactions != rhs.transactions 
+        return super.isDiffFrom(rhs) ||
+            lhs.cardNumber != rhs.cardNumber ||
+            lhs.expiration != rhs.expiration ||
+            lhs.nickname != rhs.nickname ||
+            lhs.pinNumber != rhs.pinNumber ||
+            lhs.transactions != rhs.transactions
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOCard, rhs: DAOCard) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOCard, rhs: DAOCard) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

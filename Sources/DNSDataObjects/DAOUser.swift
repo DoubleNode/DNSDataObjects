@@ -160,14 +160,23 @@ open class DAOUser: DAOBaseObject {
         guard let rhs = rhs as? DAOUser else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.accounts != rhs.accounts
-            || lhs.cards != rhs.cards
-            || lhs.dob != rhs.dob
-            || lhs.email != rhs.email
-            || lhs.favorites != rhs.favorites
-            || lhs.firstName != rhs.firstName
-            || lhs.lastName != rhs.lastName
-            || lhs.myPlace != rhs.myPlace
-            || lhs.phone != rhs.phone
+        return super.isDiffFrom(rhs) ||
+            lhs.accounts != rhs.accounts ||
+            lhs.cards != rhs.cards ||
+            lhs.dob != rhs.dob ||
+            lhs.email != rhs.email ||
+            lhs.favorites != rhs.favorites ||
+            lhs.firstName != rhs.firstName ||
+            lhs.lastName != rhs.lastName ||
+            lhs.myPlace != rhs.myPlace ||
+            lhs.phone != rhs.phone
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOUser, rhs: DAOUser) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOUser, rhs: DAOUser) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

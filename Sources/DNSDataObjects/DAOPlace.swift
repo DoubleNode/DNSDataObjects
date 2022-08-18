@@ -202,17 +202,26 @@ open class DAOPlace: DAOBaseObject {
         guard let rhs = rhs as? DAOPlace else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.activities != rhs.activities
-            || lhs.address != rhs.address
-            || lhs.alerts != rhs.alerts
-            || lhs.code != rhs.code
-            || lhs.district != rhs.district
-            || lhs.geohashes != rhs.geohashes
-            || lhs.geopoint != rhs.geopoint
-            || lhs.hours != rhs.hours
-            || lhs.name != rhs.name
-            || lhs.phone != rhs.phone
-            || lhs.statuses != rhs.statuses
-            || lhs.timeZone != rhs.timeZone
+        return super.isDiffFrom(rhs) ||
+            lhs.activities != rhs.activities ||
+            lhs.address != rhs.address ||
+            lhs.alerts != rhs.alerts ||
+            lhs.code != rhs.code ||
+            lhs.district != rhs.district ||
+            lhs.geohashes != rhs.geohashes ||
+            lhs.geopoint != rhs.geopoint ||
+            lhs.hours != rhs.hours ||
+            lhs.name != rhs.name ||
+            lhs.phone != rhs.phone ||
+            lhs.statuses != rhs.statuses ||
+            lhs.timeZone != rhs.timeZone
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOPlace, rhs: DAOPlace) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOPlace, rhs: DAOPlace) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

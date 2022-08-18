@@ -128,12 +128,21 @@ open class DAOTransaction: DAOBaseObject {
         guard let rhs = rhs as? DAOTransaction else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.amount != rhs.amount
-            || lhs.card != rhs.card
-            || lhs.confirmation != rhs.confirmation
-            || lhs.order != rhs.order
-            || lhs.tax != rhs.tax
-            || lhs.tip != rhs.tip
-            || lhs.type != rhs.type
+        return super.isDiffFrom(rhs) ||
+            lhs.amount != rhs.amount ||
+            lhs.card != rhs.card ||
+            lhs.confirmation != rhs.confirmation ||
+            lhs.order != rhs.order ||
+            lhs.tax != rhs.tax ||
+            lhs.tip != rhs.tip ||
+            lhs.type != rhs.type
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOTransaction, rhs: DAOTransaction) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOTransaction, rhs: DAOTransaction) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

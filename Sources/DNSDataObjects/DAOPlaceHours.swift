@@ -168,14 +168,23 @@ open class DAOPlaceHours: DAOBaseObject {
         guard let rhs = rhs as? DAOPlaceHours else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.events != rhs.events
-            || lhs.holidays != rhs.holidays
-            || lhs.monday != rhs.monday
-            || lhs.tuesday != rhs.tuesday
-            || lhs.wednesday != rhs.wednesday
-            || lhs.thursday != rhs.thursday
-            || lhs.friday != rhs.friday
-            || lhs.saturday != rhs.saturday
-            || lhs.sunday != rhs.sunday
+        return super.isDiffFrom(rhs) ||
+            lhs.events != rhs.events ||
+            lhs.holidays != rhs.holidays ||
+            lhs.monday != rhs.monday ||
+            lhs.tuesday != rhs.tuesday ||
+            lhs.wednesday != rhs.wednesday ||
+            lhs.thursday != rhs.thursday ||
+            lhs.friday != rhs.friday ||
+            lhs.saturday != rhs.saturday ||
+            lhs.sunday != rhs.sunday
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOPlaceHours, rhs: DAOPlaceHours) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOPlaceHours, rhs: DAOPlaceHours) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

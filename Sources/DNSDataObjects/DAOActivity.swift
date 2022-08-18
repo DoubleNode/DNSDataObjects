@@ -131,11 +131,20 @@ open class DAOActivity: DAOBaseObject {
         guard let rhs = rhs as? DAOActivity else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.baseType != rhs.baseType
-            || lhs.blackouts != rhs.blackouts
-            || lhs.bookingEndTime != rhs.bookingEndTime
-            || lhs.bookingStartTime != rhs.bookingStartTime
-            || lhs.code != rhs.code
-            || lhs.name != rhs.name
+        return super.isDiffFrom(rhs) ||
+            lhs.baseType != rhs.baseType ||
+            lhs.blackouts != rhs.blackouts ||
+            lhs.bookingEndTime != rhs.bookingEndTime ||
+            lhs.bookingStartTime != rhs.bookingStartTime ||
+            lhs.code != rhs.code ||
+            lhs.name != rhs.name
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOActivity, rhs: DAOActivity) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOActivity, rhs: DAOActivity) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

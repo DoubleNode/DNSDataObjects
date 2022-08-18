@@ -132,14 +132,23 @@ open class DAOBeacon: DAOBaseObject {
         guard let rhs = rhs as? DAOBeacon else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.accuracy != rhs.accuracy
-            || lhs.code != rhs.code
-            || lhs.data != rhs.data
-            || lhs.distance != rhs.distance
-            || lhs.major != rhs.major
-            || lhs.minor != rhs.minor
-            || lhs.name != rhs.name
-            || lhs.range != rhs.range
-            || lhs.rssi != rhs.rssi
+        return super.isDiffFrom(rhs) ||
+            lhs.accuracy != rhs.accuracy ||
+            lhs.code != rhs.code ||
+            lhs.data != rhs.data ||
+            lhs.distance != rhs.distance ||
+            lhs.major != rhs.major ||
+            lhs.minor != rhs.minor ||
+            lhs.name != rhs.name ||
+            lhs.range != rhs.range ||
+            lhs.rssi != rhs.rssi
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOBeacon, rhs: DAOBeacon) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOBeacon, rhs: DAOBeacon) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

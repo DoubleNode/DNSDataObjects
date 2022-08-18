@@ -88,8 +88,17 @@ open class DAOActivityBlackout: DAOBaseObject {
         guard let rhs = rhs as? DAOActivityBlackout else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endTime != rhs.endTime
-            || lhs.message != rhs.message
-            || lhs.startTime != rhs.startTime
+        return super.isDiffFrom(rhs) ||
+            lhs.endTime != rhs.endTime ||
+            lhs.message != rhs.message ||
+            lhs.startTime != rhs.startTime
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOActivityBlackout, rhs: DAOActivityBlackout) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOActivityBlackout, rhs: DAOActivityBlackout) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

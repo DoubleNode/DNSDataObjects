@@ -88,7 +88,16 @@ open class DAODocument: DAOBaseObject {
         guard let rhs = rhs as? DAODocument else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.title != rhs.title
-            || lhs.url != rhs.url
+        return super.isDiffFrom(rhs) ||
+            lhs.title != rhs.title ||
+            lhs.url != rhs.url
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAODocument, rhs: DAODocument) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAODocument, rhs: DAODocument) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

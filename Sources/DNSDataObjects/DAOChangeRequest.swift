@@ -63,6 +63,14 @@ open class DAOChangeRequest: DAOBaseObject {
         guard let rhs = rhs as? DAOChangeRequest else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
 //        let lhs = self
-        return false
+        return super.isDiffFrom(rhs)
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOChangeRequest, rhs: DAOChangeRequest) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOChangeRequest, rhs: DAOChangeRequest) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

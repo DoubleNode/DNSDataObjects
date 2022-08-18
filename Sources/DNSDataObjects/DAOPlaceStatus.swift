@@ -108,11 +108,20 @@ open class DAOPlaceStatus: DAOBaseObject {
         guard let rhs = rhs as? DAOPlaceStatus else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endTime != rhs.endTime
-            || lhs.message != rhs.message
-            || lhs.scope != rhs.scope
-            || lhs.startTime != rhs.startTime
-            || lhs.status != rhs.status
+        return super.isDiffFrom(rhs) ||
+            lhs.endTime != rhs.endTime ||
+            lhs.message != rhs.message ||
+            lhs.scope != rhs.scope ||
+            lhs.startTime != rhs.startTime ||
+            lhs.status != rhs.status
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOPlaceStatus, rhs: DAOPlaceStatus) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOPlaceStatus, rhs: DAOPlaceStatus) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 
     // MARK: - Utility methods -

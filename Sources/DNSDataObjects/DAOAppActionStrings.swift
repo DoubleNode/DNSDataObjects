@@ -108,11 +108,20 @@ open class DAOAppActionStrings: DAOBaseObject {
         guard let rhs = rhs as? DAOAppActionStrings else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.body != rhs.body
-            || lhs.cancelLabel != rhs.cancelLabel
-            || lhs.disclaimer != rhs.disclaimer
-            || lhs.okayLabel != rhs.okayLabel
-            || lhs.subTitle != rhs.subTitle
-            || lhs.title != rhs.title
+        return super.isDiffFrom(rhs) ||
+            lhs.body != rhs.body ||
+            lhs.cancelLabel != rhs.cancelLabel ||
+            lhs.disclaimer != rhs.disclaimer ||
+            lhs.okayLabel != rhs.okayLabel ||
+            lhs.subTitle != rhs.subTitle ||
+            lhs.title != rhs.title
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAppActionStrings, rhs: DAOAppActionStrings) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAppActionStrings, rhs: DAOAppActionStrings) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

@@ -114,10 +114,19 @@ open class DAOSystemState: DAOBaseObject {
         guard let rhs = rhs as? DAOSystemState else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.failureCodes != rhs.failureCodes
-            || lhs.failureRate != rhs.failureRate
-            || lhs.state != rhs.state
-            || lhs.stateOverride != rhs.stateOverride
-            || lhs.totalPoints != rhs.totalPoints
+        return super.isDiffFrom(rhs) ||
+            lhs.failureCodes != rhs.failureCodes ||
+            lhs.failureRate != rhs.failureRate ||
+            lhs.state != rhs.state ||
+            lhs.stateOverride != rhs.stateOverride ||
+            lhs.totalPoints != rhs.totalPoints
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOSystemState, rhs: DAOSystemState) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOSystemState, rhs: DAOSystemState) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

@@ -110,9 +110,18 @@ open class DAOFaqSection: DAOBaseObject {
         guard let rhs = rhs as? DAOFaqSection else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.code != rhs.code
-            || lhs.faqs != rhs.faqs
-            || lhs.icon != rhs.icon
-            || lhs.title != rhs.title
+        return super.isDiffFrom(rhs) ||
+            lhs.code != rhs.code ||
+            lhs.faqs != rhs.faqs ||
+            lhs.icon != rhs.icon ||
+            lhs.title != rhs.title
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOFaqSection, rhs: DAOFaqSection) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOFaqSection, rhs: DAOFaqSection) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

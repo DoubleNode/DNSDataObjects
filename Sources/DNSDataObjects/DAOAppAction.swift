@@ -125,9 +125,18 @@ open class DAOAppAction: DAOBaseObject {
         guard let rhs = rhs as? DAOAppAction else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.actionType != rhs.actionType
-            || lhs.deepLink != rhs.deepLink
-            || lhs.images != rhs.images
-            || lhs.strings != rhs.strings
+        return super.isDiffFrom(rhs) ||
+            lhs.actionType != rhs.actionType ||
+            lhs.deepLink != rhs.deepLink ||
+            lhs.images != rhs.images ||
+            lhs.strings != rhs.strings
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAppAction, rhs: DAOAppAction) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAppAction, rhs: DAOAppAction) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

@@ -122,10 +122,19 @@ open class DAOAccount: DAOBaseObject {
         guard let rhs = rhs as? DAOAccount else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.cards != rhs.cards
-            || lhs.emailNotifications != rhs.emailNotifications
-            || lhs.name != rhs.name
-            || lhs.pushNotifications != rhs.pushNotifications
-            || lhs.users != rhs.users
+        return super.isDiffFrom(rhs) ||
+            lhs.cards != rhs.cards ||
+            lhs.emailNotifications != rhs.emailNotifications ||
+            lhs.name != rhs.name ||
+            lhs.pushNotifications != rhs.pushNotifications ||
+            lhs.users != rhs.users
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAccount, rhs: DAOAccount) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAccount, rhs: DAOAccount) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

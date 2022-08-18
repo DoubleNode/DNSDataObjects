@@ -93,8 +93,17 @@ open class DAOMedia: DAOBaseObject {
         guard let rhs = rhs as? DAOMedia else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.type != rhs.type
-            || lhs.url != rhs.url
-            || lhs.preloadUrl != rhs.preloadUrl
+        return super.isDiffFrom(rhs) ||
+            lhs.type != rhs.type ||
+            lhs.url != rhs.url ||
+            lhs.preloadUrl != rhs.preloadUrl
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOMedia, rhs: DAOMedia) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOMedia, rhs: DAOMedia) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

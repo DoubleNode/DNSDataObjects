@@ -16,24 +16,24 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         case uuid, created, synced, updated, status, createdBy, updatedBy
         case genericValues
     }
-
+    
     public var uuid: UUID = UUID()
-
+    
     public var created = Date()
     public var synced: Date?
     public var updated = Date()
-
+    
     public var status = ""
     public var createdBy = ""
     public var updatedBy = ""
     
     public var genericValues: DNSDataDictionary = [:]
-
+    
     // MARK: - Initializers -
     required override public init() {
         super.init()
     }
-
+    
     // MARK: - DAO copy methods -
     public init(from object: DNSMetadata) {
         super.init()
@@ -49,7 +49,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.updatedBy = object.updatedBy
         self.genericValues = object.genericValues
     }
-
+    
     // MARK: - DAO translation methods -
     required public init(from data: DNSDataDictionary) {
         super.init()
@@ -80,7 +80,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         ]
         return retval
     }
-
+    
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -102,7 +102,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         try container.encode(createdBy, forKey: .createdBy)
         try container.encode(updatedBy, forKey: .updatedBy)
     }
-
+    
     // MARK: - NSCopying protocol methods -
     open func copy(with zone: NSZone? = nil) -> Any {
         let copy = DNSMetadata(from: self)
@@ -111,12 +111,20 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DNSMetadata else { return true }
         let lhs = self
-        return lhs.uuid != rhs.uuid
-            || lhs.created != rhs.created
-            || lhs.synced != rhs.synced
-            || lhs.updated != rhs.updated
-            || lhs.status != rhs.status
-            || lhs.createdBy != rhs.createdBy
-            || lhs.updatedBy != rhs.updatedBy
+        return lhs.uuid != rhs.uuid ||
+            lhs.created != rhs.created ||
+            lhs.synced != rhs.synced ||
+            lhs.updated != rhs.updated ||
+            lhs.status != rhs.status ||
+            lhs.createdBy != rhs.createdBy ||
+            lhs.updatedBy != rhs.updatedBy
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DNSMetadata, rhs: DNSMetadata) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DNSMetadata, rhs: DNSMetadata) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

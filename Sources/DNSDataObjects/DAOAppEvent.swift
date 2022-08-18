@@ -115,9 +115,18 @@ open class DAOAppEvent: DAOBaseObject {
         guard let rhs = rhs as? DAOAppEvent else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endTime != rhs.endTime
-            || lhs.priority != rhs.priority
-            || lhs.startTime != rhs.startTime
-            || lhs.title != rhs.title
+        return super.isDiffFrom(rhs) ||
+            lhs.endTime != rhs.endTime ||
+            lhs.priority != rhs.priority ||
+            lhs.startTime != rhs.startTime ||
+            lhs.title != rhs.title
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAppEvent, rhs: DAOAppEvent) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAppEvent, rhs: DAOAppEvent) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

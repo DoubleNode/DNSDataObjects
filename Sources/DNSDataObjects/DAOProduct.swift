@@ -94,9 +94,18 @@ open class DAOProduct: DAOBaseObject {
         guard let rhs = rhs as? DAOProduct else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.about != rhs.about
-            || lhs.price != rhs.price
-            || lhs.sku != rhs.sku
-            || lhs.title != rhs.title
+        return super.isDiffFrom(rhs) ||
+            lhs.about != rhs.about ||
+            lhs.price != rhs.price ||
+            lhs.sku != rhs.sku ||
+            lhs.title != rhs.title
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOProduct, rhs: DAOProduct) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOProduct, rhs: DAOProduct) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

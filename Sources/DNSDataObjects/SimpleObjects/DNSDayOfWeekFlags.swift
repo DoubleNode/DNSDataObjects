@@ -20,17 +20,6 @@ open class DNSDayOfWeekFlags: Codable, Hashable, NSCopying {
     
     public init() { }
     
-    // Equatable protocol methods
-    static public func ==(lhs: DNSDayOfWeekFlags, rhs: DNSDayOfWeekFlags) -> Bool {
-        return lhs.sunday == rhs.sunday &&
-        lhs.monday == rhs.monday &&
-        lhs.tuesday == rhs.tuesday &&
-        lhs.wednesday == rhs.wednesday &&
-        lhs.thursday == rhs.thursday &&
-        lhs.friday == rhs.friday &&
-        lhs.saturday == rhs.saturday
-    }
-    
     // Hashable protocol methods
     open func hash(into hasher: inout Hasher) {
         hasher.combine(sunday)
@@ -53,5 +42,24 @@ open class DNSDayOfWeekFlags: Codable, Hashable, NSCopying {
         copy.friday = friday
         copy.saturday = saturday
         return copy
+    }
+    open func isDiffFrom(_ rhs: Any?) -> Bool {
+        guard let rhs = rhs as? DNSDayOfWeekFlags else { return true }
+        let lhs = self
+        return lhs.sunday != rhs.sunday ||
+            lhs.monday != rhs.monday ||
+            lhs.tuesday != rhs.tuesday ||
+            lhs.wednesday != rhs.wednesday ||
+            lhs.thursday != rhs.thursday ||
+            lhs.friday != rhs.friday ||
+            lhs.saturday != rhs.saturday
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DNSDayOfWeekFlags, rhs: DNSDayOfWeekFlags) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DNSDayOfWeekFlags, rhs: DNSDayOfWeekFlags) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

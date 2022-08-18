@@ -112,8 +112,17 @@ open class DAOBasket: DAOBaseObject {
         guard let rhs = rhs as? DAOBasket else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.account != rhs.account
-            || lhs.items != rhs.items
-            || lhs.place != rhs.place
+        return super.isDiffFrom(rhs) ||
+            lhs.account != rhs.account ||
+            lhs.items != rhs.items ||
+            lhs.place != rhs.place
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOBasket, rhs: DAOBasket) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOBasket, rhs: DAOBasket) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

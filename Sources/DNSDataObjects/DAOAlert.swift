@@ -144,14 +144,23 @@ open class DAOAlert: DAOBaseObject {
         guard let rhs = rhs as? DAOAlert else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endTime != rhs.endTime
-            || lhs.imageUrl != rhs.imageUrl
-            || lhs.name != rhs.name
-            || lhs.priority != rhs.priority
-            || lhs.scope != rhs.scope
-            || lhs.startTime != rhs.startTime
-            || lhs.status != rhs.status
-            || lhs.tagLine != rhs.tagLine
-            || lhs.title != rhs.title
+        return super.isDiffFrom(rhs) ||
+            lhs.endTime != rhs.endTime ||
+            lhs.imageUrl != rhs.imageUrl ||
+            lhs.name != rhs.name ||
+            lhs.priority != rhs.priority ||
+            lhs.scope != rhs.scope ||
+            lhs.startTime != rhs.startTime ||
+            lhs.status != rhs.status ||
+            lhs.tagLine != rhs.tagLine ||
+            lhs.title != rhs.title
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAlert, rhs: DAOAlert) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAlert, rhs: DAOAlert) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

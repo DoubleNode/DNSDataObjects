@@ -78,6 +78,15 @@ open class DAOAppActionImages: DAOBaseObject {
         guard let rhs = rhs as? DAOAppActionImages else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.topUrl != rhs.topUrl
+        return super.isDiffFrom(rhs) ||
+            lhs.topUrl != rhs.topUrl
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOAppActionImages, rhs: DAOAppActionImages) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOAppActionImages, rhs: DAOAppActionImages) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

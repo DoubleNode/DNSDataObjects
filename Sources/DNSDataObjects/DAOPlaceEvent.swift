@@ -110,10 +110,19 @@ open class DAOPlaceEvent: DAOBaseObject {
         guard let rhs = rhs as? DAOPlaceEvent else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.endDate != rhs.endDate
-            || lhs.name != rhs.name
-            || lhs.startDate != rhs.startDate
-            || lhs.timeZone != rhs.timeZone
-            || lhs.type != rhs.type
+        return super.isDiffFrom(rhs) ||
+            lhs.endDate != rhs.endDate ||
+            lhs.name != rhs.name ||
+            lhs.startDate != rhs.startDate ||
+            lhs.timeZone != rhs.timeZone ||
+            lhs.type != rhs.type
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOPlaceEvent, rhs: DAOPlaceEvent) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOPlaceEvent, rhs: DAOPlaceEvent) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

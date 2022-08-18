@@ -89,7 +89,16 @@ open class DAOApplication: DAOBaseObject {
         guard let rhs = rhs as? DAOApplication else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.appEvents != rhs.appEvents
+        return super.isDiffFrom(rhs) ||
+            lhs.appEvents != rhs.appEvents
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOApplication, rhs: DAOApplication) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOApplication, rhs: DAOApplication) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 
     // MARK: - Utility methods -

@@ -121,10 +121,19 @@ open class DAOSystem: DAOBaseObject {
         guard let rhs = rhs as? DAOSystem else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.currentState != rhs.currentState
-            || lhs.endPoints != rhs.endPoints
-            || lhs.historyState != rhs.historyState
-            || lhs.message != rhs.message
-            || lhs.name != rhs.name
+        return super.isDiffFrom(rhs) ||
+            lhs.currentState != rhs.currentState ||
+            lhs.endPoints != rhs.endPoints ||
+            lhs.historyState != rhs.historyState ||
+            lhs.message != rhs.message ||
+            lhs.name != rhs.name
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOSystem, rhs: DAOSystem) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOSystem, rhs: DAOSystem) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

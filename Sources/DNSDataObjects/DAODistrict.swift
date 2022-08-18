@@ -109,8 +109,17 @@ open class DAODistrict: DAOBaseObject {
         guard let rhs = rhs as? DAODistrict else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.centers != rhs.centers
-            || lhs.name != rhs.name
-            || lhs.region != rhs.region
+        return super.isDiffFrom(rhs) ||
+            lhs.centers != rhs.centers ||
+            lhs.name != rhs.name ||
+            lhs.region != rhs.region
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAODistrict, rhs: DAODistrict) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAODistrict, rhs: DAODistrict) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

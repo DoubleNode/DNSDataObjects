@@ -147,13 +147,22 @@ open class DAOOrder: DAOBaseObject {
         guard let rhs = rhs as? DAOOrder else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return lhs.account != rhs.account
-            || lhs.items != rhs.items
-            || lhs.place != rhs.place
-            || lhs.state != rhs.state
-            || lhs.subtotal != rhs.subtotal
-            || lhs.tax != rhs.tax
-            || lhs.total != rhs.total
-            || lhs.transaction != rhs.transaction
+        return super.isDiffFrom(rhs) ||
+            lhs.account != rhs.account ||
+            lhs.items != rhs.items ||
+            lhs.place != rhs.place ||
+            lhs.state != rhs.state ||
+            lhs.subtotal != rhs.subtotal ||
+            lhs.tax != rhs.tax ||
+            lhs.total != rhs.total ||
+            lhs.transaction != rhs.transaction
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DAOOrder, rhs: DAOOrder) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOOrder, rhs: DAOOrder) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }

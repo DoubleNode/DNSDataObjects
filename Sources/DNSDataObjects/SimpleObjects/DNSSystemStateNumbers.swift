@@ -86,8 +86,16 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DNSSystemStateNumbers else { return true }
         let lhs = self
-        return lhs.android != rhs.android
-            || lhs.iOS != rhs.iOS
-            || lhs.total != rhs.total
+        return lhs.android != rhs.android ||
+            lhs.iOS != rhs.iOS ||
+            lhs.total != rhs.total
+    }
+
+    // MARK: - Equatable protocol methods -
+    static public func !=(lhs: DNSSystemStateNumbers, rhs: DNSSystemStateNumbers) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DNSSystemStateNumbers, rhs: DNSSystemStateNumbers) -> Bool {
+        !lhs.isDiffFrom(rhs)
     }
 }
