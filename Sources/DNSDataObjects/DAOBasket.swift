@@ -69,7 +69,7 @@ open class DAOBasket: DAOBaseObject {
        _ = super.dao(from: data)
        let accountData = self.dictionary(from: data[field(.account)] as Any?)
        self.account = Self.createAccount(from: accountData)
-       let itemsData = self.array(from: data[field(.items)] as Any?)
+       let itemsData = self.dataarray(from: data[field(.items)] as Any?)
        self.items = itemsData.map { Self.createItem(from: $0) }
        let placeData = self.dictionary(from: data[field(.place)] as Any?)
        self.place = Self.createPlace(from: placeData)

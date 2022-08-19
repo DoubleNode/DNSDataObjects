@@ -92,11 +92,11 @@ open class DAOUser: DAOBaseObject {
         _ = super.dao(from: data)
         let accountsData = data[field(.accounts)] as? [DNSDataDictionary] ?? []
         self.accounts = accountsData.map { Self.createAccount(from: $0) }
-        let cardsData = self.array(from: data[field(.cards)] as Any?)
+        let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
         self.cards = cardsData.map { Self.createCard(from: $0) }
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
         self.email = self.string(from: data[field(.email)]  as Any?) ?? self.email
-        let favoritesData = self.array(from: data[field(.favorites)] as Any?)
+        let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
         self.favorites = favoritesData.map { Self.createActivity(from: $0) }
         self.firstName = self.string(from: data[field(.firstName)] as Any?) ?? self.firstName
         self.lastName = self.string(from: data[field(.lastName)] as Any?) ?? self.lastName

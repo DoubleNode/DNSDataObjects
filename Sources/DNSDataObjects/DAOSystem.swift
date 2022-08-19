@@ -70,9 +70,9 @@ open class DAOSystem: DAOBaseObject {
         _ = super.dao(from: data)
         let currentStateData = self.dictionary(from: data[field(.currentState)] as Any?)
         self.currentState = Self.createState(from: currentStateData)
-        let endPointsData = self.array(from: data[field(.endPoints)] as Any?)
+        let endPointsData = self.dataarray(from: data[field(.endPoints)] as Any?)
         self.endPoints = endPointsData.map { Self.createEndPoint(from: $0) }
-        let historyStateData = self.array(from: data[field(.historyState)] as Any?)
+        let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?)
         self.historyState = historyStateData.map { Self.createState(from: $0) }
         self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name

@@ -75,7 +75,7 @@ open class DAOSystemEndPoint: DAOBaseObject {
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let systemData = self.dictionary(from: data[field(.system)] as Any?)
         self.system = Self.createSystem(from: systemData)
-        let historyStateData = self.array(from: data[field(.historyState)] as Any?)
+        let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?)
         self.historyState = historyStateData.map { Self.createState(from: $0) }
         return self
     }

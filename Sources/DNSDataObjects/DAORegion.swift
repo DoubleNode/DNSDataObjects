@@ -53,7 +53,7 @@ public class DAORegion: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAORegion {
         _ = super.dao(from: data)
-        let districtsData = self.array(from: data[field(.districts)] as Any?)
+        let districtsData = self.dataarray(from: data[field(.districts)] as Any?)
         self.districts = districtsData.map { Self.createDistrict(from: $0) }
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self

@@ -64,7 +64,7 @@ open class DAOFaqSection: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOFaqSection {
         _ = super.dao(from: data)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        let faqsData = self.array(from: data[field(.faqs)] as Any?)
+        let faqsData = self.dataarray(from: data[field(.faqs)] as Any?)
         self.faqs = faqsData.map { Self.createFaq(from: $0) }
         self.icon = self.string(from: data[field(.icon)] as Any?) ?? self.icon
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
