@@ -9,7 +9,7 @@
 import DNSCore
 import UIKit
 
-public class DAORegion: DAOBaseObject {
+open class DAORegion: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var districtType: DAODistrict.Type { return DAODistrict.self }
 
