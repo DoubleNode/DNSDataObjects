@@ -13,7 +13,8 @@ open class DAOAppActionStrings: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case body, cancelLabel, disclaimer, okayLabel, subTitle, title
+        case cancelLabel, disclaimer, okayLabel, subTitle, title
+        case body = "description"
     }
 
     open var body = DNSString()
