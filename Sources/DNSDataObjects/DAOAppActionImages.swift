@@ -13,7 +13,7 @@ open class DAOAppActionImages: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case topUrl
+        case topUrl = "top"
     }
 
     open var topUrl = DNSURL()
