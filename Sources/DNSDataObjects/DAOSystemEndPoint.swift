@@ -16,11 +16,11 @@ open class DAOSystemEndPoint: DAOBaseObject {
 
     open class func createState() -> DAOSystemState { stateType.init() }
     open class func createState(from object: DAOSystemState) -> DAOSystemState { stateType.init(from: object) }
-    open class func createState(from data: DNSDataDictionary) -> DAOSystemState { stateType.init(from: data) }
+    open class func createState(from data: DNSDataDictionary) -> DAOSystemState? { stateType.init(from: data) }
 
     open class func createSystem() -> DAOSystem { systemType.init() }
     open class func createSystem(from object: DAOSystem) -> DAOSystem { systemType.init(from: object) }
-    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem { systemType.init(from: data) }
+    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem? { systemType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -63,7 +63,8 @@ open class DAOSystemEndPoint: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         currentState = Self.createState()
         system = Self.createSystem()
         super.init(from: data)
@@ -71,12 +72,12 @@ open class DAOSystemEndPoint: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOSystemEndPoint {
         _ = super.dao(from: data)
         let currentStateData = self.dictionary(from: data[field(.currentState)] as Any?)
-        self.currentState = Self.createState(from: currentStateData)
+        self.currentState = Self.createState(from: currentStateData)!
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let systemData = self.dictionary(from: data[field(.system)] as Any?)
-        self.system = Self.createSystem(from: systemData)
+        self.system = Self.createSystem(from: systemData)!
         let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?)
-        self.historyState = historyStateData.map { Self.createState(from: $0) }
+        self.historyState = historyStateData.compactMap { Self.createState(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {

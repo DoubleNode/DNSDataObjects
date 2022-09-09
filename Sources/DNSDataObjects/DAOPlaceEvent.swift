@@ -54,7 +54,8 @@ open class DAOPlaceEvent: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceEvent {

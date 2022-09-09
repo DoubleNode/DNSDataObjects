@@ -15,7 +15,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
 
     open class func createUser() -> DAOUser { userType.init() }
     open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser { userType.init(from: data) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -56,7 +56,8 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOUserChangeRequest {

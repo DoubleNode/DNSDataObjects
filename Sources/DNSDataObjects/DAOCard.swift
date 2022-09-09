@@ -15,7 +15,7 @@ open class DAOCard: DAOBaseObject {
 
     open class func createTransaction() -> DAOTransaction { transactionType.init() }
     open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { transactionType.init(from: object) }
-    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction { transactionType.init(from: data) }
+    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction? { transactionType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -60,7 +60,8 @@ open class DAOCard: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOCard {
@@ -70,7 +71,7 @@ open class DAOCard: DAOBaseObject {
         self.nickname = self.string(from: data[field(.nickname)] as Any?) ?? self.nickname
         self.pinNumber = self.string(from: data[field(.pinNumber)] as Any?) ?? self.pinNumber
         let transactionsData = self.dataarray(from: data[field(.transactions)] as Any?)
-        self.transactions = transactionsData.map { Self.createTransaction(from: $0) }
+        self.transactions = transactionsData.compactMap { Self.createTransaction(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {

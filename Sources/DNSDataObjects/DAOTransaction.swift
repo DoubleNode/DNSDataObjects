@@ -16,11 +16,11 @@ open class DAOTransaction: DAOBaseObject {
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
-    open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { cardType.init(from: data) }
     
     open class func createOrder() -> DAOOrder { orderType.init() }
     open class func createOrder(from object: DAOOrder) -> DAOOrder { orderType.init(from: object) }
-    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder { orderType.init(from: data) }
+    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { orderType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -63,7 +63,8 @@ open class DAOTransaction: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOTransaction {

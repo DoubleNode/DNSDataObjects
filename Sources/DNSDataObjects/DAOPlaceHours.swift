@@ -16,11 +16,11 @@ open class DAOPlaceHours: DAOBaseObject {
 
     open class func createEvent() -> DAOPlaceEvent { eventType.init() }
     open class func createEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOPlaceEvent { eventType.init(from: data) }
+    open class func createEvent(from data: DNSDataDictionary) -> DAOPlaceEvent? { eventType.init(from: data) }
 
     open class func createHoliday() -> DAOPlaceHoliday { holidayType.init() }
     open class func createHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { holidayType.init(from: object) }
-    open class func createHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday { holidayType.init(from: data) }
+    open class func createHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday? { holidayType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -88,15 +88,16 @@ open class DAOPlaceHours: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceHours {
         _ = super.dao(from: data)
         let eventsData = self.dataarray(from: data[field(.events)] as Any?)
-        self.events = eventsData.map { Self.createEvent(from: $0) }
+        self.events = eventsData.compactMap { Self.createEvent(from: $0) }
         let holidaysData = self.dataarray(from: data[field(.holidays)] as Any?)
-        self.holidays = holidaysData.map { Self.createHoliday(from: $0) }
+        self.holidays = holidaysData.compactMap { Self.createHoliday(from: $0) }
         let mondayData = self.dictionary(from: data[field(.monday)] as Any?)
         self.monday = DNSDailyHours(from: mondayData)
         let tuesdayData = self.dictionary(from: data[field(.tuesday)] as Any?)

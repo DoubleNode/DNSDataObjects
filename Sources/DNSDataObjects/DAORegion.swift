@@ -15,7 +15,7 @@ open class DAORegion: DAOBaseObject {
 
     open class func createDistrict() -> DAODistrict { districtType.init() }
     open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
-    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict { districtType.init(from: data) }
+    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict? { districtType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -48,13 +48,14 @@ open class DAORegion: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAORegion {
         _ = super.dao(from: data)
         let districtsData = self.dataarray(from: data[field(.districts)] as Any?)
-        self.districts = districtsData.map { Self.createDistrict(from: $0) }
+        self.districts = districtsData.compactMap { Self.createDistrict(from: $0) }
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
     }

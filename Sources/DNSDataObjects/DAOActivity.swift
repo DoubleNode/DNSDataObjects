@@ -16,11 +16,11 @@ open class DAOActivity: DAOBaseObject {
 
     open class func createBase() -> DAOActivityType { baseType.init() }
     open class func createBase(from object: DAOActivityType) -> DAOActivityType { baseType.init(from: object) }
-    open class func createBase(from data: DNSDataDictionary) -> DAOActivityType { baseType.init(from: data) }
+    open class func createBase(from data: DNSDataDictionary) -> DAOActivityType? { baseType.init(from: data) }
 
     open class func createBlackout() -> DAOActivityBlackout { blackoutType.init() }
     open class func createBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { blackoutType.init(from: object) }
-    open class func createBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout { blackoutType.init(from: data) }
+    open class func createBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { blackoutType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -70,7 +70,8 @@ open class DAOActivity: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         baseType = Self.createBase()
         super.init(from: data)
     }
@@ -78,7 +79,7 @@ open class DAOActivity: DAOBaseObject {
         _ = super.dao(from: data)
         // TODO: Implement baseType import
         let baseTypeData = self.dictionary(from: data[field(.baseType)] as Any?)
-        self.baseType = Self.createBase(from: baseTypeData)
+        self.baseType = Self.createBase(from: baseTypeData)!
         self.bookingEndTime = self.date(from: data[field(.bookingEndTime)] as Any?)
         self.bookingStartTime = self.date(from: data[field(.bookingStartTime)] as Any?)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code

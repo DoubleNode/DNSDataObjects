@@ -16,11 +16,11 @@ open class DAOAccount: DAOBaseObject {
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
-    open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { cardType.init(from: data) }
 
     open class func createUser() -> DAOUser { userType.init() }
     open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser { userType.init(from: data) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -63,20 +63,21 @@ open class DAOAccount: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAccount {
         _ = super.dao(from: data)
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
-        self.cards = cardsData.map { Self.createCard(from: $0) }
+        self.cards = cardsData.compactMap { Self.createCard(from: $0) }
         self.emailNotifications = self.bool(from: data[field(.emailNotifications)] ??
                                             self.emailNotifications)!
         self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
         self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
         let usersData = self.dataarray(from: data[field(.users)] as Any?)
-        self.users = usersData.map { Self.createUser(from: $0) }
+        self.users = usersData.compactMap { Self.createUser(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {

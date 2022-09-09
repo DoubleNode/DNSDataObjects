@@ -16,11 +16,11 @@ open class DAOAppAction: DAOBaseObject {
 
     open class func createImages() -> DAOAppActionImages { imagesType.init() }
     open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { imagesType.init(from: object) }
-    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages { imagesType.init(from: data) }
+    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages? { imagesType.init(from: data) }
 
     open class func createStrings() -> DAOAppActionStrings { stringsType.init() }
     open class func createStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { stringsType.init(from: object) }
-    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings { stringsType.init(from: data) }
+    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { stringsType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -65,7 +65,8 @@ open class DAOAppAction: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         images = Self.createImages()
         strings = Self.createStrings()
         super.init(from: data)
@@ -77,10 +78,10 @@ open class DAOAppAction: DAOBaseObject {
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
         let imagesSection = self.dictionary(from: data[field(.imagesSection)] as Any?)
-        self.images = Self.createImages(from: imagesSection)
+        self.images = Self.createImages(from: imagesSection)!
         // strings section
         let stringsSection = self.dictionary(from: data[field(.stringsSection)] as Any?)
-        self.strings = Self.createStrings(from: stringsSection)
+        self.strings = Self.createStrings(from: stringsSection)!
         return self
     }
     override open var asDictionary: DNSDataDictionary {

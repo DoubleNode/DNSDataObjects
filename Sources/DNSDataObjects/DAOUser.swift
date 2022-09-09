@@ -18,19 +18,19 @@ open class DAOUser: DAOBaseObject {
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount { accountType.init(from: data) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
 
     open class func createActivity() -> DAOActivityType { activityType.init() }
     open class func createActivity(from object: DAOActivityType) -> DAOActivityType { activityType.init(from: object) }
-    open class func createActivity(from data: DNSDataDictionary) -> DAOActivityType { activityType.init(from: data) }
+    open class func createActivity(from data: DNSDataDictionary) -> DAOActivityType? { activityType.init(from: data) }
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
-    open class func createCard(from data: DNSDataDictionary) -> DAOCard { cardType.init(from: data) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { cardType.init(from: data) }
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace { placeType.init(from: data) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -85,19 +85,20 @@ open class DAOUser: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOUser {
         _ = super.dao(from: data)
         let accountsData = data[field(.accounts)] as? [DNSDataDictionary] ?? []
-        self.accounts = accountsData.map { Self.createAccount(from: $0) }
+        self.accounts = accountsData.compactMap { Self.createAccount(from: $0) }
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
-        self.cards = cardsData.map { Self.createCard(from: $0) }
+        self.cards = cardsData.compactMap { Self.createCard(from: $0) }
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
         self.email = self.string(from: data[field(.email)]  as Any?) ?? self.email
         let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
-        self.favorites = favoritesData.map { Self.createActivity(from: $0) }
+        self.favorites = favoritesData.compactMap { Self.createActivity(from: $0) }
         self.firstName = self.string(from: data[field(.firstName)] as Any?) ?? self.firstName
         self.lastName = self.string(from: data[field(.lastName)] as Any?) ?? self.lastName
         let myPlaceData = self.dictionary(from: data[field(.myPlace)] as Any?)

@@ -20,23 +20,23 @@ open class DAOPlace: DAOBaseObject {
 
     open class func createActivity() -> DAOActivity { activityType.init() }
     open class func createActivity(from object: DAOActivity) -> DAOActivity { activityType.init(from: object) }
-    open class func createActivity(from data: DNSDataDictionary) -> DAOActivity { activityType.init(from: data) }
+    open class func createActivity(from data: DNSDataDictionary) -> DAOActivity? { activityType.init(from: data) }
 
     open class func createAlert() -> DAOAlert { alertType.init() }
     open class func createAlert(from object: DAOAlert) -> DAOAlert { alertType.init(from: object) }
-    open class func createAlert(from data: DNSDataDictionary) -> DAOAlert { alertType.init(from: data) }
+    open class func createAlert(from data: DNSDataDictionary) -> DAOAlert? { alertType.init(from: data) }
 
     open class func createDistrict() -> DAODistrict { districtType.init() }
     open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
-    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict { districtType.init(from: data) }
+    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict? { districtType.init(from: data) }
 
     open class func createHours() -> DAOPlaceHours { hoursType.init() }
     open class func createHours(from object: DAOPlaceHours) -> DAOPlaceHours { hoursType.init(from: object) }
-    open class func createHours(from data: DNSDataDictionary) -> DAOPlaceHours { hoursType.init(from: data) }
+    open class func createHours(from data: DNSDataDictionary) -> DAOPlaceHours? { hoursType.init(from: data) }
 
     open class func createStatus() -> DAOPlaceStatus { statusType.init() }
     open class func createStatus(from object: DAOPlaceStatus) -> DAOPlaceStatus { statusType.init(from: object) }
-    open class func createStatus(from data: DNSDataDictionary) -> DAOPlaceStatus { statusType.init(from: data) }
+    open class func createStatus(from data: DNSDataDictionary) -> DAOPlaceStatus? { statusType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -109,7 +109,8 @@ open class DAOPlace: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         district = Self.createDistrict()
         hours = Self.createHours()
         super.init(from: data)
@@ -117,21 +118,21 @@ open class DAOPlace: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOPlace {
         _ = super.dao(from: data)
         let activitiesData = self.dataarray(from: data[field(.activities)] as Any?)
-        self.activities = activitiesData.map { Self.createActivity(from: $0) }
+        self.activities = activitiesData.compactMap { Self.createActivity(from: $0) }
         self.address = self.string(from: data[field(.address)] as Any?) ?? self.address
         let alertsData = self.dataarray(from: data[field(.alerts)] as Any?)
-        self.alerts = alertsData.map { Self.createAlert(from: $0) }
+        self.alerts = alertsData.compactMap { Self.createAlert(from: $0) }
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
         let districtData = self.dictionary(from: data[field(.district)] as Any?)
-        self.district = Self.createDistrict(from: districtData)
+        self.district = Self.createDistrict(from: districtData)!
         let geohashesData = self.array(from: data[field(.geohashes)] as Any?)
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
         let hoursData = self.dictionary(from: data[field(.hours)] as Any?)
-        self.hours = Self.createHours(from: hoursData)
+        self.hours = Self.createHours(from: hoursData)!
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
         let statusesData = self.dataarray(from: data[field(.statuses)] as Any?)
-        self.statuses = statusesData.map { Self.createStatus(from: $0) }
+        self.statuses = statusesData.compactMap { Self.createStatus(from: $0) }
         self.timeZone = self.timeZone(from: data[field(.timeZone)] as Any?) ?? self.timeZone
         return self
     }

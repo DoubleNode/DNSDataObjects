@@ -17,15 +17,15 @@ open class DAOOrderItem: DAOProduct {
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount { accountType.init(from: data) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
     
     open class func createOrder() -> DAOOrder { orderType.init() }
     open class func createOrder(from object: DAOOrder) -> DAOOrder { orderType.init(from: object) }
-    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder { orderType.init(from: data) }
+    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { orderType.init(from: data) }
     
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace { placeType.init(from: data) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -68,7 +68,8 @@ open class DAOOrderItem: DAOProduct {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOOrderItem {

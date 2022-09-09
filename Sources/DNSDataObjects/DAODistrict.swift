@@ -16,11 +16,11 @@ open class DAODistrict: DAOBaseObject {
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace { placeType.init(from: data) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
 
     open class func createRegion() -> DAORegion { regionType.init() }
     open class func createRegion(from object: DAORegion) -> DAORegion { regionType.init(from: object) }
-    open class func createRegion(from data: DNSDataDictionary) -> DAORegion { regionType.init(from: data) }
+    open class func createRegion(from data: DNSDataDictionary) -> DAORegion? { regionType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -58,17 +58,18 @@ open class DAODistrict: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         region = Self.createRegion()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAODistrict {
         _ = super.dao(from: data)
         let centersData = self.dataarray(from: data[field(.centers)] as Any?)
-        self.centers = centersData.map { Self.createPlace(from: $0) }
+        self.centers = centersData.compactMap { Self.createPlace(from: $0) }
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let regionData = self.dictionary(from: data[field(.region)] as Any?)
-        self.region = Self.createRegion(from: regionData)
+        self.region = Self.createRegion(from: regionData)!
         return self
     }
     override open var asDictionary: DNSDataDictionary {

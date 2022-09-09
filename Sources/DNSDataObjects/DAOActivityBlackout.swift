@@ -41,7 +41,8 @@ open class DAOActivityBlackout: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     open override func dao(from data: DNSDataDictionary) -> DAOActivityBlackout {

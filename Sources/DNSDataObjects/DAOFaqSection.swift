@@ -15,7 +15,7 @@ open class DAOFaqSection: DAOBaseObject {
 
     open class func createFaq() -> DAOFaq { faqType.init() }
     open class func createFaq(from object: DAOFaq) -> DAOFaq { faqType.init(from: object) }
-    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq { faqType.init(from: data) }
+    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq? { faqType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -58,14 +58,15 @@ open class DAOFaqSection: DAOBaseObject {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOFaqSection {
         _ = super.dao(from: data)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
         let faqsData = self.dataarray(from: data[field(.faqs)] as Any?)
-        self.faqs = faqsData.map { Self.createFaq(from: $0) }
+        self.faqs = faqsData.compactMap { Self.createFaq(from: $0) }
         self.icon = self.string(from: data[field(.icon)] as Any?) ?? self.icon
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self

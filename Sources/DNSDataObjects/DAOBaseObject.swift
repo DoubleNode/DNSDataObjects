@@ -40,7 +40,8 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     }
 
     // MARK: - DAO translation methods -
-    required public init(from data: DNSDataDictionary) {
+    required public init?(from data: DNSDataDictionary) {
+        guard !data.isEmpty else { return nil }
         super.init()
         _ = self.dao(from: data)
     }
