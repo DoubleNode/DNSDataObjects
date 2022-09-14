@@ -14,8 +14,8 @@ open class DAOPlace: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var activityType: DAOActivity.Type { return DAOActivity.self }
     open class var alertType: DAOAlert.Type { return DAOAlert.self }
-    open class var districtType: DAODistrict.Type { return DAODistrict.self }
     open class var hoursType: DAOPlaceHours.Type { return DAOPlaceHours.self }
+    open class var sectionType: DAOSection.Type { return DAOSection.self }
     open class var statusType: DAOPlaceStatus.Type { return DAOPlaceStatus.self }
 
     open class func createActivity() -> DAOActivity { activityType.init() }
@@ -26,13 +26,13 @@ open class DAOPlace: DAOBaseObject {
     open class func createAlert(from object: DAOAlert) -> DAOAlert { alertType.init(from: object) }
     open class func createAlert(from data: DNSDataDictionary) -> DAOAlert? { alertType.init(from: data) }
 
-    open class func createDistrict() -> DAODistrict { districtType.init() }
-    open class func createDistrict(from object: DAODistrict) -> DAODistrict { districtType.init(from: object) }
-    open class func createDistrict(from data: DNSDataDictionary) -> DAODistrict? { districtType.init(from: data) }
-
     open class func createHours() -> DAOPlaceHours { hoursType.init() }
     open class func createHours(from object: DAOPlaceHours) -> DAOPlaceHours { hoursType.init(from: object) }
     open class func createHours(from data: DNSDataDictionary) -> DAOPlaceHours? { hoursType.init(from: data) }
+
+    open class func createSection() -> DAOSection { sectionType.init() }
+    open class func createSection(from object: DAOSection) -> DAOSection { sectionType.init(from: object) }
+    open class func createSection(from data: DNSDataDictionary) -> DAOSection? { sectionType.init(from: data) }
 
     open class func createStatus() -> DAOPlaceStatus { statusType.init() }
     open class func createStatus(from object: DAOPlaceStatus) -> DAOPlaceStatus { statusType.init(from: object) }
@@ -41,20 +41,20 @@ open class DAOPlace: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case activities, address, alerts, code, district
-        case geohashes, geopoint, hours, name, phone, statuses, timeZone
+        case activities, address, alerts, code, geohashes, geopoint
+        case hours, name, phone, section, statuses, timeZone
     }
 
     open var activities: [DAOActivity] = []
     open var address = ""
     open var alerts: [DAOAlert] = []
     open var code = ""
-    open var district: DAODistrict
     open var geohashes: [String] = []
     open var geopoint: CLLocation?
     open var hours: DAOPlaceHours
     open var name = DNSString()
     open var phone = ""
+    open var section: DAOSection?
     open var statuses: [DAOPlaceStatus] = [] {
         didSet {
             self.statuses.filter { $0.id.isEmpty }
@@ -66,17 +66,14 @@ open class DAOPlace: DAOBaseObject {
     open var timeZone: TimeZone = TimeZone.current
     // MARK: - Initializers -
     required public init() {
-        district = Self.createDistrict()
         hours = Self.createHours()
         super.init()
     }
     required public init(id: String) {
-        district = Self.createDistrict()
         hours = Self.createHours()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
-        district = Self.createDistrict()
         hours = Self.createHours()
         self.code = code
         self.name = name
@@ -85,7 +82,6 @@ open class DAOPlace: DAOBaseObject {
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOPlace) {
-        district = Self.createDistrict()
         hours = Self.createHours()
         super.init(from: object)
         self.update(from: object)
@@ -98,12 +94,12 @@ open class DAOPlace: DAOBaseObject {
         self.geopoint = object.geopoint
         self.name = object.name
         self.phone = object.phone
+        self.section = object.section?.copy() as? DAOSection
         self.timeZone = object.timeZone
         // swiftlint:disable force_cast
         self.activities = object.activities.map { $0.copy() as! DAOActivity }
         self.alerts = object.alerts.map { $0.copy() as! DAOAlert }
         self.statuses = object.statuses.map { $0.copy() as! DAOPlaceStatus }
-        self.district = object.district.copy() as! DAODistrict
         self.hours = object.hours.copy() as! DAOPlaceHours
         // swiftlint:enable force_cast
     }
@@ -111,7 +107,6 @@ open class DAOPlace: DAOBaseObject {
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
-        district = Self.createDistrict()
         hours = Self.createHours()
         super.init(from: data)
     }
@@ -123,14 +118,14 @@ open class DAOPlace: DAOBaseObject {
         let alertsData = self.dataarray(from: data[field(.alerts)] as Any?)
         self.alerts = alertsData.compactMap { Self.createAlert(from: $0) }
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        let districtData = self.dictionary(from: data[field(.district)] as Any?)
-        self.district = Self.createDistrict(from: districtData)!
         let geohashesData = self.array(from: data[field(.geohashes)] as Any?)
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
         let hoursData = self.dictionary(from: data[field(.hours)] as Any?)
-        self.hours = Self.createHours(from: hoursData)!
+        self.hours = Self.createHours(from: hoursData) ?? self.hours
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
+        let sectionData = self.dictionary(from: data[field(.section)] as Any?)
+        self.section = Self.createSection(from: sectionData) ?? self.section
         let statusesData = self.dataarray(from: data[field(.statuses)] as Any?)
         self.statuses = statusesData.compactMap { Self.createStatus(from: $0) }
         self.timeZone = self.timeZone(from: data[field(.timeZone)] as Any?) ?? self.timeZone
@@ -143,12 +138,12 @@ open class DAOPlace: DAOBaseObject {
             field(.address): self.address,
             field(.alerts): self.alerts.map { $0.asDictionary },
             field(.code): self.code,
-            field(.district): self.district.asDictionary,
             field(.geohashes): self.geohashes.map { $0 },
             field(.geopoint): self.geopoint?.asDictionary,
             field(.hours): self.hours.asDictionary,
             field(.name): self.name,
             field(.phone): self.phone,
+            field(.section): self.section?.asDictionary ?? .empty,
             field(.statuses): self.statuses.map { $0.asDictionary },
             field(.timeZone): self.timeZone.identifier,
         ]) { (current, _) in current }
@@ -157,20 +152,19 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        district = Self.createDistrict()
         hours = Self.createHours()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activities = try container.decode([DAOActivity].self, forKey: .activities)
         address = try container.decode(String.self, forKey: .address)
         alerts = try container.decode([DAOAlert].self, forKey: .alerts)
         code = try container.decode(String.self, forKey: .code)
-        district = try container.decode(Self.districtType.self, forKey: .district)
         geohashes = try container.decode([String].self, forKey: .geohashes)
         let geopointData = try container.decode([String: Double].self, forKey: .geopoint)
         geopoint = CLLocation(from: geopointData)
         hours = try container.decode(Self.hoursType.self, forKey: .hours)
         name = try container.decode(DNSString.self, forKey: .name)
         phone = try container.decode(String.self, forKey: .phone)
+        section = try container.decode(Self.sectionType.self, forKey: .section)
         statuses = try container.decode([DAOPlaceStatus].self, forKey: .statuses)
         timeZone = try container.decode(TimeZone.self, forKey: .timeZone)
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -184,12 +178,12 @@ open class DAOPlace: DAOBaseObject {
         try container.encode(address, forKey: .address)
         try container.encode(alerts, forKey: .alerts)
         try container.encode(code, forKey: .code)
-        try container.encode(district, forKey: .district)
         try container.encode(geohashes, forKey: .geohashes)
         try container.encode(geopoint?.asDictionary as? [String: Double], forKey: .geopoint)
         try container.encode(hours, forKey: .hours)
         try container.encode(name, forKey: .name)
         try container.encode(phone, forKey: .phone)
+        try container.encode(section, forKey: .section)
         try container.encode(statuses, forKey: .statuses)
         try container.encode(timeZone, forKey: .timeZone)
     }
@@ -208,12 +202,12 @@ open class DAOPlace: DAOBaseObject {
             lhs.address != rhs.address ||
             lhs.alerts != rhs.alerts ||
             lhs.code != rhs.code ||
-            lhs.district != rhs.district ||
             lhs.geohashes != rhs.geohashes ||
             lhs.geopoint != rhs.geopoint ||
             lhs.hours != rhs.hours ||
             lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
+            lhs.section != rhs.section ||
             lhs.statuses != rhs.statuses ||
             lhs.timeZone != rhs.timeZone
     }

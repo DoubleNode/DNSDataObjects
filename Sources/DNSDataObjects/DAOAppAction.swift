@@ -78,10 +78,10 @@ open class DAOAppAction: DAOBaseObject {
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
         let imagesSection = self.dictionary(from: data[field(.imagesSection)] as Any?)
-        self.images = Self.createImages(from: imagesSection)!
+        self.images = Self.createImages(from: imagesSection) ?? self.images
         // strings section
         let stringsSection = self.dictionary(from: data[field(.stringsSection)] as Any?)
-        self.strings = Self.createStrings(from: stringsSection)!
+        self.strings = Self.createStrings(from: stringsSection) ?? self.strings
         return self
     }
     override open var asDictionary: DNSDataDictionary {

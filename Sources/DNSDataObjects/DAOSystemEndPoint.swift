@@ -72,10 +72,10 @@ open class DAOSystemEndPoint: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOSystemEndPoint {
         _ = super.dao(from: data)
         let currentStateData = self.dictionary(from: data[field(.currentState)] as Any?)
-        self.currentState = Self.createState(from: currentStateData)!
+        self.currentState = Self.createState(from: currentStateData) ?? self.currentState
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let systemData = self.dictionary(from: data[field(.system)] as Any?)
-        self.system = Self.createSystem(from: systemData)!
+        self.system = Self.createSystem(from: systemData) ?? self.system
         let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?)
         self.historyState = historyStateData.compactMap { Self.createState(from: $0) }
         return self

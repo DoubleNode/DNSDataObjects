@@ -79,7 +79,7 @@ open class DAOActivity: DAOBaseObject {
         _ = super.dao(from: data)
         // TODO: Implement baseType import
         let baseTypeData = self.dictionary(from: data[field(.baseType)] as Any?)
-        self.baseType = Self.createBase(from: baseTypeData)!
+        self.baseType = Self.createBase(from: baseTypeData) ?? self.baseType
         self.bookingEndTime = self.date(from: data[field(.bookingEndTime)] as Any?)
         self.bookingStartTime = self.date(from: data[field(.bookingStartTime)] as Any?)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
