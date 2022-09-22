@@ -25,7 +25,15 @@ open class DAOAlert: DAOBaseObject {
     open var endTime = C.defaultEndTime
     open var imageUrl = DNSURL()
     open var name = ""
-    open var priority: Int = 100
+    open var priority: Int = DNSPriority.normal {
+        didSet {
+            if priority > DNSPriority.highest {
+                priority = DNSPriority.highest
+            } else if priority < DNSPriority.none {
+                priority = DNSPriority.none
+            }
+        }
+    }
     open var scope: DNSScope = .all
     open var startTime = C.defaultStartTime
     open var status: DNSStatus = .tempClosed

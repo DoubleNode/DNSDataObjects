@@ -13,9 +13,18 @@ open class DAODocument: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case title, url
+        case priority, title, url
     }
 
+    open var priority: Int = DNSPriority.normal {
+        didSet {
+            if priority > DNSPriority.highest {
+                priority = DNSPriority.highest
+            } else if priority < DNSPriority.none {
+                priority = DNSPriority.none
+            }
+        }
+    }
     open var title = DNSString()
     open var url = DNSURL()
 
@@ -40,6 +49,7 @@ open class DAODocument: DAOBaseObject {
     }
     open func update(from object: DAODocument) {
         super.update(from: object)
+        self.priority = object.priority
         self.title = object.title
         self.url = object.url
     }
@@ -51,6 +61,7 @@ open class DAODocument: DAOBaseObject {
     }
     override open func dao(from data: DNSDataDictionary) -> DAODocument {
         _ = super.dao(from: data)
+        self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         self.url = self.dnsurl(from: data[field(.url)] as Any?) ?? self.url
         return self
@@ -58,6 +69,7 @@ open class DAODocument: DAOBaseObject {
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
+            field(.priority): self.priority,
             field(.title): self.title.asDictionary,
             field(.url): self.url.asDictionary,
         ]) { (current, _) in current }
@@ -67,6 +79,7 @@ open class DAODocument: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        priority = try container.decode(Int.self, forKey: .priority)
         title = try container.decode(DNSString.self, forKey: .title)
         url = try container.decode(DNSURL.self, forKey: .url)
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -76,6 +89,7 @@ open class DAODocument: DAOBaseObject {
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(priority, forKey: .priority)
         try container.encode(title, forKey: .title)
         try container.encode(url, forKey: .url)
     }
@@ -90,6 +104,7 @@ open class DAODocument: DAOBaseObject {
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.priority != rhs.priority ||
             lhs.title != rhs.title ||
             lhs.url != rhs.url
     }
