@@ -35,7 +35,7 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case accounts, cards, dob, email, favorites, firstName, lastName, myPlace, phone
+        case accounts, cards, dob, email, favorites, firstName, lastName, myPlace, phone, type
     }
 
     open var accounts: [DAOAccount] = []
@@ -47,6 +47,7 @@ open class DAOUser: DAOBaseObject {
     open var lastName: String = ""
     open var myPlace: DAOPlace?
     open var phone: String = ""
+    open var type: DNSUserType = .unknown
 
     // MARK: - Initializers -
     required public init() {
@@ -56,11 +57,9 @@ open class DAOUser: DAOBaseObject {
         super.init(id: id)
     }
     public init(id: String, email: String, firstName: String, lastName: String) {
-        self.dob = nil
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
-        self.phone = ""
         super.init(id: id)
     }
 
@@ -76,6 +75,7 @@ open class DAOUser: DAOBaseObject {
         self.firstName = object.firstName
         self.lastName = object.lastName
         self.phone = object.phone
+        self.type = object.type
         // swiftlint:disable force_cast
         self.accounts = object.accounts.map { $0.copy() as! DAOAccount }
         self.cards = object.cards.map { $0.copy() as! DAOCard }
@@ -104,6 +104,8 @@ open class DAOUser: DAOBaseObject {
         let myPlaceData = self.dictionary(from: data[field(.myPlace)] as Any?)
         self.myPlace = Self.createPlace(from: myPlaceData)
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
+        let typeData = self.string(from: data[field(.type)] as Any?) ?? ""
+        self.type = DNSUserType(rawValue: typeData) ?? .unknown
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -118,6 +120,7 @@ open class DAOUser: DAOBaseObject {
             field(.lastName): self.lastName,
             field(.myPlace): self.myPlace?.asDictionary,
             field(.phone): self.phone,
+            field(.type): self.type.rawValue,
         ]) { (current, _) in current }
         return retval
     }
@@ -134,6 +137,7 @@ open class DAOUser: DAOBaseObject {
         lastName = try container.decode(String.self, forKey: .lastName)
         myPlace = try container.decode(Self.placeType.self, forKey: .myPlace)
         phone = try container.decode(String.self, forKey: .phone)
+        type = try container.decode(DNSUserType.self, forKey: .type)
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
@@ -150,6 +154,7 @@ open class DAOUser: DAOBaseObject {
         try container.encode(lastName, forKey: .lastName)
         try container.encode(myPlace, forKey: .myPlace)
         try container.encode(phone, forKey: .phone)
+        try container.encode(type, forKey: .type)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -170,7 +175,8 @@ open class DAOUser: DAOBaseObject {
             lhs.firstName != rhs.firstName ||
             lhs.lastName != rhs.lastName ||
             lhs.myPlace != rhs.myPlace ||
-            lhs.phone != rhs.phone
+            lhs.phone != rhs.phone ||
+            lhs.type != rhs.type
     }
 
     // MARK: - Equatable protocol methods -
