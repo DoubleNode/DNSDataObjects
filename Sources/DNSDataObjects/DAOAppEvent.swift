@@ -55,7 +55,7 @@ open class DAOAppEvent: DAOBaseObject {
         super.init(from: object)
         self.update(from: object)
     }
-    public func update(from object: DAOAppEvent) {
+    open func update(from object: DAOAppEvent) {
         super.update(from: object)
         self.endTime = object.endTime
         self.priority = object.priority
