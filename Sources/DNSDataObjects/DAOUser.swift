@@ -35,7 +35,7 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case accounts, cards, dob, email, favorites, firstName, lastName, myPlace, phone, type
+        case accounts, cards, dob, email, favorites, myPlace, name, phone, type
     }
 
     open var accounts: [DAOAccount] = []
@@ -43,11 +43,28 @@ open class DAOUser: DAOBaseObject {
     open var dob: Date?
     open var email: String = ""
     open var favorites: [DAOActivityType] = []
-    open var firstName: String = ""
-    open var lastName: String = ""
+    open var name = PersonNameComponents()
     open var myPlace: DAOPlace?
     open var phone: String = ""
     open var type: DNSUserType = .unknown
+
+    @available(*, deprecated, renamed: "name.givenName", message: "Please use new property - name.givenName")
+    public var firstName: String? {
+        get { self.name.givenName }
+        set { self.name.givenName = newValue }
+    }
+
+    @available(*, deprecated, renamed: "name.familyName", message: "Please use new property - name.familyName")
+    public var lastName: String? {
+        get { self.name.familyName }
+        set { self.name.familyName = newValue }
+    }
+
+    // name formatted output
+    public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
+    public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
+    public var nameLong: String { self.name.dnsFormatName(style: .long) }
+    public var nameShort: String { self.name.dnsFormatName(style: .short) }
 
     // MARK: - Initializers -
     required public init() {
@@ -56,10 +73,9 @@ open class DAOUser: DAOBaseObject {
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(id: String, email: String, firstName: String, lastName: String) {
+    public init(id: String, email: String, name: String) {
         self.email = email
-        self.firstName = firstName
-        self.lastName = lastName
+        self.name = PersonNameComponents.dnsBuildName(with: name) ?? self.name
         super.init(id: id)
     }
 
@@ -72,8 +88,7 @@ open class DAOUser: DAOBaseObject {
         super.update(from: object)
         self.dob = object.dob
         self.email = object.email
-        self.firstName = object.firstName
-        self.lastName = object.lastName
+        self.name = object.name
         self.phone = object.phone
         self.type = object.type
         // swiftlint:disable force_cast
@@ -96,11 +111,11 @@ open class DAOUser: DAOBaseObject {
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
         self.cards = cardsData.compactMap { Self.createCard(from: $0) }
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
-        self.email = self.string(from: data[field(.email)]  as Any?) ?? self.email
+        self.email = self.string(from: data[field(.email)] as Any?) ?? self.email
         let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
         self.favorites = favoritesData.compactMap { Self.createActivity(from: $0) }
-        self.firstName = self.string(from: data[field(.firstName)] as Any?) ?? self.firstName
-        self.lastName = self.string(from: data[field(.lastName)] as Any?) ?? self.lastName
+        let nameData = self.dictionary(from: data[field(.name)] as Any?)
+        self.name = PersonNameComponents(from: nameData) ?? self.name
         let myPlaceData = self.dictionary(from: data[field(.myPlace)] as Any?)
         self.myPlace = Self.createPlace(from: myPlaceData)
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
@@ -116,8 +131,7 @@ open class DAOUser: DAOBaseObject {
             field(.dob): self.dob,
             field(.email): self.email,
             field(.favorites): self.favorites.map { $0.asDictionary },
-            field(.firstName): self.firstName,
-            field(.lastName): self.lastName,
+            field(.name): self.name.asDictionary,
             field(.myPlace): self.myPlace?.asDictionary,
             field(.phone): self.phone,
             field(.type): self.type.rawValue,
@@ -133,8 +147,7 @@ open class DAOUser: DAOBaseObject {
         dob = try container.decode(Date?.self, forKey: .dob)
         email = try container.decode(String.self, forKey: .email)
         favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
-        firstName = try container.decode(String.self, forKey: .firstName)
-        lastName = try container.decode(String.self, forKey: .lastName)
+        name = try container.decode(PersonNameComponents.self, forKey: .name)
         myPlace = try container.decode(Self.placeType.self, forKey: .myPlace)
         phone = try container.decode(String.self, forKey: .phone)
         type = try container.decode(DNSUserType.self, forKey: .type)
@@ -150,8 +163,7 @@ open class DAOUser: DAOBaseObject {
         try container.encode(dob, forKey: .dob)
         try container.encode(email, forKey: .email)
         try container.encode(favorites, forKey: .favorites)
-        try container.encode(firstName, forKey: .firstName)
-        try container.encode(lastName, forKey: .lastName)
+        try container.encode(name, forKey: .name)
         try container.encode(myPlace, forKey: .myPlace)
         try container.encode(phone, forKey: .phone)
         try container.encode(type, forKey: .type)
@@ -172,8 +184,7 @@ open class DAOUser: DAOBaseObject {
             lhs.dob != rhs.dob ||
             lhs.email != rhs.email ||
             lhs.favorites != rhs.favorites ||
-            lhs.firstName != rhs.firstName ||
-            lhs.lastName != rhs.lastName ||
+            lhs.name != rhs.name ||
             lhs.myPlace != rhs.myPlace ||
             lhs.phone != rhs.phone ||
             lhs.type != rhs.type

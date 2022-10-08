@@ -25,14 +25,21 @@ open class DAOAccount: DAOBaseObject {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case cards, emailNotifications, name, pushNotifications, users
+        case cards, dob, emailNotifications, name, pushNotifications, users
     }
 
     open var cards: [DAOCard] = []
+    open var dob: Date?
     open var emailNotifications = false
-    open var name = ""
+    open var name = PersonNameComponents()
     open var pushNotifications = false
     open var users: [DAOUser] = []
+
+    // name formatted output
+    public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
+    public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
+    public var nameLong: String { self.name.dnsFormatName(style: .long) }
+    public var nameShort: String { self.name.dnsFormatName(style: .short) }
 
     // MARK: - Initializers -
     required public init() {
@@ -42,7 +49,7 @@ open class DAOAccount: DAOBaseObject {
         super.init(id: id)
     }
     public init(name: String = "") {
-        self.name = name
+        self.name = PersonNameComponents.dnsBuildName(with: name) ?? self.name
         super.init()
     }
 
@@ -53,6 +60,7 @@ open class DAOAccount: DAOBaseObject {
     }
     open func update(from object: DAOAccount) {
         super.update(from: object)
+        self.dob = object.dob
         self.emailNotifications = object.emailNotifications
         self.name = object.name
         self.pushNotifications = object.pushNotifications
@@ -71,9 +79,11 @@ open class DAOAccount: DAOBaseObject {
         _ = super.dao(from: data)
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
         self.cards = cardsData.compactMap { Self.createCard(from: $0) }
+        self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
         self.emailNotifications = self.bool(from: data[field(.emailNotifications)] ??
                                             self.emailNotifications)!
-        self.name = self.string(from: data[field(.name)] as Any?) ?? self.name
+        let nameData = self.dictionary(from: data[field(.name)] as Any?)
+        self.name = PersonNameComponents(from: nameData) ?? self.name
         self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
         let usersData = self.dataarray(from: data[field(.users)] as Any?)
@@ -84,8 +94,9 @@ open class DAOAccount: DAOBaseObject {
         var retval = super.asDictionary
         retval.merge([
             field(.cards): self.cards.map { $0.asDictionary },
+            field(.dob): self.dob,
             field(.emailNotifications): self.emailNotifications,
-            field(.name): self.name,
+            field(.name): self.name.asDictionary,
             field(.pushNotifications): self.pushNotifications,
             field(.users): self.users.map { $0.asDictionary },
         ]) { (current, _) in current }
@@ -96,8 +107,9 @@ open class DAOAccount: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         cards = try container.decode([DAOCard].self, forKey: .cards)
+        dob = try container.decode(Date?.self, forKey: .dob)
         emailNotifications = try container.decode(Bool.self, forKey: .emailNotifications)
-        name = try container.decode(String.self, forKey: .name)
+        name = try container.decode(PersonNameComponents.self, forKey: .name)
         pushNotifications = try container.decode(Bool.self, forKey: .pushNotifications)
         users = try container.decode([DAOUser].self, forKey: .users)
         // Get superDecoder for superclass and call super.init(from:) with it
@@ -108,6 +120,7 @@ open class DAOAccount: DAOBaseObject {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(cards, forKey: .cards)
+        try container.encode(dob, forKey: .dob)
         try container.encode(emailNotifications, forKey: .emailNotifications)
         try container.encode(name, forKey: .name)
         try container.encode(pushNotifications, forKey: .pushNotifications)
@@ -125,6 +138,7 @@ open class DAOAccount: DAOBaseObject {
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.cards != rhs.cards ||
+            lhs.dob != rhs.dob ||
             lhs.emailNotifications != rhs.emailNotifications ||
             lhs.name != rhs.name ||
             lhs.pushNotifications != rhs.pushNotifications ||
