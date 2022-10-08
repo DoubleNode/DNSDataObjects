@@ -106,12 +106,12 @@ open class DAOAccount: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        cards = try container.decode([DAOCard].self, forKey: .cards)
-        dob = try container.decode(Date?.self, forKey: .dob)
-        emailNotifications = try container.decode(Bool.self, forKey: .emailNotifications)
-        name = try container.decode(PersonNameComponents.self, forKey: .name)
-        pushNotifications = try container.decode(Bool.self, forKey: .pushNotifications)
-        users = try container.decode([DAOUser].self, forKey: .users)
+        cards = try container.decodeIfPresent([DAOCard].self, forKey: .cards) ?? cards
+        dob = try container.decodeIfPresent(Date?.self, forKey: .dob) ?? dob
+        emailNotifications = try container.decodeIfPresent(Bool.self, forKey: .emailNotifications) ?? emailNotifications
+        name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
+        pushNotifications = try container.decodeIfPresent(Bool.self, forKey: .pushNotifications) ?? pushNotifications
+        users = try container.decodeIfPresent([DAOUser].self, forKey: .users) ?? users
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

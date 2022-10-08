@@ -97,10 +97,10 @@ open class DAOOrderItem: DAOProduct {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decode(Self.accountType.self, forKey: .account)
-        order = try container.decode(Self.orderType.self, forKey: .order)
-        place = try container.decode(Self.placeType.self, forKey: .place)
-        quantity = try container.decode(Int.self, forKey: .quantity)
+        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
+        order = try container.decodeIfPresent(Self.orderType.self, forKey: .order) ?? order
+        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
+        quantity = try container.decodeIfPresent(Int.self, forKey: .quantity) ?? quantity
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

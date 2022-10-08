@@ -133,15 +133,15 @@ open class DAOPlaceHours: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = try container.decode([DAOPlaceEvent].self, forKey: .events)
-        holidays = try container.decode([DAOPlaceHoliday].self, forKey: .holidays)
-        monday = try container.decode(DNSDailyHours.self, forKey: .monday)
-        tuesday = try container.decode(DNSDailyHours.self, forKey: .tuesday)
-        wednesday = try container.decode(DNSDailyHours.self, forKey: .wednesday)
-        thursday = try container.decode(DNSDailyHours.self, forKey: .thursday)
-        friday = try container.decode(DNSDailyHours.self, forKey: .friday)
-        saturday = try container.decode(DNSDailyHours.self, forKey: .saturday)
-        sunday = try container.decode(DNSDailyHours.self, forKey: .sunday)
+        events = try container.decodeIfPresent([DAOPlaceEvent].self, forKey: .events) ?? events
+        holidays = try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: .holidays) ?? holidays
+        monday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .monday) ?? monday
+        tuesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .tuesday) ?? tuesday
+        wednesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .wednesday) ?? wednesday
+        thursday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .thursday) ?? thursday
+        friday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .friday) ?? friday
+        saturday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .saturday) ?? saturday
+        sunday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .sunday) ?? sunday
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

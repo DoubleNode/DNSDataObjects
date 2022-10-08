@@ -97,13 +97,13 @@ open class DAOTransaction: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        amount = try container.decode(Float.self, forKey: .amount)
-        card = try container.decode(Self.cardType.self, forKey: .card)
-        confirmation = try container.decode(String.self, forKey: .confirmation)
-        order = try container.decode(Self.orderType.self, forKey: .order)
-        tax = try container.decode(Float.self, forKey: .tax)
-        tip = try container.decode(Float.self, forKey: .tip)
-        type = try container.decode(String.self, forKey: .type)
+        amount = try container.decodeIfPresent(Float.self, forKey: .amount) ?? amount
+        card = try container.decodeIfPresent(Self.cardType.self, forKey: .card) ?? card
+        confirmation = try container.decodeIfPresent(String.self, forKey: .confirmation) ?? confirmation
+        order = try container.decodeIfPresent(Self.orderType.self, forKey: .order) ?? order
+        tax = try container.decodeIfPresent(Float.self, forKey: .tax) ?? tax
+        tip = try container.decodeIfPresent(Float.self, forKey: .tip) ?? tip
+        type = try container.decodeIfPresent(String.self, forKey: .type) ?? type
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

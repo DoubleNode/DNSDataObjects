@@ -65,9 +65,9 @@ open class DAOActivityBlackout: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decode(Date?.self, forKey: .endTime)
-        message = try container.decode(DNSString.self, forKey: .message)
-        startTime = try container.decode(Date?.self, forKey: .startTime)
+        endTime = try container.decodeIfPresent(Date?.self, forKey: .endTime) ?? endTime
+        message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
+        startTime = try container.decodeIfPresent(Date?.self, forKey: .startTime) ?? startTime
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

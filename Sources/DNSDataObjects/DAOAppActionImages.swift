@@ -59,7 +59,7 @@ open class DAOAppActionImages: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        topUrl = try container.decode(DNSURL.self, forKey: .topUrl)
+        topUrl = try container.decodeIfPresent(DNSURL.self, forKey: .topUrl) ?? topUrl
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

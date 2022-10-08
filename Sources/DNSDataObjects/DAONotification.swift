@@ -74,10 +74,10 @@ open class DAONotification: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        body = try container.decode(DNSString.self, forKey: .body)
-        deepLink = try container.decode(URL.self, forKey: .deepLink)
-        title = try container.decode(DNSString.self, forKey: .title)
-        type = try container.decode(DNSNotificationType.self, forKey: .type)
+        body = try container.decodeIfPresent(DNSString.self, forKey: .body) ?? body
+        deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
+        type = try container.decodeIfPresent(DNSNotificationType.self, forKey: .type) ?? type
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

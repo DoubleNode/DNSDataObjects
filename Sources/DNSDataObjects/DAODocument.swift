@@ -79,9 +79,9 @@ open class DAODocument: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        priority = try container.decode(Int.self, forKey: .priority)
-        title = try container.decode(DNSString.self, forKey: .title)
-        url = try container.decode(DNSURL.self, forKey: .url)
+        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
+        url = try container.decodeIfPresent(DNSURL.self, forKey: .url) ?? url
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

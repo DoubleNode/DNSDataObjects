@@ -88,9 +88,9 @@ open class DAOFaq: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         section = Self.createSection()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        section = try container.decode(Self.sectionType.self, forKey: .section)
-        question = try container.decode(DNSString.self, forKey: .question)
-        answer = try container.decode(DNSString.self, forKey: .answer)
+        section = try container.decodeIfPresent(Self.sectionType.self, forKey: .section) ?? section
+        question = try container.decodeIfPresent(DNSString.self, forKey: .question) ?? question
+        answer = try container.decodeIfPresent(DNSString.self, forKey: .answer) ?? answer
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

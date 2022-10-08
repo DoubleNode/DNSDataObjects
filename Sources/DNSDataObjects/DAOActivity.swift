@@ -102,12 +102,12 @@ open class DAOActivity: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         baseType = Self.createBase()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decode(Self.baseType.self, forKey: .baseType)
-        blackouts = try container.decode([DAOActivityBlackout].self, forKey: .blackouts)
-        bookingEndTime = try container.decode(Date?.self, forKey: .bookingEndTime)
-        bookingStartTime = try container.decode(Date?.self, forKey: .bookingStartTime)
-        code = try container.decode(String.self, forKey: .code)
-        name = try container.decode(DNSString.self, forKey: .name)
+        baseType = try container.decodeIfPresent(Self.baseType.self, forKey: .baseType) ?? baseType
+        blackouts = try container.decodeIfPresent([DAOActivityBlackout].self, forKey: .blackouts) ?? blackouts
+        bookingEndTime = try container.decodeIfPresent(Date?.self, forKey: .bookingEndTime) ?? bookingEndTime
+        bookingStartTime = try container.decodeIfPresent(Date?.self, forKey: .bookingStartTime) ?? bookingStartTime
+        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

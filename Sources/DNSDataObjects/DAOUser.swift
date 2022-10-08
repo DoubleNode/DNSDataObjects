@@ -142,15 +142,15 @@ open class DAOUser: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        accounts = try container.decode([DAOAccount].self, forKey: .accounts)
-        cards = try container.decode([DAOCard].self, forKey: .cards)
-        dob = try container.decode(Date?.self, forKey: .dob)
-        email = try container.decode(String.self, forKey: .email)
-        favorites = try container.decode([DAOActivityType].self, forKey: .favorites)
-        name = try container.decode(PersonNameComponents.self, forKey: .name)
-        myPlace = try container.decode(Self.placeType.self, forKey: .myPlace)
-        phone = try container.decode(String.self, forKey: .phone)
-        type = try container.decode(DNSUserType.self, forKey: .type)
+        accounts = try container.decodeIfPresent([DAOAccount].self, forKey: .accounts) ?? accounts
+        cards = try container.decodeIfPresent([DAOCard].self, forKey: .cards) ?? cards
+        dob = try container.decodeIfPresent(Date?.self, forKey: .dob) ?? dob
+        email = try container.decodeIfPresent(String.self, forKey: .email) ?? email
+        favorites = try container.decodeIfPresent([DAOActivityType].self, forKey: .favorites) ?? favorites
+        name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
+        myPlace = try container.decodeIfPresent(Self.placeType.self, forKey: .myPlace) ?? myPlace
+        phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
+        type = try container.decodeIfPresent(DNSUserType.self, forKey: .type) ?? type
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

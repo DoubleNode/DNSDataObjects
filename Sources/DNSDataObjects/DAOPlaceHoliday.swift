@@ -64,8 +64,8 @@ open class DAOPlaceHoliday: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        date = try container.decode(Date.self, forKey: .date)
-        hours = try container.decode(DNSDailyHours.self, forKey: .hours)
+        date = try container.decodeIfPresent(Date.self, forKey: .date) ?? date
+        hours = try container.decodeIfPresent(DNSDailyHours.self, forKey: .hours) ?? hours
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

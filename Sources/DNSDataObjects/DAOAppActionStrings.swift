@@ -80,12 +80,12 @@ open class DAOAppActionStrings: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        body = try container.decode(DNSString.self, forKey: .body)
-        cancelLabel = try container.decode(DNSString.self, forKey: .cancelLabel)
-        disclaimer = try container.decode(DNSString.self, forKey: .disclaimer)
-        okayLabel = try container.decode(DNSString.self, forKey: .okayLabel)
-        subTitle = try container.decode(DNSString.self, forKey: .subTitle)
-        title = try container.decode(DNSString.self, forKey: .title)
+        body = try container.decodeIfPresent(DNSString.self, forKey: .body) ?? body
+        cancelLabel = try container.decodeIfPresent(DNSString.self, forKey: .cancelLabel) ?? cancelLabel
+        disclaimer = try container.decodeIfPresent(DNSString.self, forKey: .disclaimer) ?? disclaimer
+        okayLabel = try container.decodeIfPresent(DNSString.self, forKey: .okayLabel) ?? okayLabel
+        subTitle = try container.decodeIfPresent(DNSString.self, forKey: .subTitle) ?? subTitle
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

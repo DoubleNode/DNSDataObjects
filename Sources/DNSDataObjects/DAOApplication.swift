@@ -70,7 +70,7 @@ open class DAOApplication: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        appEvents = try container.decode([DAOAppEvent].self, forKey: .appEvents)
+        appEvents = try container.decodeIfPresent([DAOAppEvent].self, forKey: .appEvents) ?? appEvents
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

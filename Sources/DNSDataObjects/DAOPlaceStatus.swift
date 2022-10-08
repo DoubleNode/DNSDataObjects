@@ -81,11 +81,11 @@ open class DAOPlaceStatus: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decode(Date.self, forKey: .endTime)
-        message = try container.decode(DNSString.self, forKey: .message)
-        scope = DNSScope(rawValue: try container.decode(Int.self, forKey: .scope)) ?? .place
-        startTime = try container.decode(Date.self, forKey: .startTime)
-        status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .open
+        endTime = try container.decodeIfPresent(Date.self, forKey: .endTime) ?? endTime
+        message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
+        scope = try container.decodeIfPresent(DNSScope.self, forKey: .scope) ?? scope
+        startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
+        status = try container.decodeIfPresent(DNSStatus.self, forKey: .status) ?? status
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

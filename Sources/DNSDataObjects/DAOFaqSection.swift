@@ -85,10 +85,10 @@ open class DAOFaqSection: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = try container.decode(String.self, forKey: .code)
-        faqs = try container.decode([DAOFaq].self, forKey: .faqs)
-        icon = try container.decode(String.self, forKey: .icon)
-        title = try container.decode(DNSString.self, forKey: .title)
+        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
+        faqs = try container.decodeIfPresent([DAOFaq].self, forKey: .faqs) ?? faqs
+        icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? icon
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

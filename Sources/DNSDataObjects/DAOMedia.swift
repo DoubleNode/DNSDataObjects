@@ -70,9 +70,9 @@ open class DAOMedia: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decode(DNSMediaType.self, forKey: .type)
-        url = try container.decode(DNSURL.self, forKey: .url)
-        preloadUrl = try container.decode(DNSURL.self, forKey: .preloadUrl)
+        type = try container.decodeIfPresent(DNSMediaType.self, forKey: .type) ?? type
+        url = try container.decodeIfPresent(DNSURL.self, forKey: .url) ?? url
+        preloadUrl = try container.decodeIfPresent(DNSURL.self, forKey: .preloadUrl) ?? preloadUrl
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

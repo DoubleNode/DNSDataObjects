@@ -89,9 +89,9 @@ open class DAOBasket: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decode(Self.accountType.self, forKey: .account)
-        items = try container.decode([DAOBasketItem].self, forKey: .items)
-        place = try container.decode(Self.placeType.self, forKey: .place)
+        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
+        items = try container.decodeIfPresent([DAOBasketItem].self, forKey: .items) ?? items
+        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

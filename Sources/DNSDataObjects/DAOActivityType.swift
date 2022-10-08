@@ -66,8 +66,8 @@ open class DAOActivityType: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = try container.decode(String.self, forKey: .code)
-        name = try container.decode(DNSString.self, forKey: .name)
+        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

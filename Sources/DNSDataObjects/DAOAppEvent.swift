@@ -90,10 +90,10 @@ open class DAOAppEvent: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decode(Date.self, forKey: .endTime)
-        priority = try container.decode(Int.self, forKey: .priority)
-        startTime = try container.decode(Date.self, forKey: .startTime)
-        title = try container.decode(DNSString.self, forKey: .title)
+        endTime = try container.decodeIfPresent(Date.self, forKey: .endTime) ?? endTime
+        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
+        startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

@@ -154,19 +154,19 @@ open class DAOPlace: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         hours = Self.createHours()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        activities = try container.decode([DAOActivity].self, forKey: .activities)
-        address = try container.decode(String.self, forKey: .address)
-        alerts = try container.decode([DAOAlert].self, forKey: .alerts)
-        code = try container.decode(String.self, forKey: .code)
-        geohashes = try container.decode([String].self, forKey: .geohashes)
-        let geopointData = try container.decode([String: Double].self, forKey: .geopoint)
+        activities = try container.decodeIfPresent([DAOActivity].self, forKey: .activities) ?? activities
+        address = try container.decodeIfPresent(String.self, forKey: .address) ?? address
+        alerts = try container.decodeIfPresent([DAOAlert].self, forKey: .alerts) ?? alerts
+        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
+        geohashes = try container.decodeIfPresent([String].self, forKey: .geohashes) ?? geohashes
+        let geopointData = try container.decodeIfPresent([String: Double].self, forKey: .geopoint) ?? [:]
         geopoint = CLLocation(from: geopointData)
-        hours = try container.decode(Self.hoursType.self, forKey: .hours)
-        name = try container.decode(DNSString.self, forKey: .name)
-        phone = try container.decode(String.self, forKey: .phone)
-        section = try container.decode(Self.sectionType.self, forKey: .section)
-        statuses = try container.decode([DAOPlaceStatus].self, forKey: .statuses)
-        timeZone = try container.decode(TimeZone.self, forKey: .timeZone)
+        hours = try container.decodeIfPresent(Self.hoursType.self, forKey: .hours) ?? hours
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
+        section = try container.decodeIfPresent(Self.sectionType.self, forKey: .section) ?? section
+        statuses = try container.decodeIfPresent([DAOPlaceStatus].self, forKey: .statuses) ?? statuses
+        timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

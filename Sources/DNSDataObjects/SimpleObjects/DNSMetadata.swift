@@ -84,13 +84,13 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        uuid = UUID(uuidString: try container.decode(String.self, forKey: .uuid)) ?? UUID()
-        created = try container.decode(Date.self, forKey: .created)
-        synced = try container.decode(Date?.self, forKey: .synced)
-        updated = try container.decode(Date.self, forKey: .updated)
-        status = try container.decode(String.self, forKey: .status)
-        createdBy = try container.decode(String.self, forKey: .createdBy)
-        updatedBy = try container.decode(String.self, forKey: .updatedBy)
+        uuid = try container.decodeIfPresent(UUID.self, forKey: .uuid) ?? uuid
+        created = try container.decodeIfPresent(Date.self, forKey: .created) ?? created
+        synced = try container.decodeIfPresent(Date?.self, forKey: .synced) ?? synced
+        updated = try container.decodeIfPresent(Date.self, forKey: .updated) ?? updated
+        status = try container.decodeIfPresent(String.self, forKey: .status) ?? status
+        createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy) ?? createdBy
+        updatedBy = try container.decodeIfPresent(String.self, forKey: .updatedBy) ?? updatedBy
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)

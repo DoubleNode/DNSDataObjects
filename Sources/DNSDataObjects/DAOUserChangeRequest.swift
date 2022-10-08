@@ -80,8 +80,8 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        requestedRole = try container.decode(DNSUserRole.self, forKey: .requestedRole)
-        user = try container.decode(Self.userType.self, forKey: .user)
+        requestedRole = try container.decodeIfPresent(DNSUserRole.self, forKey: .requestedRole) ?? requestedRole
+        user = try container.decodeIfPresent(Self.userType.self, forKey: .user) ?? user
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

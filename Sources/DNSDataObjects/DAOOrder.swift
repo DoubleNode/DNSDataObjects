@@ -114,14 +114,14 @@ open class DAOOrder: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decode(Self.accountType.self, forKey: .account)
-        items = try container.decode([DAOOrderItem].self, forKey: .items)
-        place = try container.decode(Self.placeType.self, forKey: .place)
-        state = try container.decode(DNSOrderState.self, forKey: .state)
-        subtotal = try container.decode(Float.self, forKey: .subtotal)
-        tax = try container.decode(Float.self, forKey: .tax)
-        total = try container.decode(Float.self, forKey: .total)
-        transaction = try container.decode(Self.transactionType.self, forKey: .transaction)
+        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
+        items = try container.decodeIfPresent([DAOOrderItem].self, forKey: .items) ?? items
+        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
+        state = try container.decodeIfPresent(DNSOrderState.self, forKey: .state) ?? state
+        subtotal = try container.decodeIfPresent(Float.self, forKey: .subtotal) ?? subtotal
+        tax = try container.decodeIfPresent(Float.self, forKey: .tax) ?? tax
+        total = try container.decodeIfPresent(Float.self, forKey: .total) ?? total
+        transaction = try container.decodeIfPresent(Self.transactionType.self, forKey: .transaction) ?? transaction
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

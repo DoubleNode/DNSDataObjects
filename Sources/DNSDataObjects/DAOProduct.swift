@@ -69,10 +69,10 @@ open class DAOProduct: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        about = try container.decode(DNSString.self, forKey: .about)
-        price = try container.decode(Float.self, forKey: .price)
-        sku = try container.decode(String.self, forKey: .sku)
-        title = try container.decode(DNSString.self, forKey: .title)
+        about = try container.decodeIfPresent(DNSString.self, forKey: .about) ?? about
+        price = try container.decodeIfPresent(Float.self, forKey: .price) ?? price
+        sku = try container.decodeIfPresent(String.self, forKey: .sku) ?? sku
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

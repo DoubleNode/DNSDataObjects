@@ -62,8 +62,8 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        meta = try container.decode(DNSMetadata.self, forKey: .meta)
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? id
+        meta = try container.decodeIfPresent(DNSMetadata.self, forKey: .meta) ?? meta
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)

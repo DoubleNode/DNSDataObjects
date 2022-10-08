@@ -96,10 +96,10 @@ open class DAOSystemEndPoint: DAOBaseObject {
         currentState = Self.createState()
         system = Self.createSystem()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = try container.decode(Self.stateType.self, forKey: .currentState)
-        name = try container.decode(DNSString.self, forKey: .name)
-        system = try container.decode(Self.systemType.self, forKey: .system)
-        historyState = try container.decode([DAOSystemState].self, forKey: .historyState)
+        currentState = try container.decodeIfPresent(Self.stateType.self, forKey: .currentState) ?? currentState
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        system = try container.decodeIfPresent(Self.systemType.self, forKey: .system) ?? system
+        historyState = try container.decodeIfPresent([DAOSystemState].self, forKey: .historyState) ?? historyState
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

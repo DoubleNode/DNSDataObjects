@@ -117,15 +117,15 @@ open class DAOAlert: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decode(Date.self, forKey: .endTime)
-        imageUrl = try container.decode(DNSURL.self, forKey: .imageUrl)
-        name = try container.decode(String.self, forKey: .name)
-        priority = try container.decode(Int.self, forKey: .priority)
-        scope = try container.decode(DNSScope.self, forKey: .scope)
-        startTime = try container.decode(Date.self, forKey: .startTime)
-        status = DNSStatus(rawValue: try container.decode(String.self, forKey: .status)) ?? .tempClosed
-        tagLine = try container.decode(DNSString.self, forKey: .tagLine)
-        title = try container.decode(DNSString.self, forKey: .title)
+        endTime = try container.decodeIfPresent(Date.self, forKey: .endTime) ?? endTime
+        imageUrl = try container.decodeIfPresent(DNSURL.self, forKey: .imageUrl) ?? imageUrl
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? name
+        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
+        scope = try container.decodeIfPresent(DNSScope.self, forKey: .scope) ?? scope
+        startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
+        status = try container.decodeIfPresent(DNSStatus.self, forKey: .status) ?? status
+        tagLine = try container.decodeIfPresent(DNSString.self, forKey: .tagLine) ?? tagLine
+        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

@@ -86,10 +86,10 @@ open class DAOSection: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        children = try container.decode([DAOSection].self, forKey: .children)
-        name = try container.decode(DNSString.self, forKey: .name)
-        parent = try container.decode(Self.sectionType.self, forKey: .parent)
-        places = try container.decode([DAOPlace].self, forKey: .places)
+        children = try container.decodeIfPresent([DAOSection].self, forKey: .children) ?? children
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        parent = try container.decodeIfPresent(Self.sectionType.self, forKey: .parent) ?? parent
+        places = try container.decodeIfPresent([DAOPlace].self, forKey: .places) ?? places
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

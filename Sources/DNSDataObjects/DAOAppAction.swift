@@ -100,10 +100,10 @@ open class DAOAppAction: DAOBaseObject {
         images = Self.createImages()
         strings = Self.createStrings()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        actionType = try container.decode(DNSAppActionType.self, forKey: .actionType)
-        deepLink = try container.decode(URL.self, forKey: .deepLink)
-        images = try container.decode(Self.imagesType.self, forKey: .imagesSection)
-        strings = try container.decode(Self.stringsType.self, forKey: .stringsSection)
+        actionType = try container.decodeIfPresent(DNSAppActionType.self, forKey: .actionType) ?? actionType
+        deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
+        images = try container.decodeIfPresent(Self.imagesType.self, forKey: .imagesSection) ?? images
+        strings = try container.decodeIfPresent(Self.stringsType.self, forKey: .stringsSection) ?? strings
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

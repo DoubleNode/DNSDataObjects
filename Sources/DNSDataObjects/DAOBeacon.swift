@@ -97,15 +97,15 @@ open class DAOBeacon: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        accuracy = try container.decode(CLLocationAccuracy.self, forKey: .accuracy)
-        code = try container.decode(String.self, forKey: .code)
-//        data = try container.decode(CLBeacon.self, forKey: .data)
-        distance = try container.decode(DNSBeaconDistance.self, forKey: .distance)
-        major = try container.decode(Int.self, forKey: .major)
-        minor = try container.decode(Int.self, forKey: .minor)
-        name = try container.decode(DNSString.self, forKey: .name)
-        range = try container.decode(String?.self, forKey: .range)
-        rssi = try container.decode(Int?.self, forKey: .rssi)
+        accuracy = try container.decodeIfPresent(CLLocationAccuracy.self, forKey: .accuracy) ?? accuracy
+        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
+//        data = try container.decodeIfPresent(CLBeacon.self, forKey: .data)
+        distance = try container.decodeIfPresent(DNSBeaconDistance.self, forKey: .distance) ?? distance
+        major = try container.decodeIfPresent(Int.self, forKey: .major) ?? major
+        minor = try container.decodeIfPresent(Int.self, forKey: .minor) ?? minor
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        range = try container.decodeIfPresent(String?.self, forKey: .range) ?? range
+        rssi = try container.decodeIfPresent(Int?.self, forKey: .rssi) ?? rssi
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

@@ -83,11 +83,11 @@ open class DAOPlaceEvent: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        endDate = try container.decode(Date.self, forKey: .endDate)
-        name = try container.decode(DNSString.self, forKey: .name)
-        startDate = try container.decode(Date.self, forKey: .startDate)
-        timeZone = try container.decode(TimeZone.self, forKey: .timeZone)
-        type = try container.decode(String.self, forKey: .type)
+        endDate = try container.decodeIfPresent(Date.self, forKey: .endDate) ?? endDate
+        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        startDate = try container.decodeIfPresent(Date.self, forKey: .startDate) ?? startDate
+        timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
+        type = try container.decodeIfPresent(String.self, forKey: .type) ?? type
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)

@@ -89,11 +89,11 @@ open class DAOCard: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        cardNumber = try container.decode(String.self, forKey: .cardNumber)
-        expiration = try container.decode(Date.self, forKey: .expiration)
-        nickname = try container.decode(String.self, forKey: .nickname)
-        pinNumber = try container.decode(String.self, forKey: .pinNumber)
-        transactions = try container.decode([DAOTransaction].self, forKey: .transactions)
+        cardNumber = try container.decodeIfPresent(String.self, forKey: .cardNumber) ?? cardNumber
+        expiration = try container.decodeIfPresent(Date.self, forKey: .expiration) ?? expiration
+        nickname = try container.decodeIfPresent(String.self, forKey: .nickname) ?? nickname
+        pinNumber = try container.decodeIfPresent(String.self, forKey: .pinNumber) ?? pinNumber
+        transactions = try container.decodeIfPresent([DAOTransaction].self, forKey: .transactions) ?? transactions
         // Get superDecoder for superclass and call super.init(from:) with it
         let superDecoder = try container.superDecoder()
         try super.init(from: superDecoder)
