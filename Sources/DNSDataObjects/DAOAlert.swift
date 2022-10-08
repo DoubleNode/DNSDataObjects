@@ -126,9 +126,7 @@ open class DAOAlert: DAOBaseObject {
         status = try container.decodeIfPresent(DNSStatus.self, forKey: .status) ?? status
         tagLine = try container.decodeIfPresent(DNSString.self, forKey: .tagLine) ?? tagLine
         title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

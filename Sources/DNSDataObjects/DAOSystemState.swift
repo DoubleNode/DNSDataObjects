@@ -90,9 +90,7 @@ open class DAOSystemState: DAOBaseObject {
         state = try container.decodeIfPresent(DNSSystemState.self, forKey: .state) ?? state
         stateOverride = try container.decodeIfPresent(DNSSystemState.self, forKey: .stateOverride) ?? stateOverride
         totalPoints = try container.decodeIfPresent(DNSSystemStateNumbers.self, forKey: .totalPoints) ?? totalPoints
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

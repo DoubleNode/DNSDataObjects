@@ -78,9 +78,7 @@ open class DAONotification: DAOBaseObject {
         deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
         title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         type = try container.decodeIfPresent(DNSNotificationType.self, forKey: .type) ?? type
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

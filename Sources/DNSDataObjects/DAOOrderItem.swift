@@ -101,9 +101,7 @@ open class DAOOrderItem: DAOProduct {
         order = try container.decodeIfPresent(Self.orderType.self, forKey: .order) ?? order
         place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
         quantity = try container.decodeIfPresent(Int.self, forKey: .quantity) ?? quantity
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

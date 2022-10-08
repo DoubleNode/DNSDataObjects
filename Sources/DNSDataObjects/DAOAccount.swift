@@ -112,9 +112,7 @@ open class DAOAccount: DAOBaseObject {
         name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
         pushNotifications = try container.decodeIfPresent(Bool.self, forKey: .pushNotifications) ?? pushNotifications
         users = try container.decodeIfPresent([DAOUser].self, forKey: .users) ?? users
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

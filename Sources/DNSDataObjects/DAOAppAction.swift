@@ -104,9 +104,7 @@ open class DAOAppAction: DAOBaseObject {
         deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
         images = try container.decodeIfPresent(Self.imagesType.self, forKey: .imagesSection) ?? images
         strings = try container.decodeIfPresent(Self.stringsType.self, forKey: .stringsSection) ?? strings
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

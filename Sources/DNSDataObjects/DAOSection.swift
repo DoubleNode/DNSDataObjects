@@ -90,9 +90,7 @@ open class DAOSection: DAOBaseObject {
         name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         parent = try container.decodeIfPresent(Self.sectionType.self, forKey: .parent) ?? parent
         places = try container.decodeIfPresent([DAOPlace].self, forKey: .places) ?? places
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

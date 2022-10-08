@@ -86,9 +86,7 @@ open class DAOPlaceStatus: DAOBaseObject {
         scope = try container.decodeIfPresent(DNSScope.self, forKey: .scope) ?? scope
         startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
         status = try container.decodeIfPresent(DNSStatus.self, forKey: .status) ?? status
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

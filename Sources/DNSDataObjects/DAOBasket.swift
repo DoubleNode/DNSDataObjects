@@ -92,9 +92,7 @@ open class DAOBasket: DAOBaseObject {
         account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
         items = try container.decodeIfPresent([DAOBasketItem].self, forKey: .items) ?? items
         place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

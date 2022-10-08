@@ -151,9 +151,7 @@ open class DAOUser: DAOBaseObject {
         myPlace = try container.decodeIfPresent(Self.placeType.self, forKey: .myPlace) ?? myPlace
         phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
         type = try container.decodeIfPresent(DNSUserType.self, forKey: .type) ?? type
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

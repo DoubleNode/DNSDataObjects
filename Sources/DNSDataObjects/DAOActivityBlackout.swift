@@ -68,9 +68,7 @@ open class DAOActivityBlackout: DAOBaseObject {
         endTime = try container.decodeIfPresent(Date?.self, forKey: .endTime) ?? endTime
         message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
         startTime = try container.decodeIfPresent(Date?.self, forKey: .startTime) ?? startTime
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

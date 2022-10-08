@@ -94,9 +94,7 @@ open class DAOAppEvent: DAOBaseObject {
         priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
         startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
         title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

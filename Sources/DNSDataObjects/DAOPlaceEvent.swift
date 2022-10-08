@@ -88,9 +88,7 @@ open class DAOPlaceEvent: DAOBaseObject {
         startDate = try container.decodeIfPresent(Date.self, forKey: .startDate) ?? startDate
         timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
         type = try container.decodeIfPresent(String.self, forKey: .type) ?? type
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

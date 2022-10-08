@@ -142,9 +142,7 @@ open class DAOPlaceHours: DAOBaseObject {
         friday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .friday) ?? friday
         saturday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .saturday) ?? saturday
         sunday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .sunday) ?? sunday
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

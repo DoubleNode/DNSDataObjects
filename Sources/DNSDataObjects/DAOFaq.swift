@@ -91,9 +91,7 @@ open class DAOFaq: DAOBaseObject {
         section = try container.decodeIfPresent(Self.sectionType.self, forKey: .section) ?? section
         question = try container.decodeIfPresent(DNSString.self, forKey: .question) ?? question
         answer = try container.decodeIfPresent(DNSString.self, forKey: .answer) ?? answer
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

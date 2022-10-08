@@ -82,9 +82,7 @@ open class DAODocument: DAOBaseObject {
         priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
         title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         url = try container.decodeIfPresent(DNSURL.self, forKey: .url) ?? url
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -73,9 +73,7 @@ open class DAOMedia: DAOBaseObject {
         type = try container.decodeIfPresent(DNSMediaType.self, forKey: .type) ?? type
         url = try container.decodeIfPresent(DNSURL.self, forKey: .url) ?? url
         preloadUrl = try container.decodeIfPresent(DNSURL.self, forKey: .preloadUrl) ?? preloadUrl
-        // Get superDecoder for superclass and call super.init(from:) with it
-        let superDecoder = try container.superDecoder()
-        try super.init(from: superDecoder)
+        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
