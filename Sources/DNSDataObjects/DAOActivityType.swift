@@ -65,10 +65,10 @@ open class DAOActivityType: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = self.string(from: container, forKey: .code) ?? code
+        name = self.dnsstring(from: container, forKey: .name) ?? name
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

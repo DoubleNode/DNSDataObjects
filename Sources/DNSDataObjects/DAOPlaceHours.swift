@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOPlaceHours: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var eventType: DAOPlaceEvent.Type { return DAOPlaceEvent.self }
-    open class var holidayType: DAOPlaceHoliday.Type { return DAOPlaceHoliday.self }
+    open class var eventType: DAOPlaceEvent.Type { DAOPlaceEvent.self }
+    open class var holidayType: DAOPlaceHoliday.Type { DAOPlaceHoliday.self }
 
     open class func createEvent() -> DAOPlaceEvent { eventType.init() }
     open class func createEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { eventType.init(from: object) }
@@ -132,17 +132,17 @@ open class DAOPlaceHours: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = try container.decodeIfPresent([DAOPlaceEvent].self, forKey: .events) ?? events
-        holidays = try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: .holidays) ?? holidays
-        monday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .monday) ?? monday
-        tuesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .tuesday) ?? tuesday
-        wednesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .wednesday) ?? wednesday
-        thursday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .thursday) ?? thursday
-        friday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .friday) ?? friday
-        saturday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .saturday) ?? saturday
-        sunday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .sunday) ?? sunday
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        events = try container.decodeIfPresent(Swift.type(of: events), forKey: .events) ?? events
+        holidays = try container.decodeIfPresent(Swift.type(of: holidays), forKey: .holidays) ?? holidays
+        monday = try container.decodeIfPresent(Swift.type(of: monday), forKey: .monday) ?? monday
+        tuesday = try container.decodeIfPresent(Swift.type(of: tuesday), forKey: .tuesday) ?? tuesday
+        wednesday = try container.decodeIfPresent(Swift.type(of: wednesday), forKey: .wednesday) ?? wednesday
+        thursday = try container.decodeIfPresent(Swift.type(of: thursday), forKey: .thursday) ?? thursday
+        friday = try container.decodeIfPresent(Swift.type(of: friday), forKey: .friday) ?? friday
+        saturday = try container.decodeIfPresent(Swift.type(of: saturday), forKey: .saturday) ?? saturday
+        sunday = try container.decodeIfPresent(Swift.type(of: sunday), forKey: .sunday) ?? sunday
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

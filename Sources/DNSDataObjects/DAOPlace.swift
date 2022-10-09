@@ -12,11 +12,11 @@ import Foundation
 
 open class DAOPlace: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var activityType: DAOActivity.Type { return DAOActivity.self }
-    open class var alertType: DAOAlert.Type { return DAOAlert.self }
-    open class var hoursType: DAOPlaceHours.Type { return DAOPlaceHours.self }
-    open class var sectionType: DAOSection.Type { return DAOSection.self }
-    open class var statusType: DAOPlaceStatus.Type { return DAOPlaceStatus.self }
+    open class var activityType: DAOActivity.Type { DAOActivity.self }
+    open class var alertType: DAOAlert.Type { DAOAlert.self }
+    open class var hoursType: DAOPlaceHours.Type { DAOPlaceHours.self }
+    open class var sectionType: DAOSection.Type { DAOSection.self }
+    open class var statusType: DAOPlaceStatus.Type { DAOPlaceStatus.self }
 
     open class func createActivity() -> DAOActivity { activityType.init() }
     open class func createActivity(from object: DAOActivity) -> DAOActivity { activityType.init(from: object) }
@@ -153,21 +153,22 @@ open class DAOPlace: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         hours = Self.createHours()
+        try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        activities = try container.decodeIfPresent([DAOActivity].self, forKey: .activities) ?? activities
-        address = try container.decodeIfPresent(String.self, forKey: .address) ?? address
-        alerts = try container.decodeIfPresent([DAOAlert].self, forKey: .alerts) ?? alerts
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        geohashes = try container.decodeIfPresent([String].self, forKey: .geohashes) ?? geohashes
+        address = self.string(from: container, forKey: .address) ?? address
+        code = self.string(from: container, forKey: .code) ?? code
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+        phone = self.string(from: container, forKey: .phone) ?? phone
+        timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
+
+        activities = try container.decodeIfPresent(Swift.type(of: activities), forKey: .activities) ?? activities
+        alerts = try container.decodeIfPresent(Swift.type(of: alerts), forKey: .alerts) ?? alerts
+        geohashes = try container.decodeIfPresent(Swift.type(of: geohashes), forKey: .geohashes) ?? geohashes
         let geopointData = try container.decodeIfPresent([String: Double].self, forKey: .geopoint) ?? [:]
         geopoint = CLLocation(from: geopointData)
-        hours = try container.decodeIfPresent(Self.hoursType.self, forKey: .hours) ?? hours
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
-        section = try container.decodeIfPresent(Self.sectionType.self, forKey: .section) ?? section
-        statuses = try container.decodeIfPresent([DAOPlaceStatus].self, forKey: .statuses) ?? statuses
-        timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
-        try super.init(from: decoder)
+        hours = try container.decodeIfPresent(Swift.type(of: hours), forKey: .hours) ?? hours
+        section = try container.decodeIfPresent(Swift.type(of: section), forKey: .section) ?? section
+        statuses = try container.decodeIfPresent(Swift.type(of: statuses), forKey: .statuses) ?? statuses
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

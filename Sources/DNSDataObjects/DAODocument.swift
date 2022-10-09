@@ -78,11 +78,11 @@ open class DAODocument: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
-        url = try container.decodeIfPresent(DNSURL.self, forKey: .url) ?? url
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        priority = self.int(from: container, forKey: .priority) ?? priority
+        title = self.dnsstring(from: container, forKey: .title) ?? title
+        url = self.dnsurl(from: container, forKey: .url) ?? url
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

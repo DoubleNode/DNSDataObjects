@@ -8,11 +8,12 @@
 
 import DNSCore
 import Foundation
+import KeyedCodable
 
 open class DAOAccount: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var userType: DAOUser.Type { return DAOUser.self }
+    open class var cardType: DAOCard.Type { DAOCard.self }
+    open class var userType: DAOUser.Type { DAOUser.self }
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
@@ -28,12 +29,12 @@ open class DAOAccount: DAOBaseObject {
         case cards, dob, emailNotifications, name, pushNotifications, users
     }
 
-    open var cards: [DAOCard] = []
+    @CodedBy<CardArrayTransformer> open var cards: [DAOCard] = []
     open var dob: Date?
     open var emailNotifications = false
     open var name = PersonNameComponents()
     open var pushNotifications = false
-    open var users: [DAOUser] = []
+    @CodedBy<UserArrayTransformer> open var users: [DAOUser] = []
 
     // name formatted output
     public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
@@ -105,14 +106,20 @@ open class DAOAccount: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        cards = try container.decodeIfPresent([DAOCard].self, forKey: .cards) ?? cards
-        dob = try container.decodeIfPresent(Date?.self, forKey: .dob) ?? dob
-        emailNotifications = try container.decodeIfPresent(Bool.self, forKey: .emailNotifications) ?? emailNotifications
-        name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
-        pushNotifications = try container.decodeIfPresent(Bool.self, forKey: .pushNotifications) ?? pushNotifications
-        users = try container.decodeIfPresent([DAOUser].self, forKey: .users) ?? users
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cards = self.daoCardArray(from: container, forKey: .cards)
+        do {
+            cards = try container.decodeIfPresent(Swift.type(of: cards), forKey: .cards) ?? []
+        } catch { }
+        dob = self.date(from: container, forKey: .dob) ?? dob
+        emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
+        name = self.personName(from: container, forKey: .name) ?? name
+        pushNotifications = self.bool(from: container, forKey: .pushNotifications) ?? pushNotifications
+        users = self.daoUserArray(from: container, forKey: .users)
+        do {
+            users = try container.decodeIfPresent(Swift.type(of: users), forKey: .users) ?? []
+        } catch { }
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

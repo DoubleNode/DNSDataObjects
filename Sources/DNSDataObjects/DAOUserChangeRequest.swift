@@ -79,10 +79,10 @@ open class DAOUserChangeRequest: DAOChangeRequest {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        requestedRole = try container.decodeIfPresent(DNSUserRole.self, forKey: .requestedRole) ?? requestedRole
-        user = try container.decodeIfPresent(Self.userType.self, forKey: .user) ?? user
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        requestedRole = try container.decodeIfPresent(Swift.type(of: requestedRole), forKey: .requestedRole) ?? requestedRole
+        user = try container.decodeIfPresent(Swift.type(of: user), forKey: .user) ?? user
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

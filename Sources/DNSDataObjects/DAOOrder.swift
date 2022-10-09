@@ -11,10 +11,10 @@ import Foundation
 
 open class DAOOrder: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var itemType: DAOOrderItem.Type { return DAOOrderItem.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
-    open class var transactionType: DAOTransaction.Type { return DAOTransaction.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var itemType: DAOOrderItem.Type { DAOOrderItem.self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
+    open class var transactionType: DAOTransaction.Type { DAOTransaction.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
@@ -113,16 +113,17 @@ open class DAOOrder: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
-        items = try container.decodeIfPresent([DAOOrderItem].self, forKey: .items) ?? items
-        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
-        state = try container.decodeIfPresent(DNSOrderState.self, forKey: .state) ?? state
-        subtotal = try container.decodeIfPresent(Float.self, forKey: .subtotal) ?? subtotal
-        tax = try container.decodeIfPresent(Float.self, forKey: .tax) ?? tax
-        total = try container.decodeIfPresent(Float.self, forKey: .total) ?? total
-        transaction = try container.decodeIfPresent(Self.transactionType.self, forKey: .transaction) ?? transaction
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        subtotal = self.float(from: container, forKey: .subtotal) ?? subtotal
+        tax = self.float(from: container, forKey: .tax) ?? tax
+        total = self.float(from: container, forKey: .total) ?? total
+
+        account = try container.decodeIfPresent(Swift.type(of: account), forKey: .account) ?? account
+        items = try container.decodeIfPresent(Swift.type(of: items), forKey: .items) ?? items
+        place = try container.decodeIfPresent(Swift.type(of: place), forKey: .place) ?? place
+        state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
+        transaction = try container.decodeIfPresent(Swift.type(of: transaction), forKey: .transaction) ?? transaction
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

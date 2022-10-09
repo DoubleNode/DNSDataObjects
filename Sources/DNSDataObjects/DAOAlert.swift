@@ -116,17 +116,18 @@ open class DAOAlert: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decodeIfPresent(Date.self, forKey: .endTime) ?? endTime
-        imageUrl = try container.decodeIfPresent(DNSURL.self, forKey: .imageUrl) ?? imageUrl
-        name = try container.decodeIfPresent(String.self, forKey: .name) ?? name
-        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
-        scope = try container.decodeIfPresent(DNSScope.self, forKey: .scope) ?? scope
-        startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
-        status = try container.decodeIfPresent(DNSStatus.self, forKey: .status) ?? status
-        tagLine = try container.decodeIfPresent(DNSString.self, forKey: .tagLine) ?? tagLine
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        endTime = self.date(from: container, forKey: .endTime) ?? endTime
+        imageUrl = self.dnsurl(from: container, forKey: .imageUrl) ?? imageUrl
+        name = self.string(from: container, forKey: .name) ?? name
+        priority = self.int(from: container, forKey: .priority) ?? priority
+        startTime = self.date(from: container, forKey: .startTime) ?? startTime
+        tagLine = self.dnsstring(from: container, forKey: .tagLine) ?? tagLine
+        title = self.dnsstring(from: container, forKey: .title) ?? title
+
+        scope = try container.decodeIfPresent(Swift.type(of: scope), forKey: .scope) ?? scope
+        status = try container.decodeIfPresent(Swift.type(of: status), forKey: .status) ?? status
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOActivity: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var baseType: DAOActivityType.Type { return DAOActivityType.self }
-    open class var blackoutType: DAOActivityBlackout.Type { return DAOActivityBlackout.self }
+    open class var baseType: DAOActivityType.Type { DAOActivityType.self }
+    open class var blackoutType: DAOActivityBlackout.Type { DAOActivityBlackout.self }
 
     open class func createBase() -> DAOActivityType { baseType.init() }
     open class func createBase(from object: DAOActivityType) -> DAOActivityType { baseType.init(from: object) }
@@ -101,14 +101,15 @@ open class DAOActivity: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         baseType = Self.createBase()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decodeIfPresent(Self.baseType.self, forKey: .baseType) ?? baseType
-        blackouts = try container.decodeIfPresent([DAOActivityBlackout].self, forKey: .blackouts) ?? blackouts
-        bookingEndTime = try container.decodeIfPresent(Date?.self, forKey: .bookingEndTime) ?? bookingEndTime
-        bookingStartTime = try container.decodeIfPresent(Date?.self, forKey: .bookingStartTime) ?? bookingStartTime
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        bookingEndTime = self.date(from: container, forKey: .bookingEndTime) ?? bookingEndTime
+        bookingStartTime = self.date(from: container, forKey: .bookingStartTime) ?? bookingStartTime
+        code = self.string(from: container, forKey: .code) ?? code
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+
+        baseType = try container.decodeIfPresent(Swift.type(of: baseType), forKey: .baseType) ?? baseType
+        blackouts = try container.decodeIfPresent(Swift.type(of: blackouts), forKey: .blackouts) ?? blackouts
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

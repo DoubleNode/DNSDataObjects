@@ -11,9 +11,9 @@ import Foundation
 
 open class DAOBasket: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var itemType: DAOBasketItem.Type { return DAOBasketItem.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var itemType: DAOBasketItem.Type { DAOBasketItem.self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
@@ -88,11 +88,11 @@ open class DAOBasket: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
-        items = try container.decodeIfPresent([DAOBasketItem].self, forKey: .items) ?? items
-        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        account = try container.decodeIfPresent(Swift.type(of: account), forKey: .account) ?? account
+        items = try container.decodeIfPresent(Swift.type(of: items), forKey: .items) ?? items
+        place = try container.decodeIfPresent(Swift.type(of: place), forKey: .place) ?? place
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

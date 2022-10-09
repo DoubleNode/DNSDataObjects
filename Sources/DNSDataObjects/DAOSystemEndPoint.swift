@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOSystemEndPoint: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var stateType: DAOSystemState.Type { return DAOSystemState.self }
-    open class var systemType: DAOSystem.Type { return DAOSystem.self }
+    open class var stateType: DAOSystemState.Type { DAOSystemState.self }
+    open class var systemType: DAOSystem.Type { DAOSystem.self }
 
     open class func createState() -> DAOSystemState { stateType.init() }
     open class func createState(from object: DAOSystemState) -> DAOSystemState { stateType.init(from: object) }
@@ -95,12 +95,13 @@ open class DAOSystemEndPoint: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         currentState = Self.createState()
         system = Self.createSystem()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = try container.decodeIfPresent(Self.stateType.self, forKey: .currentState) ?? currentState
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        system = try container.decodeIfPresent(Self.systemType.self, forKey: .system) ?? system
-        historyState = try container.decodeIfPresent([DAOSystemState].self, forKey: .historyState) ?? historyState
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+
+        currentState = try container.decodeIfPresent(Swift.type(of: currentState), forKey: .currentState) ?? currentState
+        system = try container.decodeIfPresent(Swift.type(of: system), forKey: .system) ?? system
+        historyState = try container.decodeIfPresent(Swift.type(of: historyState), forKey: .historyState) ?? historyState
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

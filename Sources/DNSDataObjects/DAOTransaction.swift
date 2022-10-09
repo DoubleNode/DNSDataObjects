@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOTransaction: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var orderType: DAOOrder.Type { return DAOOrder.self }
+    open class var cardType: DAOCard.Type { DAOCard.self }
+    open class var orderType: DAOOrder.Type { DAOOrder.self }
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
@@ -96,15 +96,16 @@ open class DAOTransaction: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        amount = try container.decodeIfPresent(Float.self, forKey: .amount) ?? amount
-        card = try container.decodeIfPresent(Self.cardType.self, forKey: .card) ?? card
-        confirmation = try container.decodeIfPresent(String.self, forKey: .confirmation) ?? confirmation
-        order = try container.decodeIfPresent(Self.orderType.self, forKey: .order) ?? order
-        tax = try container.decodeIfPresent(Float.self, forKey: .tax) ?? tax
-        tip = try container.decodeIfPresent(Float.self, forKey: .tip) ?? tip
-        type = try container.decodeIfPresent(String.self, forKey: .type) ?? type
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        amount = self.float(from: container, forKey: .amount) ?? amount
+        confirmation = self.string(from: container, forKey: .confirmation) ?? confirmation
+        tax = self.float(from: container, forKey: .tax) ?? tax
+        tip = self.float(from: container, forKey: .tip) ?? tip
+        type = self.string(from: container, forKey: .type) ?? type
+
+        card = try container.decodeIfPresent(Swift.type(of: card), forKey: .card) ?? card
+        order = try container.decodeIfPresent(Swift.type(of: order), forKey: .order) ?? order
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

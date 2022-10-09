@@ -11,7 +11,7 @@ import Foundation
 
 open class DAOCard: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var transactionType: DAOTransaction.Type { return DAOTransaction.self }
+    open class var transactionType: DAOTransaction.Type { DAOTransaction.self }
 
     open class func createTransaction() -> DAOTransaction { transactionType.init() }
     open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { transactionType.init(from: object) }
@@ -88,13 +88,14 @@ open class DAOCard: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        cardNumber = try container.decodeIfPresent(String.self, forKey: .cardNumber) ?? cardNumber
-        expiration = try container.decodeIfPresent(Date.self, forKey: .expiration) ?? expiration
-        nickname = try container.decodeIfPresent(String.self, forKey: .nickname) ?? nickname
-        pinNumber = try container.decodeIfPresent(String.self, forKey: .pinNumber) ?? pinNumber
-        transactions = try container.decodeIfPresent([DAOTransaction].self, forKey: .transactions) ?? transactions
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cardNumber = self.string(from: container, forKey: .cardNumber) ?? cardNumber
+        expiration = self.date(from: container, forKey: .expiration) ?? expiration
+        nickname = self.string(from: container, forKey: .nickname) ?? nickname
+        pinNumber = self.string(from: container, forKey: .pinNumber) ?? pinNumber
+
+        transactions = try container.decodeIfPresent(Swift.type(of: transactions), forKey: .transactions) ?? transactions
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -82,13 +82,13 @@ open class DAOPlaceEvent: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        endDate = try container.decodeIfPresent(Date.self, forKey: .endDate) ?? endDate
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        startDate = try container.decodeIfPresent(Date.self, forKey: .startDate) ?? startDate
-        timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
-        type = try container.decodeIfPresent(String.self, forKey: .type) ?? type
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        endDate = self.date(from: container, forKey: .endDate) ?? endDate
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+        startDate = self.date(from: container, forKey: .startDate) ?? startDate
+        timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
+        type = self.string(from: container, forKey: .type) ?? type
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

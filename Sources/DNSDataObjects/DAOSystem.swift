@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOSystem: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var endPointType: DAOSystemEndPoint.Type { return DAOSystemEndPoint.self }
-    open class var stateType: DAOSystemState.Type { return DAOSystemState.self }
+    open class var endPointType: DAOSystemEndPoint.Type { DAOSystemEndPoint.self }
+    open class var stateType: DAOSystemState.Type { DAOSystemState.self }
 
     open class func createEndPoint() -> DAOSystemEndPoint { endPointType.init() }
     open class func createEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { endPointType.init(from: object) }
@@ -93,13 +93,14 @@ open class DAOSystem: DAOBaseObject {
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
         currentState = Self.createState()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = try container.decodeIfPresent(Self.stateType.self, forKey: .currentState) ?? currentState
-        endPoints = try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: .endPoints) ?? endPoints
-        historyState = try container.decodeIfPresent([DAOSystemState].self, forKey: .historyState) ?? historyState
-        message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        message = self.dnsstring(from: container, forKey: .message) ?? message
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+
+        currentState = try container.decodeIfPresent(Swift.type(of: currentState), forKey: .currentState) ?? currentState
+        endPoints = try container.decodeIfPresent(Swift.type(of: endPoints), forKey: .endPoints) ?? endPoints
+        historyState = try container.decodeIfPresent(Swift.type(of: historyState), forKey: .historyState) ?? historyState
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

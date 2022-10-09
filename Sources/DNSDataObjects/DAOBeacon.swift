@@ -96,17 +96,18 @@ open class DAOBeacon: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        accuracy = try container.decodeIfPresent(CLLocationAccuracy.self, forKey: .accuracy) ?? accuracy
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-//        data = try container.decodeIfPresent(CLBeacon.self, forKey: .data)
-        distance = try container.decodeIfPresent(DNSBeaconDistance.self, forKey: .distance) ?? distance
-        major = try container.decodeIfPresent(Int.self, forKey: .major) ?? major
-        minor = try container.decodeIfPresent(Int.self, forKey: .minor) ?? minor
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        range = try container.decodeIfPresent(String?.self, forKey: .range) ?? range
-        rssi = try container.decodeIfPresent(Int?.self, forKey: .rssi) ?? rssi
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = self.string(from: container, forKey: .code) ?? code
+        major = self.int(from: container, forKey: .major) ?? major
+        minor = self.int(from: container, forKey: .minor) ?? minor
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+        range = self.string(from: container, forKey: .range) ?? range
+        rssi = self.int(from: container, forKey: .rssi) ?? rssi
+
+        accuracy = try container.decodeIfPresent(Swift.type(of: accuracy), forKey: .accuracy) ?? accuracy
+//        data = try container.decodeIfPresent(CLBeacon.self, forKey: .data)
+        distance = try container.decodeIfPresent(Swift.type(of: distance), forKey: .distance) ?? distance
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

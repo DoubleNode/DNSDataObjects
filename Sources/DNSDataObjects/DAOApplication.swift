@@ -11,7 +11,7 @@ import Foundation
 
 open class DAOApplication: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var eventType: DAOAppEvent.Type { return DAOAppEvent.self }
+    open class var eventType: DAOAppEvent.Type { DAOAppEvent.self }
 
     open class func createEvent() -> DAOAppEvent { eventType.init() }
     open class func createEvent(from object: DAOAppEvent) -> DAOAppEvent { eventType.init(from: object) }
@@ -69,9 +69,9 @@ open class DAOApplication: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        appEvents = try container.decodeIfPresent([DAOAppEvent].self, forKey: .appEvents) ?? appEvents
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        appEvents = try container.decodeIfPresent(Swift.type(of: appEvents), forKey: .appEvents) ?? appEvents
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

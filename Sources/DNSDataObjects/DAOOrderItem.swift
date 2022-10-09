@@ -11,9 +11,9 @@ import Foundation
 
 open class DAOOrderItem: DAOProduct {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var orderType: DAOOrder.Type { return DAOOrder.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var orderType: DAOOrder.Type { DAOOrder.self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
@@ -96,12 +96,13 @@ open class DAOOrderItem: DAOProduct {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
-        order = try container.decodeIfPresent(Self.orderType.self, forKey: .order) ?? order
-        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
-        quantity = try container.decodeIfPresent(Int.self, forKey: .quantity) ?? quantity
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        quantity = self.int(from: container, forKey: .quantity) ?? quantity
+
+        account = try container.decodeIfPresent(Swift.type(of: account), forKey: .account) ?? account
+        order = try container.decodeIfPresent(Swift.type(of: order), forKey: .order) ?? order
+        place = try container.decodeIfPresent(Swift.type(of: place), forKey: .place) ?? place
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

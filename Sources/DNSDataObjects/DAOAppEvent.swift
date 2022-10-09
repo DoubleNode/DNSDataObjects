@@ -89,12 +89,12 @@ open class DAOAppEvent: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decodeIfPresent(Date.self, forKey: .endTime) ?? endTime
-        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? priority
-        startTime = try container.decodeIfPresent(Date.self, forKey: .startTime) ?? startTime
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        endTime = self.date(from: container, forKey: .endTime) ?? endTime
+        priority = self.int(from: container, forKey: .priority) ?? priority
+        startTime = self.date(from: container, forKey: .startTime) ?? startTime
+        title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

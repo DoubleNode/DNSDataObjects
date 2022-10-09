@@ -11,7 +11,7 @@ import Foundation
 
 open class DAOFaqSection: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var faqType: DAOFaq.Type { return DAOFaq.self }
+    open class var faqType: DAOFaq.Type { DAOFaq.self }
 
     open class func createFaq() -> DAOFaq { faqType.init() }
     open class func createFaq(from object: DAOFaq) -> DAOFaq { faqType.init(from: object) }
@@ -84,12 +84,13 @@ open class DAOFaqSection: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        faqs = try container.decodeIfPresent([DAOFaq].self, forKey: .faqs) ?? faqs
-        icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? icon
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        code = self.string(from: container, forKey: .code) ?? code
+        icon = self.string(from: container, forKey: .icon) ?? icon
+        title = self.dnsstring(from: container, forKey: .title) ?? title
+
+        faqs = try container.decodeIfPresent(Swift.type(of: faqs), forKey: .faqs) ?? faqs
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

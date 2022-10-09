@@ -79,14 +79,14 @@ open class DAOAppActionStrings: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        body = try container.decodeIfPresent(DNSString.self, forKey: .body) ?? body
-        cancelLabel = try container.decodeIfPresent(DNSString.self, forKey: .cancelLabel) ?? cancelLabel
-        disclaimer = try container.decodeIfPresent(DNSString.self, forKey: .disclaimer) ?? disclaimer
-        okayLabel = try container.decodeIfPresent(DNSString.self, forKey: .okayLabel) ?? okayLabel
-        subTitle = try container.decodeIfPresent(DNSString.self, forKey: .subTitle) ?? subTitle
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        body = self.dnsstring(from: container, forKey: .body) ?? body
+        cancelLabel = self.dnsstring(from: container, forKey: .cancelLabel) ?? cancelLabel
+        disclaimer = self.dnsstring(from: container, forKey: .disclaimer) ?? disclaimer
+        okayLabel = self.dnsstring(from: container, forKey: .okayLabel) ?? okayLabel
+        subTitle = self.dnsstring(from: container, forKey: .subTitle) ?? subTitle
+        title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

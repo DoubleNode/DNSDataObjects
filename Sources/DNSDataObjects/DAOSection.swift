@@ -12,15 +12,20 @@ import UIKit
 open class DAOSection: DAOBaseObject {
     // MARK: - Class Factory methods -
     open class var placeType: DAOPlace.Type { return DAOPlace.self }
-    open class var sectionType: DAOSection.Type { return DAOSection.self }
+    open class var sectionChildType: DAOSection.Type { return DAOSection.self }
+    open class var sectionParentType: DAOSection.Type { return DAOSection.self }
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
     open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
 
-    open class func createSection() -> DAOSection { sectionType.init() }
-    open class func createSection(from object: DAOSection) -> DAOSection { sectionType.init(from: object) }
-    open class func createSection(from data: DNSDataDictionary) -> DAOSection? { sectionType.init(from: data) }
+    open class func createSectionChild() -> DAOSection { sectionChildType.init() }
+    open class func createSectionChild(from object: DAOSection) -> DAOSection { sectionChildType.init(from: object) }
+    open class func createSectionChild(from data: DNSDataDictionary) -> DAOSection? { sectionChildType.init(from: data) }
+
+    open class func createSectionParent() -> DAOSection { sectionParentType.init() }
+    open class func createSectionParent(from object: DAOSection) -> DAOSection { sectionParentType.init(from: object) }
+    open class func createSectionParent(from data: DNSDataDictionary) -> DAOSection? { sectionParentType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -64,10 +69,10 @@ open class DAOSection: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOSection {
         _ = super.dao(from: data)
         let childrenData = self.dataarray(from: data[field(.children)] as Any?)
-        self.children = childrenData.compactMap { Self.createSection(from: $0) }
+        self.children = childrenData.compactMap { Self.createSectionChild(from: $0) }
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         let parentData = self.dictionary(from: data[field(.parent)] as Any?)
-        self.parent = Self.createSection(from: parentData)
+        self.parent = Self.createSectionParent(from: parentData)
         let placesData = self.dataarray(from: data[field(.places)] as Any?)
         self.places = placesData.compactMap { Self.createPlace(from: $0) }
         return self
@@ -85,12 +90,13 @@ open class DAOSection: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        children = try container.decodeIfPresent([DAOSection].self, forKey: .children) ?? children
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        parent = try container.decodeIfPresent(Self.sectionType.self, forKey: .parent) ?? parent
-        places = try container.decodeIfPresent([DAOPlace].self, forKey: .places) ?? places
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+
+        children = try container.decodeIfPresent(Swift.type(of: children), forKey: .children) ?? children
+        parent = try container.decodeIfPresent(Swift.type(of: parent), forKey: .parent) ?? parent
+        places = try container.decodeIfPresent(Swift.type(of: places), forKey: .places) ?? places
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
