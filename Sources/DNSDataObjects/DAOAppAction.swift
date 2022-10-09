@@ -11,8 +11,8 @@ import Foundation
 
 open class DAOAppAction: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var imagesType: DAOAppActionImages.Type { return DAOAppActionImages.self }
-    open class var stringsType: DAOAppActionStrings.Type { return DAOAppActionStrings.self }
+    open class var imagesType: DAOAppActionImages.Type { DAOAppActionImages.self }
+    open class var stringsType: DAOAppActionStrings.Type { DAOAppActionStrings.self }
 
     open class func createImages() -> DAOAppActionImages { imagesType.init() }
     open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { imagesType.init(from: object) }
@@ -99,12 +99,13 @@ open class DAOAppAction: DAOBaseObject {
     required public init(from decoder: Decoder) throws {
         images = Self.createImages()
         strings = Self.createStrings()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        actionType = try container.decodeIfPresent(DNSAppActionType.self, forKey: .actionType) ?? actionType
-        deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
-        images = try container.decodeIfPresent(Self.imagesType.self, forKey: .imagesSection) ?? images
-        strings = try container.decodeIfPresent(Self.stringsType.self, forKey: .stringsSection) ?? strings
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
+
+        actionType = try container.decodeIfPresent(Swift.type(of: actionType), forKey: .actionType) ?? actionType
+        images = try container.decodeIfPresent(Swift.type(of: images), forKey: .imagesSection) ?? images
+        strings = try container.decodeIfPresent(Swift.type(of: strings), forKey: .stringsSection) ?? strings
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

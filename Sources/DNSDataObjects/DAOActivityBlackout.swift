@@ -64,11 +64,11 @@ open class DAOActivityBlackout: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        endTime = try container.decodeIfPresent(Date?.self, forKey: .endTime) ?? endTime
-        message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
-        startTime = try container.decodeIfPresent(Date?.self, forKey: .startTime) ?? startTime
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        endTime = self.date(from: container, forKey: .endTime) ?? endTime
+        message = self.dnsstring(from: container, forKey: .message) ?? message
+        startTime = self.date(from: container, forKey: .startTime) ?? startTime
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -75,9 +75,10 @@ open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
     
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        close = try container.decodeIfPresent(DNSTimeOfDay.self, forKey: .close)
-        open = try container.decodeIfPresent(DNSTimeOfDay.self, forKey: .open)
+        close = self.timeOfDay(from: container, forKey: .close) ?? close
+        open = self.timeOfDay(from: container, forKey: .open) ?? open
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)

@@ -73,12 +73,13 @@ open class DAONotification: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        body = try container.decodeIfPresent(DNSString.self, forKey: .body) ?? body
-        deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink) ?? deepLink
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
-        type = try container.decodeIfPresent(DNSNotificationType.self, forKey: .type) ?? type
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        body = self.dnsstring(from: container, forKey: .body) ?? body
+        deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
+        title = self.dnsstring(from: container, forKey: .title) ?? title
+
+        type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

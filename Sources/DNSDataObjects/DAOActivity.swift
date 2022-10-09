@@ -11,16 +11,17 @@ import Foundation
 
 open class DAOActivity: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var baseType: DAOActivityType.Type { return DAOActivityType.self }
-    open class var blackoutType: DAOActivityBlackout.Type { return DAOActivityBlackout.self }
+    open class var activityTypeType: DAOActivityType.Type { DAOActivityType.self }
+    open class var activityBlackoutType: DAOActivityBlackout.Type { DAOActivityBlackout.self }
+    open class var activityBlackoutArrayType: [DAOActivityBlackout].Type { [DAOActivityBlackout].self }
 
-    open class func createBase() -> DAOActivityType { baseType.init() }
-    open class func createBase(from object: DAOActivityType) -> DAOActivityType { baseType.init(from: object) }
-    open class func createBase(from data: DNSDataDictionary) -> DAOActivityType? { baseType.init(from: data) }
+    open class func createActivityType() -> DAOActivityType { activityTypeType.init() }
+    open class func createActivityType(from object: DAOActivityType) -> DAOActivityType { activityTypeType.init(from: object) }
+    open class func createActivityType(from data: DNSDataDictionary) -> DAOActivityType? { activityTypeType.init(from: data) }
 
-    open class func createBlackout() -> DAOActivityBlackout { blackoutType.init() }
-    open class func createBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { blackoutType.init(from: object) }
-    open class func createBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { blackoutType.init(from: data) }
+    open class func createActivityBlackout() -> DAOActivityBlackout { activityBlackoutType.init() }
+    open class func createActivityBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { activityBlackoutType.init(from: object) }
+    open class func createActivityBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { activityBlackoutType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -37,15 +38,15 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - Initializers -
     required public init() {
-        baseType = Self.createBase()
+        baseType = Self.createActivityType()
         super.init()
     }
     required public init(id: String) {
-        baseType = Self.createBase()
+        baseType = Self.createActivityType()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
-        baseType = Self.createBase()
+        baseType = Self.createActivityType()
         self.code = code
         self.name = name
         super.init(id: code)
@@ -53,7 +54,7 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOActivity) {
-        baseType = Self.createBase()
+        baseType = Self.createActivityType()
         super.init(from: object)
         self.update(from: object)
     }
@@ -72,14 +73,16 @@ open class DAOActivity: DAOBaseObject {
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
-        baseType = Self.createBase()
+        baseType = Self.createActivityType()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOActivity {
         _ = super.dao(from: data)
         // TODO: Implement baseType import
         let baseTypeData = self.dictionary(from: data[field(.baseType)] as Any?)
-        self.baseType = Self.createBase(from: baseTypeData) ?? self.baseType
+        self.baseType = Self.createActivityType(from: baseTypeData) ?? self.baseType
+        let blackoutsData = self.dataarray(from: data[field(.blackouts)] as Any?)
+        self.blackouts = blackoutsData.compactMap { Self.createActivityBlackout(from: $0) }
         self.bookingEndTime = self.date(from: data[field(.bookingEndTime)] as Any?)
         self.bookingStartTime = self.date(from: data[field(.bookingStartTime)] as Any?)
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
@@ -90,6 +93,7 @@ open class DAOActivity: DAOBaseObject {
         var retval = super.asDictionary
         retval.merge([
             field(.baseType): self.baseType.asDictionary,
+            field(.blackouts): self.blackouts.map { $0.asDictionary },
             field(.bookingEndTime): self.bookingEndTime,
             field(.bookingStartTime): self.bookingStartTime,
             field(.code): self.code,
@@ -100,15 +104,15 @@ open class DAOActivity: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        baseType = Self.createBase()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = try container.decodeIfPresent(Self.baseType.self, forKey: .baseType) ?? baseType
-        blackouts = try container.decodeIfPresent([DAOActivityBlackout].self, forKey: .blackouts) ?? blackouts
-        bookingEndTime = try container.decodeIfPresent(Date?.self, forKey: .bookingEndTime) ?? bookingEndTime
-        bookingStartTime = try container.decodeIfPresent(Date?.self, forKey: .bookingStartTime) ?? bookingStartTime
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        baseType = Self.createActivityType()
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        baseType = self.daoActivityType(of: Self.activityTypeType, from: container, forKey: .baseType) ?? baseType
+        blackouts = self.daoActivityBlackoutArray(of: Self.activityBlackoutArrayType, from: container, forKey: .blackouts)
+        bookingEndTime = self.date(from: container, forKey: .bookingEndTime) ?? bookingEndTime
+        bookingStartTime = self.date(from: container, forKey: .bookingStartTime) ?? bookingStartTime
+        code = self.string(from: container, forKey: .code) ?? code
+        name = self.dnsstring(from: container, forKey: .name) ?? name
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

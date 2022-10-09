@@ -8,21 +8,25 @@
 
 import DNSCore
 import Foundation
+import KeyedCodable
 
 open class DAOUser: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var activityType: DAOActivityType.Type { return DAOActivityType.self }
-    open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var accountArrayType: [DAOAccount].Type { [DAOAccount].self }
+    open class var activityTypeType: DAOActivityType.Type { DAOActivityType.self }
+    open class var activityTypeArrayType: [DAOActivityType].Type { [DAOActivityType].self }
+    open class var cardType: DAOCard.Type { DAOCard.self }
+    open class var cardArrayType: [DAOCard].Type { [DAOCard].self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
 
-    open class func createActivity() -> DAOActivityType { activityType.init() }
-    open class func createActivity(from object: DAOActivityType) -> DAOActivityType { activityType.init(from: object) }
-    open class func createActivity(from data: DNSDataDictionary) -> DAOActivityType? { activityType.init(from: data) }
+    open class func createActivityType() -> DAOActivityType { activityTypeType.init() }
+    open class func createActivityType(from object: DAOActivityType) -> DAOActivityType { activityTypeType.init(from: object) }
+    open class func createActivityType(from data: DNSDataDictionary) -> DAOActivityType? { activityTypeType.init(from: data) }
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
@@ -113,7 +117,7 @@ open class DAOUser: DAOBaseObject {
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
         self.email = self.string(from: data[field(.email)] as Any?) ?? self.email
         let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
-        self.favorites = favoritesData.compactMap { Self.createActivity(from: $0) }
+        self.favorites = favoritesData.compactMap { Self.createActivityType(from: $0) }
         let nameData = self.dictionary(from: data[field(.name)] as Any?)
         self.name = PersonNameComponents(from: nameData) ?? self.name
         let myPlaceData = self.dictionary(from: data[field(.myPlace)] as Any?)
@@ -141,17 +145,17 @@ open class DAOUser: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        accounts = try container.decodeIfPresent([DAOAccount].self, forKey: .accounts) ?? accounts
-        cards = try container.decodeIfPresent([DAOCard].self, forKey: .cards) ?? cards
-        dob = try container.decodeIfPresent(Date?.self, forKey: .dob) ?? dob
-        email = try container.decodeIfPresent(String.self, forKey: .email) ?? email
-        favorites = try container.decodeIfPresent([DAOActivityType].self, forKey: .favorites) ?? favorites
-        name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
-        myPlace = try container.decodeIfPresent(Self.placeType.self, forKey: .myPlace) ?? myPlace
-        phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
-        type = try container.decodeIfPresent(DNSUserType.self, forKey: .type) ?? type
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        accounts = self.daoAccountArray(of: Self.accountArrayType, from: container, forKey: .accounts)
+        cards = self.daoCardArray(of: Self.cardArrayType, from: container, forKey: .cards)
+        dob = self.date(from: container, forKey: .dob) ?? dob
+        email = self.string(from: container, forKey: .email) ?? email
+        favorites = self.daoActivityTypeArray(of: Self.activityTypeArrayType, from: container, forKey: .favorites)
+        myPlace = self.daoPlace(of: Self.placeType, from: container, forKey: .myPlace) ?? myPlace
+        name = self.personName(from: container, forKey: .name) ?? name
+        phone = self.string(from: container, forKey: .phone) ?? phone
+        type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

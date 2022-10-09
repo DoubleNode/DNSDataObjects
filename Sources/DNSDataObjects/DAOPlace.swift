@@ -12,11 +12,14 @@ import Foundation
 
 open class DAOPlace: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var activityType: DAOActivity.Type { return DAOActivity.self }
-    open class var alertType: DAOAlert.Type { return DAOAlert.self }
-    open class var hoursType: DAOPlaceHours.Type { return DAOPlaceHours.self }
-    open class var sectionType: DAOSection.Type { return DAOSection.self }
-    open class var statusType: DAOPlaceStatus.Type { return DAOPlaceStatus.self }
+    open class var activityType: DAOActivity.Type { DAOActivity.self }
+    open class var activityArrayType: [DAOActivity].Type { [DAOActivity].self }
+    open class var alertType: DAOAlert.Type { DAOAlert.self }
+    open class var alertArrayType: [DAOAlert].Type { [DAOAlert].self }
+    open class var placeHoursType: DAOPlaceHours.Type { DAOPlaceHours.self }
+    open class var placeStatusType: DAOPlaceStatus.Type { DAOPlaceStatus.self }
+    open class var placeStatusArrayType: [DAOPlaceStatus].Type { [DAOPlaceStatus].self }
+    open class var sectionType: DAOSection.Type { DAOSection.self }
 
     open class func createActivity() -> DAOActivity { activityType.init() }
     open class func createActivity(from object: DAOActivity) -> DAOActivity { activityType.init(from: object) }
@@ -26,17 +29,17 @@ open class DAOPlace: DAOBaseObject {
     open class func createAlert(from object: DAOAlert) -> DAOAlert { alertType.init(from: object) }
     open class func createAlert(from data: DNSDataDictionary) -> DAOAlert? { alertType.init(from: data) }
 
-    open class func createHours() -> DAOPlaceHours { hoursType.init() }
-    open class func createHours(from object: DAOPlaceHours) -> DAOPlaceHours { hoursType.init(from: object) }
-    open class func createHours(from data: DNSDataDictionary) -> DAOPlaceHours? { hoursType.init(from: data) }
+    open class func createPlaceHours() -> DAOPlaceHours { placeHoursType.init() }
+    open class func createPlaceHours(from object: DAOPlaceHours) -> DAOPlaceHours { placeHoursType.init(from: object) }
+    open class func createPlaceHours(from data: DNSDataDictionary) -> DAOPlaceHours? { placeHoursType.init(from: data) }
+
+    open class func createPlaceStatus() -> DAOPlaceStatus { placeStatusType.init() }
+    open class func createPlaceStatus(from object: DAOPlaceStatus) -> DAOPlaceStatus { placeStatusType.init(from: object) }
+    open class func createPlaceStatus(from data: DNSDataDictionary) -> DAOPlaceStatus? { placeStatusType.init(from: data) }
 
     open class func createSection() -> DAOSection { sectionType.init() }
     open class func createSection(from object: DAOSection) -> DAOSection { sectionType.init(from: object) }
     open class func createSection(from data: DNSDataDictionary) -> DAOSection? { sectionType.init(from: data) }
-
-    open class func createStatus() -> DAOPlaceStatus { statusType.init() }
-    open class func createStatus(from object: DAOPlaceStatus) -> DAOPlaceStatus { statusType.init(from: object) }
-    open class func createStatus(from data: DNSDataDictionary) -> DAOPlaceStatus? { statusType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -66,15 +69,15 @@ open class DAOPlace: DAOBaseObject {
     open var timeZone: TimeZone = TimeZone.current
     // MARK: - Initializers -
     required public init() {
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
         super.init()
     }
     required public init(id: String) {
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
         super.init(id: id)
     }
     public init(code: String, name: DNSString) {
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
         self.code = code
         self.name = name
         super.init(id: code)
@@ -82,7 +85,7 @@ open class DAOPlace: DAOBaseObject {
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOPlace) {
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
         super.init(from: object)
         self.update(from: object)
     }
@@ -107,7 +110,7 @@ open class DAOPlace: DAOBaseObject {
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPlace {
@@ -121,13 +124,13 @@ open class DAOPlace: DAOBaseObject {
         let geohashesData = self.array(from: data[field(.geohashes)] as Any?)
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
         let hoursData = self.dictionary(from: data[field(.hours)] as Any?)
-        self.hours = Self.createHours(from: hoursData) ?? self.hours
+        self.hours = Self.createPlaceHours(from: hoursData) ?? self.hours
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
         let sectionData = self.dictionary(from: data[field(.section)] as Any?)
         self.section = Self.createSection(from: sectionData) ?? self.section
         let statusesData = self.dataarray(from: data[field(.statuses)] as Any?)
-        self.statuses = statusesData.compactMap { Self.createStatus(from: $0) }
+        self.statuses = statusesData.compactMap { Self.createPlaceStatus(from: $0) }
         self.timeZone = self.timeZone(from: data[field(.timeZone)] as Any?) ?? self.timeZone
         return self
     }
@@ -152,22 +155,23 @@ open class DAOPlace: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        hours = Self.createHours()
+        hours = Self.createPlaceHours()
+        try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        activities = try container.decodeIfPresent([DAOActivity].self, forKey: .activities) ?? activities
-        address = try container.decodeIfPresent(String.self, forKey: .address) ?? address
-        alerts = try container.decodeIfPresent([DAOAlert].self, forKey: .alerts) ?? alerts
-        code = try container.decodeIfPresent(String.self, forKey: .code) ?? code
-        geohashes = try container.decodeIfPresent([String].self, forKey: .geohashes) ?? geohashes
+        activities = self.daoActivityArray(of: Self.activityArrayType, from: container, forKey: .activities)
+        address = self.string(from: container, forKey: .address) ?? address
+        alerts = self.daoAlertArray(of: Self.alertArrayType, from: container, forKey: .alerts)
+        code = self.string(from: container, forKey: .code) ?? code
+        hours = self.daoPlaceHours(of: Self.placeHoursType, from: container, forKey: .hours) ?? hours
+        name = self.dnsstring(from: container, forKey: .name) ?? name
+        phone = self.string(from: container, forKey: .phone) ?? phone
+        section = self.daoSection(of: Self.sectionType, from: container, forKey: .section) ?? section
+        statuses = self.daoPlaceStatusArray(of: Self.placeStatusArrayType, from: container, forKey: .statuses)
+        timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
+
+        geohashes = try container.decodeIfPresent(Swift.type(of: geohashes), forKey: .geohashes) ?? geohashes
         let geopointData = try container.decodeIfPresent([String: Double].self, forKey: .geopoint) ?? [:]
         geopoint = CLLocation(from: geopointData)
-        hours = try container.decodeIfPresent(Self.hoursType.self, forKey: .hours) ?? hours
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
-        phone = try container.decodeIfPresent(String.self, forKey: .phone) ?? phone
-        section = try container.decodeIfPresent(Self.sectionType.self, forKey: .section) ?? section
-        statuses = try container.decodeIfPresent([DAOPlaceStatus].self, forKey: .statuses) ?? statuses
-        timeZone = try container.decodeIfPresent(TimeZone.self, forKey: .timeZone) ?? timeZone
-        try super.init(from: decoder)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

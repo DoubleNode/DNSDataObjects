@@ -11,11 +11,12 @@ import Foundation
 
 open class DAOApplication: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var eventType: DAOAppEvent.Type { return DAOAppEvent.self }
+    open class var appEventType: DAOAppEvent.Type { DAOAppEvent.self }
+    open class var appEventArrayType: [DAOAppEvent].Type { [DAOAppEvent].self }
 
-    open class func createEvent() -> DAOAppEvent { eventType.init() }
-    open class func createEvent(from object: DAOAppEvent) -> DAOAppEvent { eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOAppEvent? { eventType.init(from: data) }
+    open class func createAppEvent() -> DAOAppEvent { appEventType.init() }
+    open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { appEventType.init(from: object) }
+    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { appEventType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -56,7 +57,7 @@ open class DAOApplication: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOApplication {
         _ = super.dao(from: data)
         let appEventsData = self.dataarray(from: data[field(.appEvents)] as Any?)
-        self.appEvents = appEventsData.compactMap { Self.createEvent(from: $0) }
+        self.appEvents = appEventsData.compactMap { Self.createAppEvent(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -69,9 +70,9 @@ open class DAOApplication: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        appEvents = try container.decodeIfPresent([DAOAppEvent].self, forKey: .appEvents) ?? appEvents
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        appEvents = self.daoAppEventArray(of: Self.appEventArrayType, from: container, forKey: .appEvents)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

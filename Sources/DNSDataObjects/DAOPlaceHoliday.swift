@@ -63,10 +63,11 @@ open class DAOPlaceHoliday: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        date = try container.decodeIfPresent(Date.self, forKey: .date) ?? date
-        hours = try container.decodeIfPresent(DNSDailyHours.self, forKey: .hours) ?? hours
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        date = self.date(from: container, forKey: .date) ?? date
+
+        hours = try container.decodeIfPresent(Swift.type(of: hours), forKey: .hours) ?? hours
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

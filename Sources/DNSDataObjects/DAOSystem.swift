@@ -11,16 +11,18 @@ import Foundation
 
 open class DAOSystem: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var endPointType: DAOSystemEndPoint.Type { return DAOSystemEndPoint.self }
-    open class var stateType: DAOSystemState.Type { return DAOSystemState.self }
+    open class var systemEndPointType: DAOSystemEndPoint.Type { DAOSystemEndPoint.self }
+    open class var systemEndPointArrayType: [DAOSystemEndPoint].Type { [DAOSystemEndPoint].self }
+    open class var systemStateType: DAOSystemState.Type { DAOSystemState.self }
+    open class var systemStateArrayType: [DAOSystemState].Type { [DAOSystemState].self }
 
-    open class func createEndPoint() -> DAOSystemEndPoint { endPointType.init() }
-    open class func createEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { endPointType.init(from: object) }
-    open class func createEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { endPointType.init(from: data) }
+    open class func createSystemEndPoint() -> DAOSystemEndPoint { systemEndPointType.init() }
+    open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { systemEndPointType.init(from: object) }
+    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { systemEndPointType.init(from: data) }
 
-    open class func createState() -> DAOSystemState { stateType.init() }
-    open class func createState(from object: DAOSystemState) -> DAOSystemState { stateType.init(from: object) }
-    open class func createState(from data: DNSDataDictionary) -> DAOSystemState? { stateType.init(from: data) }
+    open class func createSystemState() -> DAOSystemState { systemStateType.init() }
+    open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { systemStateType.init(from: object) }
+    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { systemStateType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -36,17 +38,17 @@ open class DAOSystem: DAOBaseObject {
 
     // MARK: - Initializers -
     required public init() {
-        currentState = Self.createState()
+        currentState = Self.createSystemState()
         super.init()
     }
     required public init(id: String) {
-        currentState = Self.createState()
+        currentState = Self.createSystemState()
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOSystem) {
-        currentState = Self.createState()
+        currentState = Self.createSystemState()
         super.init(from: object)
         self.update(from: object)
     }
@@ -64,17 +66,17 @@ open class DAOSystem: DAOBaseObject {
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
-        currentState = Self.createState()
+        currentState = Self.createSystemState()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOSystem {
         _ = super.dao(from: data)
         let currentStateData = self.dictionary(from: data[field(.currentState)] as Any?)
-        self.currentState = Self.createState(from: currentStateData) ?? self.currentState
+        self.currentState = Self.createSystemState(from: currentStateData) ?? self.currentState
         let endPointsData = self.dataarray(from: data[field(.endPoints)] as Any?)
-        self.endPoints = endPointsData.compactMap { Self.createEndPoint(from: $0) }
+        self.endPoints = endPointsData.compactMap { Self.createSystemEndPoint(from: $0) }
         let historyStateData = self.dataarray(from: data[field(.historyState)] as Any?)
-        self.historyState = historyStateData.compactMap { Self.createState(from: $0) }
+        self.historyState = historyStateData.compactMap { Self.createSystemState(from: $0) }
         self.message = self.dnsstring(from: data[field(.message)] as Any?) ?? self.message
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         return self
@@ -92,14 +94,14 @@ open class DAOSystem: DAOBaseObject {
     }
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        currentState = Self.createState()
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = try container.decodeIfPresent(Self.stateType.self, forKey: .currentState) ?? currentState
-        endPoints = try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: .endPoints) ?? endPoints
-        historyState = try container.decodeIfPresent([DAOSystemState].self, forKey: .historyState) ?? historyState
-        message = try container.decodeIfPresent(DNSString.self, forKey: .message) ?? message
-        name = try container.decodeIfPresent(DNSString.self, forKey: .name) ?? name
+        currentState = Self.createSystemState()
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        currentState = self.daoSystemState(of: Self.systemStateType, from: container, forKey: .currentState) ?? currentState
+        endPoints = self.daoSystemEndPointArray(of: Self.systemEndPointArrayType, from: container, forKey: .endPoints)
+        historyState = self.daoSystemStateArray(of: Self.systemStateArrayType, from: container, forKey: .historyState)
+        message = self.dnsstring(from: container, forKey: .message) ?? message
+        name = self.dnsstring(from: container, forKey: .name) ?? name
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

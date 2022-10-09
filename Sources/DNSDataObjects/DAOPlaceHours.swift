@@ -11,16 +11,18 @@ import Foundation
 
 open class DAOPlaceHours: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var eventType: DAOPlaceEvent.Type { return DAOPlaceEvent.self }
-    open class var holidayType: DAOPlaceHoliday.Type { return DAOPlaceHoliday.self }
+    open class var placeEventType: DAOPlaceEvent.Type { DAOPlaceEvent.self }
+    open class var placeEventArrayType: [DAOPlaceEvent].Type { [DAOPlaceEvent].self }
+    open class var placeHolidayType: DAOPlaceHoliday.Type { DAOPlaceHoliday.self }
+    open class var placeHolidayArrayType: [DAOPlaceHoliday].Type { [DAOPlaceHoliday].self }
 
-    open class func createEvent() -> DAOPlaceEvent { eventType.init() }
-    open class func createEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOPlaceEvent? { eventType.init(from: data) }
+    open class func createPlaceEvent() -> DAOPlaceEvent { placeEventType.init() }
+    open class func createPlaceEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { placeEventType.init(from: object) }
+    open class func createPlaceEvent(from data: DNSDataDictionary) -> DAOPlaceEvent? { placeEventType.init(from: data) }
 
-    open class func createHoliday() -> DAOPlaceHoliday { holidayType.init() }
-    open class func createHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { holidayType.init(from: object) }
-    open class func createHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday? { holidayType.init(from: data) }
+    open class func createPlaceHoliday() -> DAOPlaceHoliday { placeHolidayType.init() }
+    open class func createPlaceHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { placeHolidayType.init(from: object) }
+    open class func createPlaceHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday? { placeHolidayType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -95,9 +97,9 @@ open class DAOPlaceHours: DAOBaseObject {
     override open func dao(from data: DNSDataDictionary) -> DAOPlaceHours {
         _ = super.dao(from: data)
         let eventsData = self.dataarray(from: data[field(.events)] as Any?)
-        self.events = eventsData.compactMap { Self.createEvent(from: $0) }
+        self.events = eventsData.compactMap { Self.createPlaceEvent(from: $0) }
         let holidaysData = self.dataarray(from: data[field(.holidays)] as Any?)
-        self.holidays = holidaysData.compactMap { Self.createHoliday(from: $0) }
+        self.holidays = holidaysData.compactMap { Self.createPlaceHoliday(from: $0) }
         let mondayData = self.dictionary(from: data[field(.monday)] as Any?)
         self.monday = DNSDailyHours(from: mondayData)
         let tuesdayData = self.dictionary(from: data[field(.tuesday)] as Any?)
@@ -132,17 +134,17 @@ open class DAOPlaceHours: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = try container.decodeIfPresent([DAOPlaceEvent].self, forKey: .events) ?? events
-        holidays = try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: .holidays) ?? holidays
-        monday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .monday) ?? monday
-        tuesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .tuesday) ?? tuesday
-        wednesday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .wednesday) ?? wednesday
-        thursday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .thursday) ?? thursday
-        friday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .friday) ?? friday
-        saturday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .saturday) ?? saturday
-        sunday = try container.decodeIfPresent(DNSDailyHours.self, forKey: .sunday) ?? sunday
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        events = self.daoPlaceEventArray(of: Self.placeEventArrayType, from: container, forKey: .events)
+        holidays = self.daoPlaceHolidayArray(of: Self.placeHolidayArrayType, from: container, forKey: .holidays)
+        monday = try container.decodeIfPresent(Swift.type(of: monday), forKey: .monday) ?? monday
+        tuesday = try container.decodeIfPresent(Swift.type(of: tuesday), forKey: .tuesday) ?? tuesday
+        wednesday = try container.decodeIfPresent(Swift.type(of: wednesday), forKey: .wednesday) ?? wednesday
+        thursday = try container.decodeIfPresent(Swift.type(of: thursday), forKey: .thursday) ?? thursday
+        friday = try container.decodeIfPresent(Swift.type(of: friday), forKey: .friday) ?? friday
+        saturday = try container.decodeIfPresent(Swift.type(of: saturday), forKey: .saturday) ?? saturday
+        sunday = try container.decodeIfPresent(Swift.type(of: sunday), forKey: .sunday) ?? sunday
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

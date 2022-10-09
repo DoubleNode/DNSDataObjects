@@ -84,13 +84,13 @@ open class DAOSystemState: DAOBaseObject {
     
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        failureCodes = try container.decodeIfPresent([String: DNSSystemStateNumbers].self, forKey: .failureCodes) ?? failureCodes
-        failureRate = try container.decodeIfPresent(DNSSystemStateNumbers.self, forKey: .failureRate) ?? failureRate
-        state = try container.decodeIfPresent(DNSSystemState.self, forKey: .state) ?? state
-        stateOverride = try container.decodeIfPresent(DNSSystemState.self, forKey: .stateOverride) ?? stateOverride
-        totalPoints = try container.decodeIfPresent(DNSSystemStateNumbers.self, forKey: .totalPoints) ?? totalPoints
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        failureCodes = try container.decodeIfPresent(Swift.type(of: failureCodes), forKey: .failureCodes) ?? failureCodes
+        failureRate = try container.decodeIfPresent(Swift.type(of: failureRate), forKey: .failureRate) ?? failureRate
+        state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
+        stateOverride = try container.decodeIfPresent(Swift.type(of: stateOverride), forKey: .stateOverride) ?? stateOverride
+        totalPoints = try container.decodeIfPresent(Swift.type(of: totalPoints), forKey: .totalPoints) ?? totalPoints
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

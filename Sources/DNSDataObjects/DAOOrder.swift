@@ -11,18 +11,19 @@ import Foundation
 
 open class DAOOrder: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var itemType: DAOOrderItem.Type { return DAOOrderItem.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
-    open class var transactionType: DAOTransaction.Type { return DAOTransaction.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var orderItemType: DAOOrderItem.Type { DAOOrderItem.self }
+    open class var orderItemArrayType: [DAOOrderItem].Type { [DAOOrderItem].self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
+    open class var transactionType: DAOTransaction.Type { DAOTransaction.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
 
-    open class func createItem() -> DAOOrderItem { itemType.init() }
-    open class func createItem(from object: DAOOrderItem) -> DAOOrderItem { itemType.init(from: object) }
-    open class func createItem(from data: DNSDataDictionary) -> DAOOrderItem? { itemType.init(from: data) }
+    open class func createOrderItem() -> DAOOrderItem { orderItemType.init() }
+    open class func createOrderItem(from object: DAOOrderItem) -> DAOOrderItem { orderItemType.init(from: object) }
+    open class func createOrderItem(from data: DNSDataDictionary) -> DAOOrderItem? { orderItemType.init(from: data) }
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
@@ -84,7 +85,7 @@ open class DAOOrder: DAOBaseObject {
        let accountData = self.dictionary(from: data[field(.account)] as Any?)
        self.account = Self.createAccount(from: accountData)
        let itemsData = self.dataarray(from: data[field(.items)] as Any?)
-       self.items = itemsData.compactMap { Self.createItem(from: $0) }
+       self.items = itemsData.compactMap { Self.createOrderItem(from: $0) }
        let placeData = self.dictionary(from: data[field(.place)] as Any?)
        self.place = Self.createPlace(from: placeData)
        let stateData = self.string(from: data[field(.state)] as Any?) ?? ""
@@ -113,16 +114,17 @@ open class DAOOrder: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
-        items = try container.decodeIfPresent([DAOOrderItem].self, forKey: .items) ?? items
-        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
-        state = try container.decodeIfPresent(DNSOrderState.self, forKey: .state) ?? state
-        subtotal = try container.decodeIfPresent(Float.self, forKey: .subtotal) ?? subtotal
-        tax = try container.decodeIfPresent(Float.self, forKey: .tax) ?? tax
-        total = try container.decodeIfPresent(Float.self, forKey: .total) ?? total
-        transaction = try container.decodeIfPresent(Self.transactionType.self, forKey: .transaction) ?? transaction
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        account = self.daoAccount(of: Self.accountType, from: container, forKey: .account) ?? account
+        items = self.daoOrderItemArray(of: Self.orderItemArrayType, from: container, forKey: .items)
+        place = self.daoPlace(of: Self.placeType, from: container, forKey: .place) ?? place
+        subtotal = self.float(from: container, forKey: .subtotal) ?? subtotal
+        tax = self.float(from: container, forKey: .tax) ?? tax
+        total = self.float(from: container, forKey: .total) ?? total
+        transaction = self.daoTransaction(of: Self.transactionType, from: container, forKey: .transaction) ?? transaction
+
+        state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

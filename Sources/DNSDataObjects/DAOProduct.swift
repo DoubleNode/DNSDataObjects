@@ -68,12 +68,12 @@ open class DAOProduct: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        about = try container.decodeIfPresent(DNSString.self, forKey: .about) ?? about
-        price = try container.decodeIfPresent(Float.self, forKey: .price) ?? price
-        sku = try container.decodeIfPresent(String.self, forKey: .sku) ?? sku
-        title = try container.decodeIfPresent(DNSString.self, forKey: .title) ?? title
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        about = self.dnsstring(from: container, forKey: .about) ?? about
+        price = self.float(from: container, forKey: .price) ?? price
+        sku = self.string(from: container, forKey: .sku) ?? sku
+        title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

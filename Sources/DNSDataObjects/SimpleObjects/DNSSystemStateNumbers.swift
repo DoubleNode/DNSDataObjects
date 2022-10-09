@@ -66,10 +66,11 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        android = try container.decodeIfPresent(Double.self, forKey: .android) ?? android
-        iOS = try container.decodeIfPresent(Double.self, forKey: .iOS) ?? iOS
-        total = try container.decodeIfPresent(Double.self, forKey: .total) ?? total
+        android = self.double(from: container, forKey: .android) ?? android
+        iOS = self.double(from: container, forKey: .iOS) ?? iOS
+        total = self.double(from: container, forKey: .total) ?? total
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)

@@ -13,11 +13,11 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case uuid, created, synced, updated, status, createdBy, updatedBy
+        case uid, created, synced, updated, status, createdBy, updatedBy
         case genericValues
     }
     
-    public var uuid: UUID = UUID()
+    public var uid: UUID = UUID()
     
     public var created = Date()
     public var synced: Date?
@@ -40,7 +40,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.update(from: object)
     }
     open func update(from object: DNSMetadata) {
-        self.uuid = object.uuid
+        self.uid = object.uid
         self.created = object.created
         self.synced = object.synced
         self.updated = object.updated
@@ -56,8 +56,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         _ = self.dao(from: data)
     }
     open func dao(from data: DNSDataDictionary) -> DNSMetadata {
-        let uuidData = self.string(from: data[field(.uuid)] as Any?) ?? self.uuid.uuidString
-        self.uuid = UUID(uuidString: uuidData) ?? self.uuid
+        self.uid = self.uuid(from: data[field(.uid)] as Any?) ?? self.uid
         self.created = self.time(from: data[field(.created)] as Any?) ?? self.created
         self.synced = self.time(from: data[field(.synced)] as Any?) ?? self.synced
         self.updated = self.time(from: data[field(.updated)] as Any?) ?? self.updated
@@ -69,7 +68,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     }
     open var asDictionary: DNSDataDictionary {
         let retval: DNSDataDictionary = [
-            field(.uuid): self.uuid,
+            field(.uid): self.uid,
             field(.created): self.created,
             field(.synced): self.synced,
             field(.updated): self.updated,
@@ -83,18 +82,19 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        uuid = try container.decodeIfPresent(UUID.self, forKey: .uuid) ?? uuid
-        created = try container.decodeIfPresent(Date.self, forKey: .created) ?? created
-        synced = try container.decodeIfPresent(Date?.self, forKey: .synced) ?? synced
-        updated = try container.decodeIfPresent(Date.self, forKey: .updated) ?? updated
-        status = try container.decodeIfPresent(String.self, forKey: .status) ?? status
-        createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy) ?? createdBy
-        updatedBy = try container.decodeIfPresent(String.self, forKey: .updatedBy) ?? updatedBy
+        uid = self.uuid(from: container, forKey: .uid) ?? uid
+        created = self.date(from: container, forKey: .created) ?? created
+        synced = self.date(from: container, forKey: .synced) ?? synced
+        updated = self.date(from: container, forKey: .updated) ?? updated
+        status = self.string(from: container, forKey: .status) ?? status
+        createdBy = self.string(from: container, forKey: .createdBy) ?? createdBy
+        updatedBy = self.string(from: container, forKey: .updatedBy) ?? updatedBy
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(uuid.uuidString, forKey: .uuid)
+        try container.encode(uid, forKey: .uid)
         try container.encode(created, forKey: .created)
         try container.encode(synced, forKey: .synced)
         try container.encode(updated, forKey: .updated)
@@ -111,7 +111,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DNSMetadata else { return true }
         let lhs = self
-        return lhs.uuid != rhs.uuid ||
+        return lhs.uid != rhs.uid ||
             lhs.created != rhs.created ||
             lhs.synced != rhs.synced ||
             lhs.updated != rhs.updated ||

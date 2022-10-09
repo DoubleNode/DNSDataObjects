@@ -8,11 +8,14 @@
 
 import DNSCore
 import Foundation
+import KeyedCodable
 
 open class DAOAccount: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var cardType: DAOCard.Type { return DAOCard.self }
-    open class var userType: DAOUser.Type { return DAOUser.self }
+    open class var cardType: DAOCard.Type { DAOCard.self }
+    open class var cardArrayType: [DAOCard].Type { [DAOCard].self }
+    open class var userType: DAOUser.Type { DAOUser.self }
+    open class var userArrayType: [DAOUser].Type { [DAOUser].self }
 
     open class func createCard() -> DAOCard { cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
@@ -105,14 +108,14 @@ open class DAOAccount: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        cards = try container.decodeIfPresent([DAOCard].self, forKey: .cards) ?? cards
-        dob = try container.decodeIfPresent(Date?.self, forKey: .dob) ?? dob
-        emailNotifications = try container.decodeIfPresent(Bool.self, forKey: .emailNotifications) ?? emailNotifications
-        name = try container.decodeIfPresent(PersonNameComponents.self, forKey: .name) ?? name
-        pushNotifications = try container.decodeIfPresent(Bool.self, forKey: .pushNotifications) ?? pushNotifications
-        users = try container.decodeIfPresent([DAOUser].self, forKey: .users) ?? users
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cards = self.daoCardArray(of: Self.cardArrayType, from: container, forKey: .cards)
+        dob = self.date(from: container, forKey: .dob) ?? dob
+        emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
+        name = self.personName(from: container, forKey: .name) ?? name
+        pushNotifications = self.bool(from: container, forKey: .pushNotifications) ?? pushNotifications
+        users = self.daoUserArray(of: Self.userArrayType, from: container, forKey: .users)
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -22,7 +22,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     // MARK: - Initializers -
     override required public init() {
         super.init()
-        self.id = self.meta.uuid.uuidString
+        self.id = self.meta.uid.uuidString
     }
     required public init(id: String) {
         super.init()
@@ -61,9 +61,11 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
+        super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(String.self, forKey: .id) ?? id
-        meta = try container.decodeIfPresent(DNSMetadata.self, forKey: .meta) ?? meta
+        id = self.string(from: container, forKey: .id) ?? id
+
+        meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)

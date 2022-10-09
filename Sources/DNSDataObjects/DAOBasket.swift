@@ -11,17 +11,18 @@ import Foundation
 
 open class DAOBasket: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { return DAOAccount.self }
-    open class var itemType: DAOBasketItem.Type { return DAOBasketItem.self }
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
+    open class var accountType: DAOAccount.Type { DAOAccount.self }
+    open class var basketItemType: DAOBasketItem.Type { DAOBasketItem.self }
+    open class var basketItemArrayType: [DAOBasketItem].Type { [DAOBasketItem].self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
 
     open class func createAccount() -> DAOAccount { accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
 
-    open class func createItem() -> DAOBasketItem { itemType.init() }
-    open class func createItem(from object: DAOBasketItem) -> DAOBasketItem { itemType.init(from: object) }
-    open class func createItem(from data: DNSDataDictionary) -> DAOBasketItem? { itemType.init(from: data) }
+    open class func createBasketItem() -> DAOBasketItem { basketItemType.init() }
+    open class func createBasketItem(from object: DAOBasketItem) -> DAOBasketItem { basketItemType.init(from: object) }
+    open class func createBasketItem(from data: DNSDataDictionary) -> DAOBasketItem? { basketItemType.init(from: data) }
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
@@ -71,7 +72,7 @@ open class DAOBasket: DAOBaseObject {
        let accountData = self.dictionary(from: data[field(.account)] as Any?)
        self.account = Self.createAccount(from: accountData)
        let itemsData = self.dataarray(from: data[field(.items)] as Any?)
-       self.items = itemsData.compactMap { Self.createItem(from: $0) }
+       self.items = itemsData.compactMap { Self.createBasketItem(from: $0) }
        let placeData = self.dictionary(from: data[field(.place)] as Any?)
        self.place = Self.createPlace(from: placeData)
        return self
@@ -88,11 +89,11 @@ open class DAOBasket: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = try container.decodeIfPresent(Self.accountType.self, forKey: .account) ?? account
-        items = try container.decodeIfPresent([DAOBasketItem].self, forKey: .items) ?? items
-        place = try container.decodeIfPresent(Self.placeType.self, forKey: .place) ?? place
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        account = self.daoAccount(of: Self.accountType, from: container, forKey: .account) ?? account
+        items = self.daoBasketItemArray(of: Self.basketItemArrayType, from: container, forKey: .items)
+        place = self.daoPlace(of: Self.placeType, from: container, forKey: .place) ?? place
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)

@@ -58,9 +58,9 @@ open class DAOAppActionImages: DAOBaseObject {
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        topUrl = try container.decodeIfPresent(DNSURL.self, forKey: .topUrl) ?? topUrl
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        topUrl = self.dnsurl(from: container, forKey: .topUrl) ?? topUrl
     }
     override open func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
