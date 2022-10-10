@@ -11,11 +11,11 @@ import UIKit
 
 open class DAOSection: DAOBaseObject {
     // MARK: - Class Factory methods -
-    open class var placeType: DAOPlace.Type { return DAOPlace.self }
-    open class var placeArrayType: [DAOPlace].Type { return [DAOPlace].self }
-    open class var sectionChildType: DAOSection.Type { return DAOSection.self }
-    open class var sectionChildArrayType: [DAOSection].Type { return [DAOSection].self }
-    open class var sectionParentType: DAOSection.Type { return DAOSection.self }
+    open class var placeType: DAOPlace.Type { DAOPlace.self }
+    open class var placeArrayType: [DAOPlace].Type { [DAOPlace].self }
+    open class var sectionChildType: DAOSection.Type { DAOSection.self }
+    open class var sectionChildArrayType: [DAOSection].Type { [DAOSection].self }
+    open class var sectionParentType: DAOSection.Type { DAOSection.self }
 
     open class func createPlace() -> DAOPlace { placeType.init() }
     open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }

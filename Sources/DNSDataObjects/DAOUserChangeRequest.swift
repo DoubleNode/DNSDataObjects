@@ -11,7 +11,7 @@ import Foundation
 
 open class DAOUserChangeRequest: DAOChangeRequest {
     // MARK: - Class Factory methods -
-    open class var userType: DAOUser.Type { return DAOUser.self }
+    open class var userType: DAOUser.Type { DAOUser.self }
 
     open class func createUser() -> DAOUser { userType.init() }
     open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
