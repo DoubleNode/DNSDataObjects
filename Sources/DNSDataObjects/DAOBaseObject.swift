@@ -14,7 +14,7 @@ public protocol PTCLCFGDAOBaseObject {
 
 public protocol PTCLCFGBaseObject: PTCLCFGDAOBaseObject {
 }
-open class DAOBaseObject: DNSDataTranslation, CodableWithConfiguration, NSCopying {
+open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration, NSCopying {
     public typealias Config = PTCLCFGBaseObject
 
     // MARK: - Properties -

@@ -178,10 +178,13 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+    required public init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
         fatalError("init(from:configuration:) has not been implemented")
     }
-    required public init(from decoder: Decoder, configuration: PTCLCFGUserObject) throws {
+    required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         accounts = self.daoAccountArray(with: configuration, from: container, forKey: .accounts)
@@ -194,7 +197,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         phone = self.string(from: container, forKey: .phone) ?? phone
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
-    open func encode(to encoder: Encoder, configuration: PTCLCFGUserObject) throws {
+    open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accounts, forKey: .accounts, configuration: configuration)

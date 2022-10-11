@@ -78,7 +78,10 @@ open class DAOPlaceHoliday: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+    required public init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
         fatalError("init(from:configuration:) has not been implemented")
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
