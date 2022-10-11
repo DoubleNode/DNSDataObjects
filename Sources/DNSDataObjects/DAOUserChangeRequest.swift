@@ -9,13 +9,32 @@
 import DNSCore
 import Foundation
 
-open class DAOUserChangeRequest: DAOChangeRequest {
-    // MARK: - Class Factory methods -
-    open class var userType: DAOUser.Type { DAOUser.self }
+public protocol PTCLCFGDAOUserChangeRequest: PTCLCFGBaseObject {
+    var userChangeRequestType: DAOUserChangeRequest.Type { get }
+    func userChangeRequestArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUserChangeRequest] where K: CodingKey
+}
 
-    open class func createUser() -> DAOUser { userType.init() }
-    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
+public protocol PTCLCFGUserChangeRequestObject: DAOChangeRequest.Config, PTCLCFGDAOUser {
+}
+public class CFGUserChangeRequestObject: PTCLCFGUserChangeRequestObject {
+    public var userType: DAOUser.Type = DAOUser.self
+
+    open func userArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOUser].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOUserChangeRequest: DAOChangeRequest {
+    public typealias Config = PTCLCFGUserChangeRequestObject
+    private static var config: Config = CFGUserChangeRequestObject()
+
+    // MARK: - Class Factory methods -
+    open class func createUser() -> DAOUser { config.userType.init() }
+    open class func createUser(from object: DAOUser) -> DAOUser { config.userType.init(from: object) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { config.userType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -78,17 +97,23 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: DAOChangeRequest.Config) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         requestedRole = try container.decodeIfPresent(Swift.type(of: requestedRole), forKey: .requestedRole) ?? requestedRole
-        user = try container.decodeIfPresent(Swift.type(of: user), forKey: .user) ?? user
+        user = self.daoUser(with: configuration, from: container, forKey: .user) ?? user
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(requestedRole, forKey: .requestedRole)
-        try container.encode(user, forKey: .user)
+        try container.encode(user, forKey: .user, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

@@ -10,7 +10,20 @@ import CoreLocation
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOBeacon: PTCLCFGBaseObject {
+    var beaconType: DAOBeacon.Type { get }
+    func beaconArray<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBeacon] where K: CodingKey
+}
+
+public protocol PTCLCFGBeaconObject: PTCLCFGBaseObject {
+}
+public class CFGBeaconObject: PTCLCFGBeaconObject {
+}
 open class DAOBeacon: DAOBaseObject {
+    public typealias Config = PTCLCFGBeaconObject
+    public static var config: Config = CFGBeaconObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -95,8 +108,11 @@ open class DAOBeacon: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = self.string(from: container, forKey: .code) ?? code
         major = self.int(from: container, forKey: .major) ?? major
@@ -109,8 +125,8 @@ open class DAOBeacon: DAOBaseObject {
 //        data = try container.decodeIfPresent(CLBeacon.self, forKey: .data)
         distance = try container.decodeIfPresent(Swift.type(of: distance), forKey: .distance) ?? distance
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accuracy, forKey: .accuracy)
         try container.encode(code, forKey: .code)

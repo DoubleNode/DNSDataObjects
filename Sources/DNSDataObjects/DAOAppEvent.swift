@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOAppEvent: PTCLCFGBaseObject {
+    var appEventType: DAOAppEvent.Type { get }
+    func appEventArray<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppEvent] where K: CodingKey
+}
+
+public protocol PTCLCFGAppEventObject: PTCLCFGBaseObject {
+}
+public class CFGAppEventObject: PTCLCFGAppEventObject {
+}
 open class DAOAppEvent: DAOBaseObject {
+    public typealias Config = PTCLCFGAppEventObject
+    public static var config: Config = CFGAppEventObject()
+
     public enum C {
         public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
         public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
@@ -88,16 +101,19 @@ open class DAOAppEvent: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.date(from: container, forKey: .endTime) ?? endTime
         priority = self.int(from: container, forKey: .priority) ?? priority
         startTime = self.date(from: container, forKey: .startTime) ?? startTime
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(priority, forKey: .priority)

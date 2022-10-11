@@ -12,7 +12,7 @@ import PackageDescription
 let package = Package(
     name: "DNSDataObjects",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v15),
         .tvOS(.v13),
         .macOS(.v10_15),
         .watchOS(.v6),

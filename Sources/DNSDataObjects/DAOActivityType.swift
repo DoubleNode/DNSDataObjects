@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOActivityType: PTCLCFGBaseObject {
+    var activityTypeType: DAOActivityType.Type { get }
+    func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey
+}
+
+public protocol PTCLCFGActivityTypeObject: PTCLCFGBaseObject {
+}
+public class CFGActivityTypeObject: PTCLCFGActivityTypeObject {
+}
 open class DAOActivityType: DAOBaseObject {
+    public typealias Config = PTCLCFGActivityTypeObject
+    public static var config: Config = CFGActivityTypeObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -64,14 +77,17 @@ open class DAOActivityType: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = self.string(from: container, forKey: .code) ?? code
         name = self.dnsstring(from: container, forKey: .name) ?? name
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(code, forKey: .code)
         try container.encode(name, forKey: .name)

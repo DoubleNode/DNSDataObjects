@@ -9,14 +9,31 @@
 import DNSCore
 import Foundation
 
-open class DAOApplication: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var appEventType: DAOAppEvent.Type { DAOAppEvent.self }
-    open class var appEventArrayType: [DAOAppEvent].Type { [DAOAppEvent].self }
+public protocol PTCLCFGDAOApplication: PTCLCFGBaseObject {
+    var applicationType: DAOApplication.Type { get }
+    func applicationArray<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOApplication] where K: CodingKey
+}
 
-    open class func createAppEvent() -> DAOAppEvent { appEventType.init() }
-    open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { appEventType.init(from: object) }
-    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { appEventType.init(from: data) }
+public protocol PTCLCFGApplicationObject: PTCLCFGDAOAppEvent {
+}
+public class CFGApplicationObject: PTCLCFGApplicationObject {
+    public var appEventType: DAOAppEvent.Type = DAOAppEvent.self
+    open func appEventArray<K>(from container: KeyedDecodingContainer<K>,
+                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppEvent] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAppEvent].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOApplication: DAOBaseObject {
+    public typealias Config = PTCLCFGApplicationObject
+    public static var config: Config = CFGApplicationObject()
+
+    // MARK: - Class Factory methods -
+    open class func createAppEvent() -> DAOAppEvent { config.appEventType.init() }
+    open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { config.appEventType.init(from: object) }
+    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { config.appEventType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -69,15 +86,18 @@ open class DAOApplication: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        appEvents = self.daoAppEventArray(of: Self.appEventArrayType, from: container, forKey: .appEvents)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        appEvents = self.daoAppEventArray(with: configuration, from: container, forKey: .appEvents)
+    }
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(appEvents, forKey: .appEvents)
+        try container.encode(appEvents, forKey: .appEvents, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

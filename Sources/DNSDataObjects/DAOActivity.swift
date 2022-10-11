@@ -9,19 +9,43 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOActivity: PTCLCFGBaseObject {
+    var activityType: DAOActivity.Type { get }
+    func activityArray<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivity] where K: CodingKey
+}
+
+public protocol PTCLCFGActivityObject: PTCLCFGDAOActivityType, PTCLCFGDAOActivityBlackout {
+}
+public class CFGActivityObject: PTCLCFGActivityObject {
+    public var activityTypeType: DAOActivityType.Type = DAOActivityType.self
+    public var activityBlackoutType: DAOActivityBlackout.Type = DAOActivityBlackout.self
+
+    open func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOActivityType].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func activityBlackoutArray<K>(from container: KeyedDecodingContainer<K>,
+                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOActivityBlackout].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOActivity: DAOBaseObject {
+    public typealias Config = PTCLCFGActivityObject
+    public static var config: Config = CFGActivityObject()
+
     // MARK: - Class Factory methods -
-    open class var activityTypeType: DAOActivityType.Type { DAOActivityType.self }
-    open class var activityBlackoutType: DAOActivityBlackout.Type { DAOActivityBlackout.self }
-    open class var activityBlackoutArrayType: [DAOActivityBlackout].Type { [DAOActivityBlackout].self }
+    open class func createActivityType() -> DAOActivityType { config.activityTypeType.init() }
+    open class func createActivityType(from object: DAOActivityType) -> DAOActivityType { config.activityTypeType.init(from: object) }
+    open class func createActivityType(from data: DNSDataDictionary) -> DAOActivityType? { config.activityTypeType.init(from: data) }
 
-    open class func createActivityType() -> DAOActivityType { activityTypeType.init() }
-    open class func createActivityType(from object: DAOActivityType) -> DAOActivityType { activityTypeType.init(from: object) }
-    open class func createActivityType(from data: DNSDataDictionary) -> DAOActivityType? { activityTypeType.init(from: data) }
-
-    open class func createActivityBlackout() -> DAOActivityBlackout { activityBlackoutType.init() }
-    open class func createActivityBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { activityBlackoutType.init(from: object) }
-    open class func createActivityBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { activityBlackoutType.init(from: data) }
+    open class func createActivityBlackout() -> DAOActivityBlackout { config.activityBlackoutType.init() }
+    open class func createActivityBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { config.activityBlackoutType.init(from: object) }
+    open class func createActivityBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { config.activityBlackoutType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -103,22 +127,25 @@ open class DAOActivity: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
         baseType = Self.createActivityType()
-        try super.init(from: decoder)
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        baseType = self.daoActivityType(of: Self.activityTypeType, from: container, forKey: .baseType) ?? baseType
-        blackouts = self.daoActivityBlackoutArray(of: Self.activityBlackoutArrayType, from: container, forKey: .blackouts)
+        baseType = self.daoActivityType(with: configuration, from: container, forKey: .baseType) ?? baseType
+        blackouts = self.daoActivityBlackoutArray(with: configuration, from: container, forKey: .blackouts)
         bookingEndTime = self.date(from: container, forKey: .bookingEndTime) ?? bookingEndTime
         bookingStartTime = self.date(from: container, forKey: .bookingStartTime) ?? bookingStartTime
         code = self.string(from: container, forKey: .code) ?? code
         name = self.dnsstring(from: container, forKey: .name) ?? name
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(baseType, forKey: .baseType)
-        try container.encode(blackouts, forKey: .blackouts)
+        try container.encode(baseType, forKey: .baseType, configuration: configuration)
+        try container.encode(blackouts, forKey: .blackouts, configuration: configuration)
         try container.encode(bookingEndTime, forKey: .bookingEndTime)
         try container.encode(bookingStartTime, forKey: .bookingStartTime)
         try container.encode(code, forKey: .code)

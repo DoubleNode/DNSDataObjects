@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOPlaceEvent: PTCLCFGBaseObject {
+    var placeEventType: DAOPlaceEvent.Type { get }
+    func placeEventArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceEvent] where K: CodingKey
+}
+
+public protocol PTCLCFGPlaceEventObject: PTCLCFGBaseObject {
+}
+public class CFGPlaceEventObject: PTCLCFGPlaceEventObject {
+}
 open class DAOPlaceEvent: DAOBaseObject {
+    public typealias Config = PTCLCFGPlaceEventObject
+    public static var config: Config = CFGPlaceEventObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -81,8 +94,11 @@ open class DAOPlaceEvent: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endDate = self.date(from: container, forKey: .endDate) ?? endDate
         name = self.dnsstring(from: container, forKey: .name) ?? name
@@ -90,8 +106,8 @@ open class DAOPlaceEvent: DAOBaseObject {
         timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
         type = self.string(from: container, forKey: .type) ?? type
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endDate, forKey: .endDate)
         try container.encode(name, forKey: .name)

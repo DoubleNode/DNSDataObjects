@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOChangeRequest: PTCLCFGBaseObject {
+    var changeRequestType: DAOChangeRequest.Type { get }
+    func changeRequestArray<K>(from container: KeyedDecodingContainer<K>,
+                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOChangeRequest] where K: CodingKey
+}
+
+public protocol PTCLCFGChangeRequestObject: PTCLCFGBaseObject {
+}
+public class CFGChangeRequestObject: PTCLCFGChangeRequestObject {
+}
 open class DAOChangeRequest: DAOBaseObject {
+    public typealias Config = PTCLCFGChangeRequestObject
+    private static var config: Config = CFGChangeRequestObject()
+
     // MARK: - Initializers -
     required public init() {
         super.init()
@@ -44,12 +57,15 @@ open class DAOChangeRequest: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
 //        let container = try decoder.container(keyedBy: CodingKeys.self)
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
 //        var container = encoder.container(keyedBy: CodingKeys.self)
     }
 

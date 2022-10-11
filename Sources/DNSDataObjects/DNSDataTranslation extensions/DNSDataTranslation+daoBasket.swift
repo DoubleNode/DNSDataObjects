@@ -10,17 +10,17 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoBasket<K>(of objectType: DAOBasket.Type,
-                      from container: KeyedDecodingContainer<K>,
-                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasket? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+    func daoBasket<K>(with configuration: PTCLCFGDAOBasket,
+                        from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasket? where K: CodingKey {
+        do { return try container.decodeIfPresent(configuration.basketType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoBasketArray<K>(of arrayType: [DAOBasket].Type,
-                           from container: KeyedDecodingContainer<K>,
-                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasket] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+    func daoBasketArray<K>(with configuration: PTCLCFGDAOBasket,
+                             from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasket] where K: CodingKey {
+        return configuration.basketArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoBasket(from any: Any?) -> DAOBasket? {

@@ -9,23 +9,54 @@
 import DNSCore
 import Foundation
 
-open class DAOOrderItem: DAOProduct {
-    // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { DAOAccount.self }
-    open class var orderType: DAOOrder.Type { DAOOrder.self }
-    open class var placeType: DAOPlace.Type { DAOPlace.self }
+public protocol PTCLCFGDAOOrderItem: PTCLCFGBaseObject {
+    var orderItemType: DAOOrderItem.Type { get }
+    func orderItemArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrderItem] where K: CodingKey
+}
 
-    open class func createAccount() -> DAOAccount { accountType.init() }
-    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
+public protocol PTCLCFGOrderItemObject: PTCLCFGDAOAccount, PTCLCFGDAOOrder, PTCLCFGDAOPlace {
+}
+public class CFGOrderItemObject: PTCLCFGOrderItemObject {
+    public var accountType: DAOAccount.Type = DAOAccount.self
+    public var orderType: DAOOrder.Type = DAOOrder.self
+    public var placeType: DAOPlace.Type = DAOPlace.self
+
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func orderArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOOrder].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func placeArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOOrderItem: DAOBaseObject {
+    public typealias Config = PTCLCFGOrderItemObject
+    public static var config: Config = CFGOrderItemObject()
+
+    // MARK: - Class Factory methods -
+    open class func createAccount() -> DAOAccount { config.accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
     
-    open class func createOrder() -> DAOOrder { orderType.init() }
-    open class func createOrder(from object: DAOOrder) -> DAOOrder { orderType.init(from: object) }
-    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { orderType.init(from: data) }
+    open class func createOrder() -> DAOOrder { config.orderType.init() }
+    open class func createOrder(from object: DAOOrder) -> DAOOrder { config.orderType.init(from: object) }
+    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { config.orderType.init(from: data) }
     
-    open class func createPlace() -> DAOPlace { placeType.init() }
-    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
+    open class func createPlace() -> DAOPlace { config.placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -95,21 +126,23 @@ open class DAOOrderItem: DAOProduct {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        quantity = self.int(from: container, forKey: .quantity) ?? quantity
-
-        account = try container.decodeIfPresent(Swift.type(of: account), forKey: .account) ?? account
-        order = try container.decodeIfPresent(Swift.type(of: order), forKey: .order) ?? order
-        place = try container.decodeIfPresent(Swift.type(of: place), forKey: .place) ?? place
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
+        order = self.daoOrder(with: configuration, from: container, forKey: .order) ?? order
+        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
+        quantity = self.int(from: container, forKey: .quantity) ?? quantity
+    }
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(account, forKey: .account)
-        try container.encode(order, forKey: .order)
-        try container.encode(place, forKey: .place)
+        try container.encode(account, forKey: .account, configuration: configuration)
+        try container.encode(order, forKey: .order, configuration: configuration)
+        try container.encode(place, forKey: .place, configuration: configuration)
         try container.encode(quantity, forKey: .quantity)
     }
 

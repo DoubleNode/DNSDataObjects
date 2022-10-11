@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOActivityBlackout: PTCLCFGBaseObject {
+    var activityBlackoutType: DAOActivityBlackout.Type { get }
+    func activityBlackoutArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey
+}
+
+public protocol PTCLCFGActivityBlackoutObject: PTCLCFGBaseObject {
+}
+public class CFGActivityBlackoutObject: PTCLCFGActivityBlackoutObject {
+}
 open class DAOActivityBlackout: DAOBaseObject {
+    public typealias Config = PTCLCFGActivityBlackoutObject
+    public static var config: Config = CFGActivityBlackoutObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -63,15 +76,18 @@ open class DAOActivityBlackout: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.date(from: container, forKey: .endTime) ?? endTime
         message = self.dnsstring(from: container, forKey: .message) ?? message
         startTime = self.date(from: container, forKey: .startTime) ?? startTime
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(message, forKey: .message)

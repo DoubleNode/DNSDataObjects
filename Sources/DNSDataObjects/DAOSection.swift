@@ -9,25 +9,62 @@
 import DNSCore
 import UIKit
 
+public protocol PTCLCFGDAOSection: PTCLCFGBaseObject {
+    var sectionType: DAOSection.Type { get }
+    func sectionArray<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey
+}
+public protocol PTCLCFGDAOSectionSection: PTCLCFGBaseObject {
+    var sectionChildType: DAOSection.Type { get }
+    var sectionParentType: DAOSection.Type { get }
+    func sectionChildArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey
+    func sectionParentArray<K>(from container: KeyedDecodingContainer<K>,
+                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey
+}
+
+public protocol PTCLCFGSectionObject: PTCLCFGDAOPlace, PTCLCFGDAOSectionSection {
+}
+public class CFGSectionObject: PTCLCFGSectionObject {
+    public var placeType: DAOPlace.Type = DAOPlace.self
+    public var sectionChildType: DAOSection.Type = DAOSection.self
+    public var sectionParentType: DAOSection.Type = DAOSection.self
+
+    open func placeArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func sectionChildArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSection].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func sectionParentArray<K>(from container: KeyedDecodingContainer<K>,
+                                    forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSection].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOSection: DAOBaseObject {
+    public typealias Config = PTCLCFGSectionObject
+    public static var config: Config = CFGSectionObject()
+
     // MARK: - Class Factory methods -
-    open class var placeType: DAOPlace.Type { DAOPlace.self }
-    open class var placeArrayType: [DAOPlace].Type { [DAOPlace].self }
-    open class var sectionChildType: DAOSection.Type { DAOSection.self }
-    open class var sectionChildArrayType: [DAOSection].Type { [DAOSection].self }
-    open class var sectionParentType: DAOSection.Type { DAOSection.self }
+    open class func createPlace() -> DAOPlace { config.placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
 
-    open class func createPlace() -> DAOPlace { placeType.init() }
-    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
+    open class func createSectionChild() -> DAOSection { config.sectionChildType.init() }
+    open class func createSectionChild(from object: DAOSection) -> DAOSection { config.sectionChildType.init(from: object) }
+    open class func createSectionChild(from data: DNSDataDictionary) -> DAOSection? { config.sectionChildType.init(from: data) }
 
-    open class func createSectionChild() -> DAOSection { sectionChildType.init() }
-    open class func createSectionChild(from object: DAOSection) -> DAOSection { sectionChildType.init(from: object) }
-    open class func createSectionChild(from data: DNSDataDictionary) -> DAOSection? { sectionChildType.init(from: data) }
-
-    open class func createSectionParent() -> DAOSection { sectionParentType.init() }
-    open class func createSectionParent(from object: DAOSection) -> DAOSection { sectionParentType.init(from: object) }
-    open class func createSectionParent(from data: DNSDataDictionary) -> DAOSection? { sectionParentType.init(from: data) }
+    open class func createSectionParent() -> DAOSection { config.sectionParentType.init() }
+    open class func createSectionParent(from object: DAOSection) -> DAOSection { config.sectionParentType.init(from: object) }
+    open class func createSectionParent(from data: DNSDataDictionary) -> DAOSection? { config.sectionParentType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -91,21 +128,24 @@ open class DAOSection: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = self.dnsstring(from: container, forKey: .name) ?? name
-        children = self.daoSectionArray(of: Self.sectionChildArrayType, from: container, forKey: .children)
-        parent = self.daoSection(of: Self.sectionParentType, from: container, forKey: .parent) ?? parent
-        places = self.daoPlaceArray(of: Self.placeArrayType, from: container, forKey: .places)
+        children = self.daoSectionChildArray(with: configuration, from: container, forKey: .children)
+        parent = self.daoSectionParent(with: configuration, from: container, forKey: .parent) ?? parent
+        places = self.daoPlaceArray(with: configuration, from: container, forKey: .places)
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(children, forKey: .children)
+        try container.encode(children, forKey: .children, configuration: configuration)
         try container.encode(name, forKey: .name)
-        try container.encode(parent, forKey: .parent)
-        try container.encode(places, forKey: .places)
+        try container.encode(parent, forKey: .parent, configuration: configuration)
+        try container.encode(places, forKey: .places, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

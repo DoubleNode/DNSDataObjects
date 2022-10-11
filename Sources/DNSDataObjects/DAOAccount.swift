@@ -10,20 +10,41 @@ import DNSCore
 import Foundation
 import KeyedCodable
 
+public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
+    var accountType: DAOAccount.Type { get }
+    func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey
+}
+
+public protocol PTCLCFGAccountObject: PTCLCFGDAOCard, PTCLCFGDAOUser {
+}
+public class CFGAccountObject: PTCLCFGAccountObject {
+    public var cardType: DAOCard.Type = DAOCard.self
+    public var userType: DAOUser.Type = DAOUser.self
+
+    open func cardArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOCard].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func userArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOUser].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOAccount: DAOBaseObject {
+    public typealias Config = PTCLCFGAccountObject
+    public static var config: Config = CFGAccountObject()
+
     // MARK: - Class Factory methods -
-    open class var cardType: DAOCard.Type { DAOCard.self }
-    open class var cardArrayType: [DAOCard].Type { [DAOCard].self }
-    open class var userType: DAOUser.Type { DAOUser.self }
-    open class var userArrayType: [DAOUser].Type { [DAOUser].self }
+    open class func createCard() -> DAOCard { config.cardType.init() }
+    open class func createCard(from object: DAOCard) -> DAOCard { config.cardType.init(from: object) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { config.cardType.init(from: data) }
 
-    open class func createCard() -> DAOCard { cardType.init() }
-    open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
-    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { cardType.init(from: data) }
-
-    open class func createUser() -> DAOUser { userType.init() }
-    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
+    open class func createUser() -> DAOUser { config.userType.init() }
+    open class func createUser(from object: DAOUser) -> DAOUser { config.userType.init(from: object) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { config.userType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -37,12 +58,37 @@ open class DAOAccount: DAOBaseObject {
     open var name = PersonNameComponents()
     open var pushNotifications = false
     open var users: [DAOUser] = []
+//    @CodableConfiguration(from: accountConfig.userType) open var users: [DAOUser] = []
 
     // name formatted output
-    public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
-    public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
-    public var nameLong: String { self.name.dnsFormatName(style: .long) }
-    public var nameShort: String { self.name.dnsFormatName(style: .short) }
+    public var nameAbbreviated: String {
+        if #available(iOS 15.0, *) {
+            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.abbreviated)
+        } else {
+            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.abbreviated)
+        }
+    }
+    public var nameMedium: String {
+        if #available(iOS 15.0, *) {
+            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.medium)
+        } else {
+            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.medium)
+        }
+    }
+    public var nameLong: String {
+        if #available(iOS 15.0, *) {
+            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.long)
+        } else {
+            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.long)
+        }
+    }
+    public var nameShort: String {
+        if #available(iOS 15.0, *) {
+            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.short)
+        } else {
+            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.short)
+        }
+    }
 
     // MARK: - Initializers -
     required public init() {
@@ -107,25 +153,28 @@ open class DAOAccount: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        cards = self.daoCardArray(of: Self.cardArrayType, from: container, forKey: .cards)
+        cards = self.daoCardArray(with: configuration, from: container, forKey: .cards)
         dob = self.date(from: container, forKey: .dob) ?? dob
         emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
         name = self.personName(from: container, forKey: .name) ?? name
         pushNotifications = self.bool(from: container, forKey: .pushNotifications) ?? pushNotifications
-        users = self.daoUserArray(of: Self.userArrayType, from: container, forKey: .users)
+        users = self.daoUserArray(with: configuration, from: container, forKey: .users)
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(cards, forKey: .cards)
+        try container.encode(cards, forKey: .cards, configuration: configuration)
         try container.encode(dob, forKey: .dob)
         try container.encode(emailNotifications, forKey: .emailNotifications)
         try container.encode(name, forKey: .name)
         try container.encode(pushNotifications, forKey: .pushNotifications)
-        try container.encode(users, forKey: .users)
+        try container.encode(users, forKey: .users, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

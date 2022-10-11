@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAONotification: PTCLCFGBaseObject {
+    var notificationType: DAONotification.Type { get }
+    func notificationArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAONotification] where K: CodingKey
+}
+
+public protocol PTCLCFGNotificationObject: PTCLCFGBaseObject {
+}
+public class CFGNotificationObject: PTCLCFGNotificationObject {
+}
 open class DAONotification: DAOBaseObject {
+    public typealias Config = PTCLCFGNotificationObject
+    public static var config: Config = CFGNotificationObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -72,8 +85,11 @@ open class DAONotification: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = self.dnsstring(from: container, forKey: .body) ?? body
         deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
@@ -81,8 +97,8 @@ open class DAONotification: DAOBaseObject {
 
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
         try container.encode(deepLink, forKey: .deepLink)

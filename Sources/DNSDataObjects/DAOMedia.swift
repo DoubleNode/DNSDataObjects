@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOMedia: PTCLCFGBaseObject {
+    var mediaType: DAOMedia.Type { get }
+    func mediaArray<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey
+}
+
+public protocol PTCLCFGMediaObject: PTCLCFGBaseObject {
+}
+public class CFGMediaObject: PTCLCFGMediaObject {
+}
 open class DAOMedia: DAOBaseObject {
+    public typealias Config = PTCLCFGMediaObject
+    public static var config: Config = CFGMediaObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -68,16 +81,19 @@ open class DAOMedia: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         url = self.dnsurl(from: container, forKey: .url) ?? url
         preloadUrl = self.dnsurl(from: container, forKey: .preloadUrl) ?? preloadUrl
 
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(url, forKey: .url)

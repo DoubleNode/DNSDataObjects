@@ -10,17 +10,17 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoPlaceHoliday<K>(of objectType: DAOPlaceHoliday.Type,
-                          from container: KeyedDecodingContainer<K>,
-                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHoliday? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+    func daoPlaceHoliday<K>(with configuration: PTCLCFGDAOPlaceHoliday,
+                            from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHoliday? where K: CodingKey {
+        do { return try container.decodeIfPresent(configuration.placeHolidayType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoPlaceHolidayArray<K>(of arrayType: [DAOPlaceHoliday].Type,
-                               from container: KeyedDecodingContainer<K>,
-                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHoliday] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+    func daoPlaceHolidayArray<K>(with configuration: PTCLCFGDAOPlaceHoliday,
+                                 from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHoliday] where K: CodingKey {
+        return configuration.placeHolidayArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoPlaceHoliday(from any: Any?) -> DAOPlaceHoliday? {

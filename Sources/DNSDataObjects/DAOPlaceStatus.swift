@@ -9,7 +9,20 @@
 import DNSCore
 import UIKit
 
+public protocol PTCLCFGDAOPlaceStatus: PTCLCFGBaseObject {
+    var placeStatusType: DAOPlaceStatus.Type { get }
+    func placeStatusArray<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceStatus] where K: CodingKey
+}
+
+public protocol PTCLCFGPlaceStatusObject: PTCLCFGBaseObject {
+}
+public class CFGPlaceStatusObject: PTCLCFGPlaceStatusObject {
+}
 open class DAOPlaceStatus: DAOBaseObject {
+    public typealias Config = PTCLCFGPlaceStatusObject
+    public static var config: Config = CFGPlaceStatusObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -79,8 +92,11 @@ open class DAOPlaceStatus: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.date(from: container, forKey: .endTime) ?? endTime
         message = self.dnsstring(from: container, forKey: .message) ?? message
@@ -89,8 +105,8 @@ open class DAOPlaceStatus: DAOBaseObject {
         scope = try container.decodeIfPresent(Swift.type(of: scope), forKey: .scope) ?? scope
         status = try container.decodeIfPresent(Swift.type(of: status), forKey: .status) ?? status
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(message, forKey: .message)

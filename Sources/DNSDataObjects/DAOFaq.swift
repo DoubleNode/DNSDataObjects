@@ -9,13 +9,31 @@
 import DNSCore
 import Foundation
 
-open class DAOFaq: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var sectionType: DAOFaqSection.Type { DAOFaqSection.self }
+public protocol PTCLCFGDAOFaq: PTCLCFGBaseObject {
+    var faqType: DAOFaq.Type { get }
+    func faqArray<K>(from container: KeyedDecodingContainer<K>,
+                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaq] where K: CodingKey
+}
 
-    open class func createSection() -> DAOFaqSection { sectionType.init() }
-    open class func createSection(from object: DAOFaqSection) -> DAOFaqSection { sectionType.init(from: object) }
-    open class func createSection(from data: DNSDataDictionary) -> DAOFaqSection? { sectionType.init(from: data) }
+public protocol PTCLCFGFaqObject: PTCLCFGDAOFaqSection {
+}
+public class CFGFaqObject: PTCLCFGFaqObject {
+    public var faqSectionType: DAOFaqSection.Type = DAOFaqSection.self
+    open func faqSectionArray<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaqSection] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOFaqSection].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOFaq: DAOBaseObject {
+    public typealias Config = PTCLCFGFaqObject
+    public static var config: Config = CFGFaqObject()
+
+    // MARK: - Class Factory methods -
+    open class func createSection() -> DAOFaqSection { config.faqSectionType.init() }
+    open class func createSection(from object: DAOFaqSection) -> DAOFaqSection { config.faqSectionType.init(from: object) }
+    open class func createSection(from data: DNSDataDictionary) -> DAOFaqSection? { config.faqSectionType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -85,19 +103,21 @@ open class DAOFaq: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
         section = Self.createSection()
-        try super.init(from: decoder)
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         question = self.dnsstring(from: container, forKey: .question) ?? question
         answer = self.dnsstring(from: container, forKey: .answer) ?? answer
-
-        section = try container.decodeIfPresent(Swift.type(of: section), forKey: .section) ?? section
+        section = self.daoFaqSection(with: configuration, from: container, forKey: .section) ?? section
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(section, forKey: .section)
+        try container.encode(section, forKey: .section, configuration: configuration)
         try container.encode(question, forKey: .question)
         try container.encode(answer, forKey: .answer)
     }

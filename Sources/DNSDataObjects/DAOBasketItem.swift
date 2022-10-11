@@ -9,23 +9,51 @@
 import DNSCore
 import Foundation
 
-open class DAOBasketItem: DAOProduct {
-    // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { DAOAccount.self }
-    open class var basketType: DAOBasket.Type { DAOBasket.self }
-    open class var placeType: DAOPlace.Type { DAOPlace.self }
+public protocol PTCLCFGDAOBasketItem: PTCLCFGBaseObject {
+    var basketItemType: DAOBasketItem.Type { get }
+    func basketItemArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasketItem] where K: CodingKey
+}
 
-    open class func createAccount() -> DAOAccount { accountType.init() }
-    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
+public protocol PTCLCFGBasketItemObject: PTCLCFGDAOAccount, PTCLCFGDAOBasket, PTCLCFGDAOPlace {
+}
+public class CFGBasketItemObject: PTCLCFGBasketItemObject {
+    public var accountType: DAOAccount.Type = DAOAccount.self
+    public var basketType: DAOBasket.Type = DAOBasket.self
+    public var placeType: DAOPlace.Type = DAOPlace.self
+
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func basketArray<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasket] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOBasket].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func placeArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOBasketItem: DAOBaseObject {
+    public typealias Config = PTCLCFGBasketItemObject
+    public static var config: Config = CFGBasketItemObject()
+
+    // MARK: - Class Factory methods -
+    open class func createAccount() -> DAOAccount { config.accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
     
-    open class func createBasket() -> DAOBasket { basketType.init() }
-    open class func createBasket(from object: DAOBasket) -> DAOBasket { basketType.init(from: object) }
-    open class func createBasket(from data: DNSDataDictionary) -> DAOBasket? { basketType.init(from: data) }
+    open class func createBasket() -> DAOBasket { config.basketType.init() }
+    open class func createBasket(from object: DAOBasket) -> DAOBasket { config.basketType.init(from: object) }
+    open class func createBasket(from data: DNSDataDictionary) -> DAOBasket? { config.basketType.init(from: data) }
     
-    open class func createPlace() -> DAOPlace { placeType.init() }
-    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
+    open class func createPlace() -> DAOPlace { config.placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -92,20 +120,23 @@ open class DAOBasketItem: DAOProduct {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(of: Self.accountType, from: container, forKey: .account) ?? account
-        basket = self.daoBasket(of: Self.basketType, from: container, forKey: .basket) ?? basket
-        place = self.daoPlace(of: Self.placeType, from: container, forKey: .place) ?? place
+        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
+        basket = self.daoBasket(with: configuration, from: container, forKey: .basket) ?? basket
+        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
         quantity = self.int(from: container, forKey: .quantity) ?? quantity
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(account, forKey: .account)
-        try container.encode(basket, forKey: .basket)
-        try container.encode(place, forKey: .place)
+        try container.encode(account, forKey: .account, configuration: configuration)
+        try container.encode(basket, forKey: .basket, configuration: configuration)
+        try container.encode(place, forKey: .place, configuration: configuration)
         try container.encode(quantity, forKey: .quantity)
     }
 

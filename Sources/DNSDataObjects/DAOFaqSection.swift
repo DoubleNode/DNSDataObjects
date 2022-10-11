@@ -9,14 +9,31 @@
 import DNSCore
 import Foundation
 
-open class DAOFaqSection: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var faqType: DAOFaq.Type { DAOFaq.self }
-    open class var faqArrayType: [DAOFaq].Type { [DAOFaq].self }
+public protocol PTCLCFGDAOFaqSection: PTCLCFGBaseObject {
+    var faqSectionType: DAOFaqSection.Type { get }
+    func faqSectionArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaqSection] where K: CodingKey
+}
 
-    open class func createFaq() -> DAOFaq { faqType.init() }
-    open class func createFaq(from object: DAOFaq) -> DAOFaq { faqType.init(from: object) }
-    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq? { faqType.init(from: data) }
+public protocol PTCLCFGFaqSectionObject: PTCLCFGDAOFaq {
+}
+public class CFGFaqSectionObject: PTCLCFGFaqSectionObject {
+    public var faqType: DAOFaq.Type = DAOFaq.self
+    open func faqArray<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaq] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOFaq].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOFaqSection: DAOBaseObject {
+    public typealias Config = PTCLCFGFaqSectionObject
+    public static var config: Config = CFGFaqSectionObject()
+
+    // MARK: - Class Factory methods -
+    open class func createFaq() -> DAOFaq { config.faqType.init() }
+    open class func createFaq(from object: DAOFaq) -> DAOFaq { config.faqType.init(from: object) }
+    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq? { config.faqType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -84,19 +101,22 @@ open class DAOFaqSection: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         code = self.string(from: container, forKey: .code) ?? code
-        faqs = self.daoFaqArray(of: Self.faqArrayType, from: container, forKey: .faqs)
+        faqs = self.daoFaqArray(with: configuration, from: container, forKey: .faqs)
         icon = self.string(from: container, forKey: .icon) ?? icon
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(code, forKey: .code)
-        try container.encode(faqs, forKey: .faqs)
+        try container.encode(faqs, forKey: .faqs, configuration: configuration)
         try container.encode(icon, forKey: .icon)
         try container.encode(title, forKey: .title)
     }

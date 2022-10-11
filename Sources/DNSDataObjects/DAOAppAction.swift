@@ -9,25 +9,48 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOAppAction: PTCLCFGBaseObject {
+    var appActionType: DAOAppAction.Type { get }
+    func appActionArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppAction] where K: CodingKey
+}
+
+public protocol PTCLCFGAppActionObject: PTCLCFGDAOAppActionImages, PTCLCFGDAOAppActionStrings {
+}
+public class CFGAppActionObject: PTCLCFGAppActionObject {
+    public var appActionImagesType: DAOAppActionImages.Type = DAOAppActionImages.self
+    public var appActionStringsType: DAOAppActionStrings.Type = DAOAppActionStrings.self
+
+    open func appActionImagesArray<K>(from container: KeyedDecodingContainer<K>,
+                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionImages] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAppActionImages].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func appActionStringsArray<K>(from container: KeyedDecodingContainer<K>,
+                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAppActionStrings].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOAppAction: DAOBaseObject {
+    public typealias Config = PTCLCFGAppActionObject
+    public static var config: Config = CFGAppActionObject()
+
     // MARK: - Class Factory methods -
-    open class var imagesType: DAOAppActionImages.Type { DAOAppActionImages.self }
-    open class var stringsType: DAOAppActionStrings.Type { DAOAppActionStrings.self }
+    open class func createImages() -> DAOAppActionImages { config.appActionImagesType.init() }
+    open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { config.appActionImagesType.init(from: object) }
+    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages? { config.appActionImagesType.init(from: data) }
 
-    open class func createImages() -> DAOAppActionImages { imagesType.init() }
-    open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { imagesType.init(from: object) }
-    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages? { imagesType.init(from: data) }
-
-    open class func createStrings() -> DAOAppActionStrings { stringsType.init() }
-    open class func createStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { stringsType.init(from: object) }
-    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { stringsType.init(from: data) }
+    open class func createStrings() -> DAOAppActionStrings { config.appActionStringsType.init() }
+    open class func createStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { config.appActionStringsType.init(from: object) }
+    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { config.appActionStringsType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case actionType, deepLink
-        case imagesSection = "images"
-        case stringsSection = "strings"
+        case actionType, deepLink, images, strings
     }
 
     open var actionType: DNSAppActionType = .popup
@@ -77,11 +100,11 @@ open class DAOAppAction: DAOBaseObject {
         self.actionType = DNSAppActionType(rawValue: typeString) ?? .popup
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
-        let imagesSection = self.dictionary(from: data[field(.imagesSection)] as Any?)
-        self.images = Self.createImages(from: imagesSection) ?? self.images
+        let imagesData = self.dictionary(from: data[field(.images)] as Any?)
+        self.images = Self.createImages(from: imagesData) ?? self.images
         // strings section
-        let stringsSection = self.dictionary(from: data[field(.stringsSection)] as Any?)
-        self.strings = Self.createStrings(from: stringsSection) ?? self.strings
+        let stringsData = self.dictionary(from: data[field(.strings)] as Any?)
+        self.strings = Self.createStrings(from: stringsData) ?? self.strings
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -89,31 +112,34 @@ open class DAOAppAction: DAOBaseObject {
         retval.merge([
             field(.actionType): self.actionType,
             field(.deepLink): self.deepLink,
-            field(.imagesSection): self.images.asDictionary,
-            field(.stringsSection): self.strings.asDictionary,
+            field(.images): self.images.asDictionary,
+            field(.strings): self.strings.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
         images = Self.createImages()
         strings = Self.createStrings()
-        try super.init(from: decoder)
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
-
         actionType = try container.decodeIfPresent(Swift.type(of: actionType), forKey: .actionType) ?? actionType
-        images = try container.decodeIfPresent(Swift.type(of: images), forKey: .imagesSection) ?? images
-        strings = try container.decodeIfPresent(Swift.type(of: strings), forKey: .stringsSection) ?? strings
+        deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
+        images = self.daoAppActionImages(with: configuration, from: container, forKey: .images) ?? images
+        strings = self.daoAppActionStrings(with: configuration, from: container, forKey: .strings) ?? strings
+
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(actionType, forKey: .actionType)
         try container.encode(deepLink, forKey: .deepLink)
-        try container.encode(images, forKey: .imagesSection)
-        try container.encode(strings, forKey: .stringsSection)
+        try container.encode(images, forKey: .images, configuration: configuration)
+        try container.encode(strings, forKey: .strings, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

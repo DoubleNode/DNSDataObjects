@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOAlert: PTCLCFGBaseObject {
+    var alertType: DAOAlert.Type { get }
+    func alertArray<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey
+}
+
+public protocol PTCLCFGAlertObject: PTCLCFGBaseObject {
+}
+public class CFGAlertObject: PTCLCFGAlertObject {
+}
 open class DAOAlert: DAOBaseObject {
+    public typealias Config = PTCLCFGAlertObject
+    public static var config: Config = CFGAlertObject()
+
     public enum C {
         public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
         public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
@@ -115,8 +128,11 @@ open class DAOAlert: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.date(from: container, forKey: .endTime) ?? endTime
         imageUrl = self.dnsurl(from: container, forKey: .imageUrl) ?? imageUrl
@@ -129,8 +145,8 @@ open class DAOAlert: DAOBaseObject {
         scope = try container.decodeIfPresent(Swift.type(of: scope), forKey: .scope) ?? scope
         status = try container.decodeIfPresent(Swift.type(of: status), forKey: .status) ?? status
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(imageUrl, forKey: .imageUrl)

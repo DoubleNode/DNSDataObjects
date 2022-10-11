@@ -9,14 +9,30 @@
 import DNSCore
 import Foundation
 
-open class DAOCard: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var transactionType: DAOTransaction.Type { DAOTransaction.self }
-    open class var transactionArrayType: [DAOTransaction].Type { [DAOTransaction].self }
+public protocol PTCLCFGDAOCard: PTCLCFGBaseObject {
+    var cardType: DAOCard.Type { get }
+    func cardArray<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey
+}
 
-    open class func createTransaction() -> DAOTransaction { transactionType.init() }
-    open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { transactionType.init(from: object) }
-    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction? { transactionType.init(from: data) }
+public protocol PTCLCFGCardObject: PTCLCFGDAOTransaction {
+}
+public class CFGCardObject: PTCLCFGCardObject {
+    public var transactionType: DAOTransaction.Type = DAOTransaction.self
+    open func transactionArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOTransaction].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOCard: DAOBaseObject {
+    public typealias Config = PTCLCFGCardObject
+    public static var config: Config = CFGCardObject()
+
+    // MARK: - Class Factory methods -
+    open class func createTransaction() -> DAOTransaction { config.transactionType.init() }
+    open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { config.transactionType.init(from: object) }
+    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction? { config.transactionType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -88,23 +104,26 @@ open class DAOCard: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         cardNumber = self.string(from: container, forKey: .cardNumber) ?? cardNumber
         expiration = self.date(from: container, forKey: .expiration) ?? expiration
         nickname = self.string(from: container, forKey: .nickname) ?? nickname
         pinNumber = self.string(from: container, forKey: .pinNumber) ?? pinNumber
-        transactions = self.daoTransactionArray(of: Self.transactionArrayType, from: container, forKey: .transactions)
+        transactions = self.daoTransactionArray(with: configuration, from: container, forKey: .transactions)
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(cardNumber, forKey: .cardNumber)
         try container.encode(expiration, forKey: .expiration)
         try container.encode(nickname, forKey: .nickname)
         try container.encode(pinNumber, forKey: .pinNumber)
-        try container.encode(transactions, forKey: .transactions)
+        try container.encode(transactions, forKey: .transactions, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

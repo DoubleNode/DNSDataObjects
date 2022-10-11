@@ -9,29 +9,65 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOOrder: PTCLCFGBaseObject {
+    var orderType: DAOOrder.Type { get }
+    func orderArray<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey
+}
+
+public protocol PTCLCFGOrderObject: PTCLCFGDAOAccount, PTCLCFGDAOOrderItem, PTCLCFGDAOPlace, PTCLCFGDAOTransaction {
+}
+public class CFGOrderObject: PTCLCFGOrderObject {
+    public var accountType: DAOAccount.Type = DAOAccount.self
+    public var orderItemType: DAOOrderItem.Type = DAOOrderItem.self
+    public var placeType: DAOPlace.Type = DAOPlace.self
+    public var transactionType: DAOTransaction.Type = DAOTransaction.self
+
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func orderItemArray<K>(from container: KeyedDecodingContainer<K>,
+                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrderItem] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOOrderItem].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func placeArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func transactionArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOTransaction].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOOrder: DAOBaseObject {
+    public typealias Config = PTCLCFGOrderObject
+    public static var config: Config = CFGOrderObject()
+
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { DAOAccount.self }
-    open class var orderItemType: DAOOrderItem.Type { DAOOrderItem.self }
-    open class var orderItemArrayType: [DAOOrderItem].Type { [DAOOrderItem].self }
-    open class var placeType: DAOPlace.Type { DAOPlace.self }
-    open class var transactionType: DAOTransaction.Type { DAOTransaction.self }
+    open class func createAccount() -> DAOAccount { config.accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
 
-    open class func createAccount() -> DAOAccount { accountType.init() }
-    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
+    open class func createOrderItem() -> DAOOrderItem { config.orderItemType.init() }
+    open class func createOrderItem(from object: DAOOrderItem) -> DAOOrderItem { config.orderItemType.init(from: object) }
+    open class func createOrderItem(from data: DNSDataDictionary) -> DAOOrderItem? { config.orderItemType.init(from: data) }
 
-    open class func createOrderItem() -> DAOOrderItem { orderItemType.init() }
-    open class func createOrderItem(from object: DAOOrderItem) -> DAOOrderItem { orderItemType.init(from: object) }
-    open class func createOrderItem(from data: DNSDataDictionary) -> DAOOrderItem? { orderItemType.init(from: data) }
-
-    open class func createPlace() -> DAOPlace { placeType.init() }
-    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
+    open class func createPlace() -> DAOPlace { config.placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
     
-    open class func createTransaction() -> DAOTransaction { transactionType.init() }
-    open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { transactionType.init(from: object) }
-    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction? { transactionType.init(from: data) }
+    open class func createTransaction() -> DAOTransaction { config.transactionType.init() }
+    open class func createTransaction(from object: DAOTransaction) -> DAOTransaction { config.transactionType.init(from: object) }
+    open class func createTransaction(from data: DNSDataDictionary) -> DAOTransaction? { config.transactionType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -113,30 +149,33 @@ open class DAOOrder: DAOBaseObject {
    }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(of: Self.accountType, from: container, forKey: .account) ?? account
-        items = self.daoOrderItemArray(of: Self.orderItemArrayType, from: container, forKey: .items)
-        place = self.daoPlace(of: Self.placeType, from: container, forKey: .place) ?? place
+        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
+        items = self.daoOrderItemArray(with: configuration, from: container, forKey: .items)
+        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
         subtotal = self.float(from: container, forKey: .subtotal) ?? subtotal
         tax = self.float(from: container, forKey: .tax) ?? tax
         total = self.float(from: container, forKey: .total) ?? total
-        transaction = self.daoTransaction(of: Self.transactionType, from: container, forKey: .transaction) ?? transaction
+        transaction = self.daoTransaction(with: configuration, from: container, forKey: .transaction) ?? transaction
 
         state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(account, forKey: .account)
-        try container.encode(items, forKey: .items)
-        try container.encode(place, forKey: .place)
+        try container.encode(account, forKey: .account, configuration: configuration)
+        try container.encode(items, forKey: .items, configuration: configuration)
+        try container.encode(place, forKey: .place, configuration: configuration)
         try container.encode(state, forKey: .state)
         try container.encode(subtotal, forKey: .subtotal)
         try container.encode(tax, forKey: .tax)
         try container.encode(total, forKey: .total)
-        try container.encode(transaction, forKey: .transaction)
+        try container.encode(transaction, forKey: .transaction, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

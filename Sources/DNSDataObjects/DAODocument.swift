@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAODocument: PTCLCFGBaseObject {
+    var documentType: DAODocument.Type { get }
+    func documentArray<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAODocument] where K: CodingKey
+}
+
+public protocol PTCLCFGDocumentObject: PTCLCFGBaseObject {
+}
+public class CFGDocumentObject: PTCLCFGDocumentObject {
+}
 open class DAODocument: DAOBaseObject {
+    public typealias Config = PTCLCFGDocumentObject
+    public static var config: Config = CFGDocumentObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -77,15 +90,18 @@ open class DAODocument: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         priority = self.int(from: container, forKey: .priority) ?? priority
         title = self.dnsstring(from: container, forKey: .title) ?? title
         url = self.dnsurl(from: container, forKey: .url) ?? url
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(priority, forKey: .priority)
         try container.encode(title, forKey: .title)

@@ -10,17 +10,17 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoSystemEndPoint<K>(of objectType: DAOSystemEndPoint.Type,
+    func daoSystemEndPoint<K>(with configuration: PTCLCFGDAOSystemEndPoint,
                               from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemEndPoint? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+        do { return try container.decodeIfPresent(configuration.systemEndPointType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoSystemEndPointArray<K>(of arrayType: [DAOSystemEndPoint].Type,
+    func daoSystemEndPointArray<K>(with configuration: PTCLCFGDAOSystemEndPoint,
                                    from container: KeyedDecodingContainer<K>,
                                    forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemEndPoint] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+        return configuration.systemEndPointArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoSystemEndPoint(from any: Any?) -> DAOSystemEndPoint? {

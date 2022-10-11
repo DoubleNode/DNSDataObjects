@@ -9,7 +9,17 @@
 import DNSCore
 import Foundation
 
-open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
+public protocol PTCLCFGDAOBaseObject {
+}
+
+public protocol PTCLCFGBaseObject: PTCLCFGDAOBaseObject {
+}
+public class CFGBaseObject: PTCLCFGBaseObject {
+}
+open class DAOBaseObject: DNSDataTranslation, CodableWithConfiguration, NSCopying {
+    public typealias Config = PTCLCFGBaseObject
+    public static var baseConfig: Config = CFGBaseObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -60,14 +70,13 @@ open class DAOBaseObject: DNSDataTranslation, Codable, NSCopying {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder, configuration: Config) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = self.string(from: container, forKey: .id) ?? id
-
         meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: Encoder, configuration: Config) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(meta, forKey: .meta)

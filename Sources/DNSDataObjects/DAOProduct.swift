@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOProduct: PTCLCFGBaseObject {
+    var productType: DAOProduct.Type { get }
+    func productArray<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOProduct] where K: CodingKey
+}
+
+public protocol PTCLCFGProductObject: PTCLCFGBaseObject {
+}
+public class CFGProductObject: PTCLCFGProductObject {
+}
 open class DAOProduct: DAOBaseObject {
+    public typealias Config = PTCLCFGProductObject
+    public static var config: Config = CFGProductObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -67,16 +80,19 @@ open class DAOProduct: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         about = self.dnsstring(from: container, forKey: .about) ?? about
         price = self.float(from: container, forKey: .price) ?? price
         sku = self.string(from: container, forKey: .sku) ?? sku
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(about, forKey: .about)
         try container.encode(price, forKey: .price)

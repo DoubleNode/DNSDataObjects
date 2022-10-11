@@ -9,18 +9,43 @@
 import DNSCore
 import Foundation
 
-open class DAOTransaction: DAOBaseObject {
-    // MARK: - Class Factory methods -
-    open class var cardType: DAOCard.Type { DAOCard.self }
-    open class var orderType: DAOOrder.Type { DAOOrder.self }
+public protocol PTCLCFGDAOTransaction: PTCLCFGBaseObject {
+    var transactionType: DAOTransaction.Type { get }
+    func transactionArray<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey
+}
 
-    open class func createCard() -> DAOCard { cardType.init() }
-    open class func createCard(from object: DAOCard) -> DAOCard { cardType.init(from: object) }
-    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { cardType.init(from: data) }
+public protocol PTCLCFGTransactionObject: PTCLCFGDAOCard, PTCLCFGDAOOrder {
+}
+public class CFGTransactionObject: PTCLCFGTransactionObject {
+    public var cardType: DAOCard.Type = DAOCard.self
+    public var orderType: DAOOrder.Type = DAOOrder.self
+
+    open func cardArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOCard].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func orderArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOOrder].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class DAOTransaction: DAOBaseObject {
+    public typealias Config = PTCLCFGTransactionObject
+    public static var config: Config = CFGTransactionObject()
+
+    // MARK: - Class Factory methods -
+    open class func createCard() -> DAOCard { config.cardType.init() }
+    open class func createCard(from object: DAOCard) -> DAOCard { config.cardType.init(from: object) }
+    open class func createCard(from data: DNSDataDictionary) -> DAOCard? { config.cardType.init(from: data) }
     
-    open class func createOrder() -> DAOOrder { orderType.init() }
-    open class func createOrder(from object: DAOOrder) -> DAOOrder { orderType.init(from: object) }
-    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { orderType.init(from: data) }
+    open class func createOrder() -> DAOOrder { config.orderType.init() }
+    open class func createOrder(from object: DAOOrder) -> DAOOrder { config.orderType.init(from: object) }
+    open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { config.orderType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -95,24 +120,27 @@ open class DAOTransaction: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         amount = self.float(from: container, forKey: .amount) ?? amount
-        card = self.daoCard(of: Self.cardType, from: container, forKey: .card) ?? card
+        card = self.daoCard(with: configuration, from: container, forKey: .card) ?? card
         confirmation = self.string(from: container, forKey: .confirmation) ?? confirmation
-        order = self.daoOrder(of: Self.orderType, from: container, forKey: .order) ?? order
+        order = self.daoOrder(with: configuration, from: container, forKey: .order) ?? order
         tax = self.float(from: container, forKey: .tax) ?? tax
         tip = self.float(from: container, forKey: .tip) ?? tip
         type = self.string(from: container, forKey: .type) ?? type
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(amount, forKey: .amount)
-        try container.encode(card, forKey: .card)
+        try container.encode(card, forKey: .card, configuration: configuration)
         try container.encode(confirmation, forKey: .confirmation)
-        try container.encode(order, forKey: .order)
+        try container.encode(order, forKey: .order, configuration: configuration)
         try container.encode(tax, forKey: .tax)
         try container.encode(tip, forKey: .tip)
         try container.encode(type, forKey: .type)

@@ -9,7 +9,20 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOAppActionStrings: PTCLCFGBaseObject {
+    var appActionStringsType: DAOAppActionStrings.Type { get }
+    func appActionStringsArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey
+}
+
+public protocol PTCLCFGAppActionStringsObject: PTCLCFGBaseObject {
+}
+public class CFGAppActionStringsObject: PTCLCFGAppActionStringsObject {
+}
 open class DAOAppActionStrings: DAOBaseObject {
+    public typealias Config = PTCLCFGAppActionStringsObject
+    public static var config: Config = CFGAppActionStringsObject()
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -78,8 +91,11 @@ open class DAOAppActionStrings: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = self.dnsstring(from: container, forKey: .body) ?? body
         cancelLabel = self.dnsstring(from: container, forKey: .cancelLabel) ?? cancelLabel
@@ -88,8 +104,8 @@ open class DAOAppActionStrings: DAOBaseObject {
         subTitle = self.dnsstring(from: container, forKey: .subTitle) ?? subTitle
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
         try container.encode(cancelLabel, forKey: .cancelLabel)

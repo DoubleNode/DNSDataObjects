@@ -10,17 +10,17 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoAppEvent<K>(of objectType: DAOAppEvent.Type,
+    func daoAppEvent<K>(with configuration: PTCLCFGDAOAppEvent,
                         from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppEvent? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+        do { return try container.decodeIfPresent(configuration.appEventType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoAppEventArray<K>(of arrayType: [DAOAppEvent].Type,
+    func daoAppEventArray<K>(with configuration: PTCLCFGDAOAppEvent,
                              from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppEvent] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+        return configuration.appEventArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoAppEvent(from any: Any?) -> DAOAppEvent? {

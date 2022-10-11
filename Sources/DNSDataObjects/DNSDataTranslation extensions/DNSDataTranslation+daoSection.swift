@@ -10,17 +10,41 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoSection<K>(of objectType: DAOSection.Type,
+    func daoSection<K>(with configuration: PTCLCFGDAOSection,
                        from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+        do { return try container.decodeIfPresent(configuration.sectionType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoSectionArray<K>(of arrayType: [DAOSection].Type,
+    func daoSectionChild<K>(with configuration: PTCLCFGDAOSectionSection,
+                            from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
+        do { return try container.decodeIfPresent(configuration.sectionChildType, forKey: key,
+                                                  configuration: configuration) } catch { }
+        return nil
+    }
+    func daoSectionParent<K>(with configuration: PTCLCFGDAOSectionSection,
+                             from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
+        do { return try container.decodeIfPresent(configuration.sectionParentType, forKey: key,
+                                                  configuration: configuration) } catch { }
+        return nil
+    }
+    func daoSectionArray<K>(with configuration: PTCLCFGDAOSection,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+        return configuration.sectionArray(from: container, forKey: key)
+    }
+    func daoSectionChildArray<K>(with configuration: PTCLCFGDAOSectionSection,
+                                 from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
+        return configuration.sectionChildArray(from: container, forKey: key)
+    }
+    func daoSectionParentArray<K>(with configuration: PTCLCFGDAOSectionSection,
+                                  from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
+        return configuration.sectionParentArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoSection(from any: Any?) -> DAOSection? {

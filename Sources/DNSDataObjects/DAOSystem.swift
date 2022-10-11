@@ -9,20 +9,43 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOSystem: PTCLCFGBaseObject {
+    var systemType: DAOSystem.Type { get }
+    func systemArray<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystem] where K: CodingKey
+}
+
+public protocol PTCLCFGSystemObject: PTCLCFGDAOSystemEndPoint, PTCLCFGDAOSystemState {
+}
+public class CFGSystemObject: PTCLCFGSystemObject {
+    public var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
+    public var systemStateType: DAOSystemState.Type = DAOSystemState.self
+
+    open func systemEndPointArray<K>(from container: KeyedDecodingContainer<K>,
+                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemEndPoint] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func systemStateArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemState] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSystemState].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOSystem: DAOBaseObject {
+    public typealias Config = PTCLCFGSystemObject
+    public static var config: Config = CFGSystemObject()
+
     // MARK: - Class Factory methods -
-    open class var systemEndPointType: DAOSystemEndPoint.Type { DAOSystemEndPoint.self }
-    open class var systemEndPointArrayType: [DAOSystemEndPoint].Type { [DAOSystemEndPoint].self }
-    open class var systemStateType: DAOSystemState.Type { DAOSystemState.self }
-    open class var systemStateArrayType: [DAOSystemState].Type { [DAOSystemState].self }
+    open class func createSystemEndPoint() -> DAOSystemEndPoint { config.systemEndPointType.init() }
+    open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { config.systemEndPointType.init(from: object) }
+    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { config.systemEndPointType.init(from: data) }
 
-    open class func createSystemEndPoint() -> DAOSystemEndPoint { systemEndPointType.init() }
-    open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { systemEndPointType.init(from: object) }
-    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { systemEndPointType.init(from: data) }
-
-    open class func createSystemState() -> DAOSystemState { systemStateType.init() }
-    open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { systemStateType.init(from: object) }
-    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { systemStateType.init(from: data) }
+    open class func createSystemState() -> DAOSystemState { config.systemStateType.init() }
+    open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { config.systemStateType.init(from: object) }
+    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { config.systemStateType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -93,22 +116,25 @@ open class DAOSystem: DAOBaseObject {
         return retval
     }
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
         currentState = Self.createSystemState()
-        try super.init(from: decoder)
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = self.daoSystemState(of: Self.systemStateType, from: container, forKey: .currentState) ?? currentState
-        endPoints = self.daoSystemEndPointArray(of: Self.systemEndPointArrayType, from: container, forKey: .endPoints)
-        historyState = self.daoSystemStateArray(of: Self.systemStateArrayType, from: container, forKey: .historyState)
+        currentState = self.daoSystemState(with: configuration, from: container, forKey: .currentState) ?? currentState
+        endPoints = self.daoSystemEndPointArray(with: configuration, from: container, forKey: .endPoints)
+        historyState = self.daoSystemStateArray(with: configuration, from: container, forKey: .historyState)
         message = self.dnsstring(from: container, forKey: .message) ?? message
         name = self.dnsstring(from: container, forKey: .name) ?? name
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(currentState, forKey: .currentState)
-        try container.encode(endPoints, forKey: .endPoints)
-        try container.encode(historyState, forKey: .historyState)
+        try container.encode(currentState, forKey: .currentState, configuration: configuration)
+        try container.encode(endPoints, forKey: .endPoints, configuration: configuration)
+        try container.encode(historyState, forKey: .historyState, configuration: configuration)
         try container.encode(message, forKey: .message)
         try container.encode(name, forKey: .name)
     }

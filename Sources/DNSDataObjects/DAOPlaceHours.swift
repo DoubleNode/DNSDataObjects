@@ -9,20 +9,43 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOPlaceHours: PTCLCFGBaseObject {
+    var placeHoursType: DAOPlaceHours.Type { get }
+    func placeHoursArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHours] where K: CodingKey
+}
+
+public protocol PTCLCFGPlaceHoursObject: PTCLCFGDAOPlaceEvent, PTCLCFGDAOPlaceHoliday {
+}
+public class CFGPlaceHoursObject: PTCLCFGPlaceHoursObject {
+    public var placeEventType: DAOPlaceEvent.Type = DAOPlaceEvent.self
+    public var placeHolidayType: DAOPlaceHoliday.Type = DAOPlaceHoliday.self
+
+    open func placeEventArray<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceEvent] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlaceEvent].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func placeHolidayArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHoliday] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: key,
+                                                  configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOPlaceHours: DAOBaseObject {
+    public typealias Config = PTCLCFGPlaceHoursObject
+    public static var config: Config = CFGPlaceHoursObject()
+
     // MARK: - Class Factory methods -
-    open class var placeEventType: DAOPlaceEvent.Type { DAOPlaceEvent.self }
-    open class var placeEventArrayType: [DAOPlaceEvent].Type { [DAOPlaceEvent].self }
-    open class var placeHolidayType: DAOPlaceHoliday.Type { DAOPlaceHoliday.self }
-    open class var placeHolidayArrayType: [DAOPlaceHoliday].Type { [DAOPlaceHoliday].self }
+    open class func createPlaceEvent() -> DAOPlaceEvent { config.placeEventType.init() }
+    open class func createPlaceEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { config.placeEventType.init(from: object) }
+    open class func createPlaceEvent(from data: DNSDataDictionary) -> DAOPlaceEvent? { config.placeEventType.init(from: data) }
 
-    open class func createPlaceEvent() -> DAOPlaceEvent { placeEventType.init() }
-    open class func createPlaceEvent(from object: DAOPlaceEvent) -> DAOPlaceEvent { placeEventType.init(from: object) }
-    open class func createPlaceEvent(from data: DNSDataDictionary) -> DAOPlaceEvent? { placeEventType.init(from: data) }
-
-    open class func createPlaceHoliday() -> DAOPlaceHoliday { placeHolidayType.init() }
-    open class func createPlaceHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { placeHolidayType.init(from: object) }
-    open class func createPlaceHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday? { placeHolidayType.init(from: data) }
+    open class func createPlaceHoliday() -> DAOPlaceHoliday { config.placeHolidayType.init() }
+    open class func createPlaceHoliday(from object: DAOPlaceHoliday) -> DAOPlaceHoliday { config.placeHolidayType.init(from: object) }
+    open class func createPlaceHoliday(from data: DNSDataDictionary) -> DAOPlaceHoliday? { config.placeHolidayType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -133,11 +156,14 @@ open class DAOPlaceHours: DAOBaseObject {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
+    }
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = self.daoPlaceEventArray(of: Self.placeEventArrayType, from: container, forKey: .events)
-        holidays = self.daoPlaceHolidayArray(of: Self.placeHolidayArrayType, from: container, forKey: .holidays)
+        events = self.daoPlaceEventArray(with: configuration, from: container, forKey: .events)
+        holidays = self.daoPlaceHolidayArray(with: configuration, from: container, forKey: .holidays)
         monday = try container.decodeIfPresent(Swift.type(of: monday), forKey: .monday) ?? monday
         tuesday = try container.decodeIfPresent(Swift.type(of: tuesday), forKey: .tuesday) ?? tuesday
         wednesday = try container.decodeIfPresent(Swift.type(of: wednesday), forKey: .wednesday) ?? wednesday
@@ -146,11 +172,11 @@ open class DAOPlaceHours: DAOBaseObject {
         saturday = try container.decodeIfPresent(Swift.type(of: saturday), forKey: .saturday) ?? saturday
         sunday = try container.decodeIfPresent(Swift.type(of: sunday), forKey: .sunday) ?? sunday
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(events, forKey: .events)
-        try container.encode(holidays, forKey: .holidays)
+        try container.encode(events, forKey: .events, configuration: configuration)
+        try container.encode(holidays, forKey: .holidays, configuration: configuration)
         try container.encode(monday, forKey: .monday)
         try container.encode(tuesday, forKey: .tuesday)
         try container.encode(wednesday, forKey: .wednesday)

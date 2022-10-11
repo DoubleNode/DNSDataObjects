@@ -9,24 +9,51 @@
 import DNSCore
 import Foundation
 
+public protocol PTCLCFGDAOBasket: PTCLCFGBaseObject {
+    var basketType: DAOBasket.Type { get }
+    func basketArray<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasket] where K: CodingKey
+}
+
+public protocol PTCLCFGBasketObject: PTCLCFGDAOAccount, PTCLCFGDAOBasketItem, PTCLCFGDAOPlace {
+}
+public class CFGBasketObject: PTCLCFGBasketObject {
+    public var accountType: DAOAccount.Type = DAOAccount.self
+    public var basketItemType: DAOBasketItem.Type = DAOBasketItem.self
+    public var placeType: DAOPlace.Type = DAOPlace.self
+
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func basketItemArray<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasketItem] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOBasketItem].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func placeArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class DAOBasket: DAOBaseObject {
+    public typealias Config = PTCLCFGBasketObject
+    public static var config: Config = CFGBasketObject()
+
     // MARK: - Class Factory methods -
-    open class var accountType: DAOAccount.Type { DAOAccount.self }
-    open class var basketItemType: DAOBasketItem.Type { DAOBasketItem.self }
-    open class var basketItemArrayType: [DAOBasketItem].Type { [DAOBasketItem].self }
-    open class var placeType: DAOPlace.Type { DAOPlace.self }
+    open class func createAccount() -> DAOAccount { config.accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
 
-    open class func createAccount() -> DAOAccount { accountType.init() }
-    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
+    open class func createBasketItem() -> DAOBasketItem { config.basketItemType.init() }
+    open class func createBasketItem(from object: DAOBasketItem) -> DAOBasketItem { config.basketItemType.init(from: object) }
+    open class func createBasketItem(from data: DNSDataDictionary) -> DAOBasketItem? { config.basketItemType.init(from: data) }
 
-    open class func createBasketItem() -> DAOBasketItem { basketItemType.init() }
-    open class func createBasketItem(from object: DAOBasketItem) -> DAOBasketItem { basketItemType.init(from: object) }
-    open class func createBasketItem(from data: DNSDataDictionary) -> DAOBasketItem? { basketItemType.init(from: data) }
-
-    open class func createPlace() -> DAOPlace { placeType.init() }
-    open class func createPlace(from object: DAOPlace) -> DAOPlace { placeType.init(from: object) }
-    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { placeType.init(from: data) }
+    open class func createPlace() -> DAOPlace { config.placeType.init() }
+    open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
+    open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
     
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -88,19 +115,22 @@ open class DAOBasket: DAOBaseObject {
    }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(of: Self.accountType, from: container, forKey: .account) ?? account
-        items = self.daoBasketItemArray(of: Self.basketItemArrayType, from: container, forKey: .items)
-        place = self.daoPlace(of: Self.placeType, from: container, forKey: .place) ?? place
+    required public init(from decoder: Decoder, configuration: PTCLCFGBaseObject) throws {
+        fatalError("init(from:configuration:) has not been implemented")
     }
-    override open func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
+    required public init(from decoder: Decoder, configuration: Config) throws {
+        try super.init(from: decoder, configuration: configuration)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
+        items = self.daoBasketItemArray(with: configuration, from: container, forKey: .items)
+        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
+    }
+    open func encode(to encoder: Encoder, configuration: Config) throws {
+        try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(account, forKey: .account)
-        try container.encode(items, forKey: .items)
-        try container.encode(place, forKey: .place)
+        try container.encode(account, forKey: .account, configuration: configuration)
+        try container.encode(items, forKey: .items, configuration: configuration)
+        try container.encode(place, forKey: .place, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -

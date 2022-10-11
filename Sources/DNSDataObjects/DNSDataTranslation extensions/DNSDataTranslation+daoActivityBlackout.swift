@@ -10,17 +10,17 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoActivityBlackout<K>(of objectType: DAOActivityBlackout.Type,
+    func daoActivityBlackout<K>(with configuration: PTCLCFGDAOActivityBlackout,
                                 from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey {
-        do { return try container.decodeIfPresent(objectType, forKey: key) } catch { }
+        do { return try container.decodeIfPresent(configuration.activityBlackoutType, forKey: key,
+                                                  configuration: configuration) } catch { }
         return nil
     }
-    func daoActivityBlackoutArray<K>(of arrayType: [DAOActivityBlackout].Type,
+    func daoActivityBlackoutArray<K>(with configuration: PTCLCFGDAOActivityBlackout,
                                      from container: KeyedDecodingContainer<K>,
                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey {
-        do { return try container.decodeIfPresent(arrayType, forKey: key) ?? [] } catch { }
-        return []
+        return configuration.activityBlackoutArray(from: container, forKey: key)
     }
     // swiftlint:disable:next cyclomatic_complexity
     func daoActivityBlackout(from any: Any?) -> DAOActivityBlackout? {
