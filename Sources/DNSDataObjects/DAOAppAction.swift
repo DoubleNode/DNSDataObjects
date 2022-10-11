@@ -34,9 +34,12 @@ public class CFGAppActionObject: PTCLCFGAppActionObject {
         return []
     }
 }
-open class DAOAppAction: DAOBaseObject {
+open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAppActionObject
     public static var config: Config = CFGAppActionObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createImages() -> DAOAppActionImages { config.appActionImagesType.init() }
@@ -55,8 +58,8 @@ open class DAOAppAction: DAOBaseObject {
 
     open var actionType: DNSAppActionType = .popup
     open var deepLink: URL?
-    open var images: DAOAppActionImages
-    open var strings: DAOAppActionStrings
+    @CodableConfiguration(from: DAOAppAction.self) open var images: DAOAppActionImages = DAOAppActionImages()
+    @CodableConfiguration(from: DAOAppAction.self) open var strings: DAOAppActionStrings = DAOAppActionStrings()
 
     // MARK: - Initializers -
     required public init() {

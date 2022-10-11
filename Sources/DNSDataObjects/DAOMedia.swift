@@ -19,9 +19,12 @@ public protocol PTCLCFGMediaObject: PTCLCFGBaseObject {
 }
 public class CFGMediaObject: PTCLCFGMediaObject {
 }
-open class DAOMedia: DAOBaseObject {
+open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGMediaObject
     public static var config: Config = CFGMediaObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

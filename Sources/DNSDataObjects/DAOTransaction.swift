@@ -34,9 +34,12 @@ public class CFGTransactionObject: PTCLCFGTransactionObject {
         return []
     }
 }
-open class DAOTransaction: DAOBaseObject {
+open class DAOTransaction: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGTransactionObject
     public static var config: Config = CFGTransactionObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createCard() -> DAOCard { config.cardType.init() }
@@ -54,12 +57,12 @@ open class DAOTransaction: DAOBaseObject {
     }
 
     open var amount: Float = 0
-    open var card: DAOCard?
     open var confirmation = ""
-    open var order: DAOOrder?
     open var tax: Float = 0
     open var tip: Float = 0
     open var type = ""
+    @CodableConfiguration(from: DAOTransaction.self) open var card: DAOCard? = nil
+    @CodableConfiguration(from: DAOTransaction.self) open var order: DAOOrder? = nil
 
     // MARK: - Initializers -
     required public init() {

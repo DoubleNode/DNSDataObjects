@@ -7,6 +7,7 @@
 //
 
 import DNSCore
+import DNSError
 import Foundation
 import KeyedCodable
 
@@ -33,9 +34,12 @@ public class CFGAccountObject: PTCLCFGAccountObject {
         return []
     }
 }
-open class DAOAccount: DAOBaseObject {
+open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAccountObject
-    public static var config: Config = CFGAccountObject()
+    public static var config = CFGAccountObject()
+      
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createCard() -> DAOCard { config.cardType.init() }
@@ -52,43 +56,18 @@ open class DAOAccount: DAOBaseObject {
         case cards, dob, emailNotifications, name, pushNotifications, users
     }
 
-    open var cards: [DAOCard] = []
     open var dob: Date?
     open var emailNotifications = false
     open var name = PersonNameComponents()
     open var pushNotifications = false
-    open var users: [DAOUser] = []
-//    @CodableConfiguration(from: accountConfig.userType) open var users: [DAOUser] = []
+    @CodableConfiguration(from: DAOAccount.self) open var cards: [DAOCard] = []
+    @CodableConfiguration(from: DAOAccount.self) open var users: [DAOUser] = []
 
     // name formatted output
-    public var nameAbbreviated: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.abbreviated)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.abbreviated)
-        }
-    }
-    public var nameMedium: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.medium)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.medium)
-        }
-    }
-    public var nameLong: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.long)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.long)
-        }
-    }
-    public var nameShort: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.short)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.short)
-        }
-    }
+    public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
+    public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
+    public var nameLong: String { self.name.dnsFormatName(style: .long) }
+    public var nameShort: String { self.name.dnsFormatName(style: .short) }
 
     // MARK: - Initializers -
     required public init() {

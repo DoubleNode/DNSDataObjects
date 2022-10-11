@@ -19,9 +19,12 @@ public protocol PTCLCFGNotificationObject: PTCLCFGBaseObject {
 }
 public class CFGNotificationObject: PTCLCFGNotificationObject {
 }
-open class DAONotification: DAOBaseObject {
+open class DAONotification: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGNotificationObject
     public static var config: Config = CFGNotificationObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

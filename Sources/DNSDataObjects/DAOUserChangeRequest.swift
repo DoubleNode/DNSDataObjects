@@ -27,9 +27,12 @@ public class CFGUserChangeRequestObject: PTCLCFGUserChangeRequestObject {
         return []
     }
 }
-open class DAOUserChangeRequest: DAOChangeRequest {
+open class DAOUserChangeRequest: DAOChangeRequest, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGUserChangeRequestObject
-    private static var config: Config = CFGUserChangeRequestObject()
+    public static var config: Config = CFGUserChangeRequestObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createUser() -> DAOUser { config.userType.init() }
@@ -43,7 +46,7 @@ open class DAOUserChangeRequest: DAOChangeRequest {
     }
     
     open var requestedRole = DNSUserRole.endUser
-    open var user: DAOUser?
+    @CodableConfiguration(from: DAOUserChangeRequest.self) open var user: DAOUser? = nil
     
     // MARK: - Initializers -
     required public init() {

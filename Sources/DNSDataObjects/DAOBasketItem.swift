@@ -38,9 +38,12 @@ public class CFGBasketItemObject: PTCLCFGBasketItemObject {
         return []
     }
 }
-open class DAOBasketItem: DAOBaseObject {
+open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGBasketItemObject
     public static var config: Config = CFGBasketItemObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createAccount() -> DAOAccount { config.accountType.init() }
@@ -61,9 +64,9 @@ open class DAOBasketItem: DAOBaseObject {
         case account, basket, place, quantity
     }
     
-    open var account: DAOAccount?
-    open var basket: DAOBasket?
-    open var place: DAOPlace?
+    @CodableConfiguration(from: DAOBasketItem.self) open var account: DAOAccount? = nil
+    @CodableConfiguration(from: DAOBasketItem.self) open var basket: DAOBasket? = nil
+    @CodableConfiguration(from: DAOBasketItem.self) open var place: DAOPlace? = nil
     open var quantity: Int = 0
     
     // MARK: - Initializers -

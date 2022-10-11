@@ -19,9 +19,12 @@ public protocol PTCLCFGActivityTypeObject: PTCLCFGBaseObject {
 }
 public class CFGActivityTypeObject: PTCLCFGActivityTypeObject {
 }
-open class DAOActivityType: DAOBaseObject {
+open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGActivityTypeObject
     public static var config: Config = CFGActivityTypeObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

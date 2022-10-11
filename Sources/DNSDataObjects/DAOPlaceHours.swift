@@ -34,9 +34,12 @@ public class CFGPlaceHoursObject: PTCLCFGPlaceHoursObject {
         return []
     }
 }
-open class DAOPlaceHours: DAOBaseObject {
+open class DAOPlaceHours: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGPlaceHoursObject
     public static var config: Config = CFGPlaceHoursObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createPlaceEvent() -> DAOPlaceEvent { config.placeEventType.init() }
@@ -54,9 +57,6 @@ open class DAOPlaceHours: DAOBaseObject {
         case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     }
 
-    open var events: [DAOPlaceEvent] = []
-    open var holidays: [DAOPlaceHoliday] = []
-
     open var monday = DNSDailyHours()
     open var tuesday = DNSDailyHours()
     open var wednesday = DNSDailyHours()
@@ -64,6 +64,8 @@ open class DAOPlaceHours: DAOBaseObject {
     open var friday = DNSDailyHours()
     open var saturday = DNSDailyHours()
     open var sunday = DNSDailyHours()
+    @CodableConfiguration(from: DAOPlaceHours.self) open var events: [DAOPlaceEvent] = []
+    @CodableConfiguration(from: DAOPlaceHours.self) open var holidays: [DAOPlaceHoliday] = []
 
     public var today: DNSDailyHours {
         switch Date().dnsDayOfWeek {

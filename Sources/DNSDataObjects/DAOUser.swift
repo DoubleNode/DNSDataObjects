@@ -46,9 +46,12 @@ public class CFGUserObject: PTCLCFGUserObject {
         return []
     }
 }
-open class DAOUser: DAOBaseObject {
+open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGUserObject
     public static var config: Config = CFGUserObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createAccount() -> DAOAccount { config.accountType.init() }
@@ -73,15 +76,15 @@ open class DAOUser: DAOBaseObject {
         case accounts, cards, dob, email, favorites, myPlace, name, phone, type
     }
 
-    open var accounts: [DAOAccount] = []
-    open var cards: [DAOCard] = []
     open var dob: Date?
     open var email: String = ""
-    open var favorites: [DAOActivityType] = []
     open var name = PersonNameComponents()
-    open var myPlace: DAOPlace?
     open var phone: String = ""
     open var type: DNSUserType = .unknown
+    @CodableConfiguration(from: DAOTransaction.self) open var accounts: [DAOAccount] = []
+    @CodableConfiguration(from: DAOTransaction.self) open var cards: [DAOCard] = []
+    @CodableConfiguration(from: DAOTransaction.self) open var favorites: [DAOActivityType] = []
+    @CodableConfiguration(from: DAOTransaction.self) open var myPlace: DAOPlace? = nil
 
     @available(*, deprecated, renamed: "name.givenName", message: "Please use new property - name.givenName")
     public var firstName: String? {
@@ -96,34 +99,10 @@ open class DAOUser: DAOBaseObject {
     }
 
     // name formatted output
-    public var nameAbbreviated: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.abbreviated)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.abbreviated)
-        }
-    }
-    public var nameMedium: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.medium)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.medium)
-        }
-    }
-    public var nameLong: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.long)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.long)
-        }
-    }
-    public var nameShort: String {
-        if #available(iOS 15.0, *) {
-            return self.name.dnsFormatName(style: PersonNameComponents.FormatStyle.Style.short)
-        } else {
-            return self.name.dnsFormatName(style: PersonNameComponentsFormatter.Style.short)
-        }
-    }
+    public var nameAbbreviated: String { self.name.dnsFormatName(style: .abbreviated) }
+    public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
+    public var nameLong: String { self.name.dnsFormatName(style: .long) }
+    public var nameShort: String { self.name.dnsFormatName(style: .short) }
 
     // MARK: - Initializers -
     required public init() {

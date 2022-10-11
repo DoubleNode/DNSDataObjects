@@ -19,9 +19,12 @@ public protocol PTCLCFGPlaceHolidayObject: PTCLCFGBaseObject {
 }
 public class CFGPlaceHolidayObject: PTCLCFGPlaceHolidayObject {
 }
-open class DAOPlaceHoliday: DAOBaseObject {
+open class DAOPlaceHoliday: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGPlaceHolidayObject
     public static var config: Config = CFGPlaceHolidayObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

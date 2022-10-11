@@ -26,9 +26,12 @@ public class CFGFaqObject: PTCLCFGFaqObject {
         return []
     }
 }
-open class DAOFaq: DAOBaseObject {
+open class DAOFaq: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGFaqObject
     public static var config: Config = CFGFaqObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createSection() -> DAOFaqSection { config.faqSectionType.init() }
@@ -41,7 +44,7 @@ open class DAOFaq: DAOBaseObject {
         case section, question, answer
     }
 
-    open var section: DAOFaqSection
+    @CodableConfiguration(from: DAOFaq.self) open var section: DAOFaqSection = DAOFaqSection()
     open var question = DNSString()
     open var answer = DNSString()
 

@@ -19,9 +19,12 @@ public protocol PTCLCFGAppEventObject: PTCLCFGBaseObject {
 }
 public class CFGAppEventObject: PTCLCFGAppEventObject {
 }
-open class DAOAppEvent: DAOBaseObject {
+open class DAOAppEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAppEventObject
     public static var config: Config = CFGAppEventObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     public enum C {
         public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)

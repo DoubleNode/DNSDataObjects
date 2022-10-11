@@ -34,9 +34,12 @@ public class CFGActivityObject: PTCLCFGActivityObject {
         return []
     }
 }
-open class DAOActivity: DAOBaseObject {
+open class DAOActivity: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGActivityObject
     public static var config: Config = CFGActivityObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createActivityType() -> DAOActivityType { config.activityTypeType.init() }
@@ -53,8 +56,8 @@ open class DAOActivity: DAOBaseObject {
         case baseType, blackouts, bookingEndTime, bookingStartTime, code, name
     }
 
-    open var baseType: DAOActivityType
-    open var blackouts: [DAOActivityBlackout] = []
+    @CodableConfiguration(from: DAOActivity.self) open var baseType: DAOActivityType = DAOActivityType()
+    @CodableConfiguration(from: DAOActivity.self) open var blackouts: [DAOActivityBlackout] = []
     open var bookingEndTime: Date?
     open var bookingStartTime: Date?
     open var code = ""

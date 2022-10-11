@@ -48,9 +48,12 @@ public class CFGOrderObject: PTCLCFGOrderObject {
         return []
     }
 }
-open class DAOOrder: DAOBaseObject {
+open class DAOOrder: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGOrderObject
     public static var config: Config = CFGOrderObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createAccount() -> DAOAccount { config.accountType.init() }
@@ -75,14 +78,14 @@ open class DAOOrder: DAOBaseObject {
         case account, items, place, state, subtotal, tax, total, transaction
     }
 
-    open var account: DAOAccount?
-    open var items: [DAOOrderItem] = []
-    open var place: DAOPlace?
     open var state = DNSOrderState.unknown
     open var subtotal: Float = 0
     open var tax: Float = 0
     open var total: Float = 0
-    open var transaction: DAOTransaction?
+    @CodableConfiguration(from: DAOOrder.self) open var account: DAOAccount? = nil
+    @CodableConfiguration(from: DAOOrder.self) open var items: [DAOOrderItem] = []
+    @CodableConfiguration(from: DAOOrder.self) open var place: DAOPlace? = nil
+    @CodableConfiguration(from: DAOOrder.self) open var transaction: DAOTransaction? = nil
 
     // MARK: - Initializers -
     required public init() {

@@ -13,9 +13,9 @@ let package = Package(
     name: "DNSDataObjects",
     platforms: [
         .iOS(.v15),
-        .tvOS(.v13),
+        .tvOS(.v15),
         .macOS(.v10_15),
-        .watchOS(.v6),
+        .watchOS(.v9),
     ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
@@ -28,9 +28,9 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.6.1"),
         .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: "4.2.0"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.48"),
-        .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.9.0"),
-        .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.9.2"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.10.0"),
+        .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.10.0"),
+        .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.10.0"),
         .package(url: "https://github.com/kaishin/Gifu.git", from: "3.3.1"),
         .package(url: "https://github.com/dgrzeszczak/KeyedCodable.git", from: "3.1.2"),
     ],

@@ -14,11 +14,8 @@ public protocol PTCLCFGDAOBaseObject {
 
 public protocol PTCLCFGBaseObject: PTCLCFGDAOBaseObject {
 }
-public class CFGBaseObject: PTCLCFGBaseObject {
-}
 open class DAOBaseObject: DNSDataTranslation, CodableWithConfiguration, NSCopying {
     public typealias Config = PTCLCFGBaseObject
-    public static var baseConfig: Config = CFGBaseObject()
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

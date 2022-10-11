@@ -20,9 +20,12 @@ public protocol PTCLCFGBeaconObject: PTCLCFGBaseObject {
 }
 public class CFGBeaconObject: PTCLCFGBeaconObject {
 }
-open class DAOBeacon: DAOBaseObject {
+open class DAOBeacon: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGBeaconObject
     public static var config: Config = CFGBeaconObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

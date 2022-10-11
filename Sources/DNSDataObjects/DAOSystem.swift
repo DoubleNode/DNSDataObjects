@@ -34,9 +34,12 @@ public class CFGSystemObject: PTCLCFGSystemObject {
         return []
     }
 }
-open class DAOSystem: DAOBaseObject {
+open class DAOSystem: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGSystemObject
     public static var config: Config = CFGSystemObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createSystemEndPoint() -> DAOSystemEndPoint { config.systemEndPointType.init() }
@@ -53,11 +56,11 @@ open class DAOSystem: DAOBaseObject {
         case currentState, endPoints, historyState, message, name
     }
 
-    open var currentState: DAOSystemState
-    open var endPoints: [DAOSystemEndPoint] = []
-    open var historyState: [DAOSystemState] = []
     open var message = DNSString()
     open var name = DNSString()
+    @CodableConfiguration(from: DAOSystem.self) open var currentState: DAOSystemState = DAOSystemState()
+    @CodableConfiguration(from: DAOSystem.self) open var endPoints: [DAOSystemEndPoint] = []
+    @CodableConfiguration(from: DAOSystem.self) open var historyState: [DAOSystemState] = []
 
     // MARK: - Initializers -
     required public init() {

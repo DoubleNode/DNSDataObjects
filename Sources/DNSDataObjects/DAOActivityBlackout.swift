@@ -19,9 +19,12 @@ public protocol PTCLCFGActivityBlackoutObject: PTCLCFGBaseObject {
 }
 public class CFGActivityBlackoutObject: PTCLCFGActivityBlackoutObject {
 }
-open class DAOActivityBlackout: DAOBaseObject {
+open class DAOActivityBlackout: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGActivityBlackoutObject
     public static var config: Config = CFGActivityBlackoutObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

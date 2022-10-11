@@ -19,9 +19,12 @@ public protocol PTCLCFGAlertObject: PTCLCFGBaseObject {
 }
 public class CFGAlertObject: PTCLCFGAlertObject {
 }
-open class DAOAlert: DAOBaseObject {
+open class DAOAlert: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAlertObject
     public static var config: Config = CFGAlertObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     public enum C {
         public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)

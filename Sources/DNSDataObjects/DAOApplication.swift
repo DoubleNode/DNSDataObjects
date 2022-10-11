@@ -26,9 +26,12 @@ public class CFGApplicationObject: PTCLCFGApplicationObject {
         return []
     }
 }
-open class DAOApplication: DAOBaseObject {
+open class DAOApplication: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGApplicationObject
     public static var config: Config = CFGApplicationObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createAppEvent() -> DAOAppEvent { config.appEventType.init() }
@@ -41,7 +44,7 @@ open class DAOApplication: DAOBaseObject {
         case appEvents
     }
 
-    open var appEvents: [DAOAppEvent] = []
+    @CodableConfiguration(from: DAOApplication.self) open var appEvents: [DAOAppEvent] = []
     open var activeAppEvent: DAOAppEvent? {
         self.utilityActiveAppEvent()
     }

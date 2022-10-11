@@ -49,9 +49,12 @@ public class CFGSectionObject: PTCLCFGSectionObject {
         return []
     }
 }
-open class DAOSection: DAOBaseObject {
+open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGSectionObject
     public static var config: Config = CFGSectionObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createPlace() -> DAOPlace { config.placeType.init() }
@@ -72,10 +75,10 @@ open class DAOSection: DAOBaseObject {
         case children, name, parent, places
     }
 
-    open var children: [DAOSection] = []
     open var name = DNSString()
-    open var parent: DAOSection?
-    open var places: [DAOPlace] = []
+    @CodableConfiguration(from: DAOSection.self) open var children: [DAOSection] = []
+    @CodableConfiguration(from: DAOSection.self) open var parent: DAOSection? = nil
+    @CodableConfiguration(from: DAOSection.self) open var places: [DAOPlace] = []
 
     // MARK: - Initializers -
     required public init() {

@@ -57,9 +57,12 @@ public class CFGPlaceObject: PTCLCFGPlaceObject {
         return []
     }
 }
-open class DAOPlace: DAOBaseObject {
+open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGPlaceObject
     public static var config: Config = CFGPlaceObject()
+
+    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createActivity() -> DAOActivity { config.activityType.init() }
@@ -89,17 +92,17 @@ open class DAOPlace: DAOBaseObject {
         case hours, name, phone, section, statuses, timeZone
     }
 
-    open var activities: [DAOActivity] = []
     open var address = ""
-    open var alerts: [DAOAlert] = []
     open var code = ""
     open var geohashes: [String] = []
     open var geopoint: CLLocation?
-    open var hours: DAOPlaceHours
     open var name = DNSString()
     open var phone = ""
-    open var section: DAOSection?
-    open var statuses: [DAOPlaceStatus] = [] {
+    @CodableConfiguration(from: DAOPlace.self) open var activities: [DAOActivity] = []
+    @CodableConfiguration(from: DAOPlace.self) open var alerts: [DAOAlert] = []
+    @CodableConfiguration(from: DAOPlace.self) open var hours: DAOPlaceHours = DAOPlaceHours()
+    @CodableConfiguration(from: DAOPlace.self) open var section: DAOSection? = nil
+    @CodableConfiguration(from: DAOPlace.self) open var statuses: [DAOPlaceStatus] = [] {
         didSet {
             self.statuses.filter { $0.id.isEmpty }
                 .forEach {
