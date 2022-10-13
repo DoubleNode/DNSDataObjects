@@ -15,12 +15,13 @@ public protocol PTCLCFGDAOBasketItem: PTCLCFGBaseObject {
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasketItem] where K: CodingKey
 }
 
-public protocol PTCLCFGBasketItemObject: PTCLCFGDAOAccount, PTCLCFGDAOBasket, PTCLCFGDAOPlace {
+public protocol PTCLCFGBasketItemObject: PTCLCFGDAOAccount, PTCLCFGDAOBasket, PTCLCFGDAOPlace, PTCLCFGDAOProduct {
 }
 public class CFGBasketItemObject: PTCLCFGBasketItemObject {
     public var accountType: DAOAccount.Type = DAOAccount.self
     public var basketType: DAOBasket.Type = DAOBasket.self
     public var placeType: DAOPlace.Type = DAOPlace.self
+    public var productType: DAOProduct.Type = DAOProduct.self
 
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
@@ -35,6 +36,11 @@ public class CFGBasketItemObject: PTCLCFGBasketItemObject {
     open func placeArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func productArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOProduct] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOProduct].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }
@@ -58,15 +64,20 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
     open class func createPlace(from object: DAOPlace) -> DAOPlace { config.placeType.init(from: object) }
     open class func createPlace(from data: DNSDataDictionary) -> DAOPlace? { config.placeType.init(from: data) }
     
+    open class func createProduct() -> DAOProduct { config.productType.init() }
+    open class func createProduct(from object: DAOProduct) -> DAOProduct { config.productType.init(from: object) }
+    open class func createProduct(from data: DNSDataDictionary) -> DAOProduct? { config.productType.init(from: data) }
+    
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case account, basket, place, quantity
+        case account, basket, place, product, quantity
     }
     
     @CodableConfiguration(from: DAOBasketItem.self) open var account: DAOAccount? = nil
     @CodableConfiguration(from: DAOBasketItem.self) open var basket: DAOBasket? = nil
     @CodableConfiguration(from: DAOBasketItem.self) open var place: DAOPlace? = nil
+    @CodableConfiguration(from: DAOBasketItem.self) open var product: DAOProduct? = nil
     open var quantity: Int = 0
     
     // MARK: - Initializers -
@@ -92,6 +103,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         self.account = object.account?.copy() as? DAOAccount
         self.basket = object.basket?.copy() as? DAOBasket
         self.place = object.place?.copy() as? DAOPlace
+        self.product = object.product?.copy() as? DAOProduct
         // swiftlint:enable force_cast
     }
 
@@ -108,6 +120,8 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         self.basket = Self.createBasket(from: basketData)
         let placeData = self.dictionary(from: data[field(.place)] as Any?)
         self.place = Self.createPlace(from: placeData)
+        let productData = self.dictionary(from: data[field(.product)] as Any?)
+        self.product = Self.createProduct(from: productData)
         self.quantity = self.int(from: data[field(.quantity)] as Any?) ?? self.quantity
         return self
     }
@@ -117,6 +131,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
             field(.account): self.account?.asDictionary ?? [:],
             field(.basket): self.basket?.asDictionary ?? [:],
             field(.place): self.place?.asDictionary ?? [:],
+            field(.product): self.product?.asDictionary ?? [:],
             field(.quantity): self.quantity,
         ]) { (current, _) in current }
         return retval
@@ -135,6 +150,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
         basket = self.daoBasket(with: configuration, from: container, forKey: .basket) ?? basket
         place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
+        product = self.daoProduct(with: configuration, from: container, forKey: .product) ?? product
         quantity = self.int(from: container, forKey: .quantity) ?? quantity
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
@@ -143,6 +159,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         try container.encode(account, forKey: .account, configuration: configuration)
         try container.encode(basket, forKey: .basket, configuration: configuration)
         try container.encode(place, forKey: .place, configuration: configuration)
+        try container.encode(product, forKey: .product, configuration: configuration)
         try container.encode(quantity, forKey: .quantity)
     }
 
@@ -159,6 +176,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
             lhs.account != rhs.account ||
             lhs.basket != rhs.basket ||
             lhs.place != rhs.place ||
+            lhs.product != rhs.product ||
             lhs.quantity != rhs.quantity
     }
 
