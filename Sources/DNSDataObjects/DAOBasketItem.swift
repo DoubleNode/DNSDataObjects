@@ -89,9 +89,6 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
     }
 
     // MARK: - DAO copy methods -
-    required public init(from object: DAOProduct) {
-        fatalError("init(from:) has not been implemented")
-    }
     required public init(from object: DAOBasketItem) {
         super.init(from: object)
         self.update(from: object)
