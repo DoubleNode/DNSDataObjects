@@ -68,6 +68,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     public var nameMedium: String { self.name.dnsFormatName(style: .medium) }
     public var nameLong: String { self.name.dnsFormatName(style: .long) }
     public var nameShort: String { self.name.dnsFormatName(style: .short) }
+    public var nameSortable: String { self.name.dnsSortableName }
 
     // MARK: - Initializers -
     required public init() {
