@@ -107,6 +107,11 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
     required public init(from decoder: Decoder) throws {
         fatalError("init(from:) has not been implemented")
     }
+    override open func encode(to encoder: Encoder) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
+
+    // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
         fatalError("init(from:configuration:) has not been implemented")
     }

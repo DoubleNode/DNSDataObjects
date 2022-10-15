@@ -67,6 +67,19 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     }
 
     // MARK: - Codable protocol methods -
+    required public init(from decoder: Decoder) throws {
+        super.init()
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = self.string(from: container, forKey: .id) ?? id
+        meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
+    }
+    open func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(meta, forKey: .meta)
+    }
+
+    // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: Config) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
