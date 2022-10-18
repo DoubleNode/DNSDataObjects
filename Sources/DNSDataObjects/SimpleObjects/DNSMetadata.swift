@@ -85,9 +85,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uid = self.uuid(from: container, forKey: .uid) ?? uid
-        created = self.date(from: container, forKey: .created) ?? created
-        synced = self.date(from: container, forKey: .synced) ?? synced
-        updated = self.date(from: container, forKey: .updated) ?? updated
+        created = self.time(from: container, forKey: .created) ?? created
+        synced = self.time(from: container, forKey: .synced) ?? synced
+        updated = self.time(from: container, forKey: .updated) ?? updated
         status = self.string(from: container, forKey: .status) ?? status
         createdBy = self.string(from: container, forKey: .createdBy) ?? createdBy
         updatedBy = self.string(from: container, forKey: .updatedBy) ?? updatedBy
