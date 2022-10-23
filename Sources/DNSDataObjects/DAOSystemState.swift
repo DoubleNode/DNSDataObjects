@@ -108,10 +108,14 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: Self.config)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: configuration)
+    }
+    private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         failureCodes = try container.decodeIfPresent(Swift.type(of: failureCodes), forKey: .failureCodes) ?? failureCodes
         failureRate = try container.decodeIfPresent(Swift.type(of: failureRate), forKey: .failureRate) ?? failureRate

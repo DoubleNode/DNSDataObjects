@@ -13,8 +13,12 @@ public extension DNSDataTranslation {
     func daoAccount<K>(with configuration: PTCLCFGDAOAccount,
                        from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.accountType, forKey: key,
-                                                  configuration: configuration) } catch { }
+        do {
+            let accountType = configuration.accountType
+            let retval = try container.decodeIfPresent(accountType, forKey: key,
+                                                       configuration: configuration)
+            return retval
+        } catch { }
         return nil
     }
     func daoAccountArray<K>(with configuration: PTCLCFGDAOAccount,

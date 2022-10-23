@@ -140,10 +140,14 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: Self.config)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: configuration)
+    }
+    private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = self.dnsstring(from: container, forKey: .name) ?? name
         children = self.daoSectionChildArray(with: configuration, from: container, forKey: .children)
