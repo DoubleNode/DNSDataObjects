@@ -115,11 +115,14 @@ open class DAOFaq: DAOBaseObject, DecodingConfigurationProviding, EncodingConfig
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: Self.config)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
-        section = Self.createSection()
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: configuration)
+    }
+    private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         question = self.dnsstring(from: container, forKey: .question) ?? question
         answer = self.dnsstring(from: container, forKey: .answer) ?? answer

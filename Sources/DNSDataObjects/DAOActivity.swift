@@ -139,11 +139,14 @@ open class DAOActivity: DAOBaseObject, DecodingConfigurationProviding, EncodingC
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: Self.config)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
-        baseType = Self.createActivityType()
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder, configuration: configuration)
+    }
+    private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         baseType = self.daoActivityType(with: configuration, from: container, forKey: .baseType) ?? baseType
         blackouts = self.daoActivityBlackoutArray(with: configuration, from: container, forKey: .blackouts)
