@@ -207,21 +207,24 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
-        hours = Self.createPlaceHours()
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        activities = self.daoActivityArray(with: configuration, from: container, forKey: .activities)
+        activities = self.daoActivityArray(with: Self.config, from: container, forKey: .activities)
         address = self.string(from: container, forKey: .address) ?? address
-        alerts = self.daoAlertArray(with: configuration, from: container, forKey: .alerts)
+        alerts = self.daoAlertArray(with: Self.config, from: container, forKey: .alerts)
         code = self.string(from: container, forKey: .code) ?? code
-        hours = self.daoPlaceHours(with: configuration, from: container, forKey: .hours) ?? hours
+        hours = self.daoPlaceHours(with: Self.config, from: container, forKey: .hours) ?? hours
         name = self.dnsstring(from: container, forKey: .name) ?? name
         phone = self.string(from: container, forKey: .phone) ?? phone
-        section = self.daoSection(with: configuration, from: container, forKey: .section) ?? section
-        statuses = self.daoPlaceStatusArray(with: configuration, from: container, forKey: .statuses)
+        section = self.daoSection(with: Self.config, from: container, forKey: .section) ?? section
+        statuses = self.daoPlaceStatusArray(with: Self.config, from: container, forKey: .statuses)
         timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
 
         geohashes = try container.decodeIfPresent(Swift.type(of: geohashes), forKey: .geohashes) ?? geohashes

@@ -142,17 +142,21 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: Self.config)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        cards = self.daoCardArray(with: configuration, from: container, forKey: .cards)
+        cards = self.daoCardArray(with: Self.config, from: container, forKey: .cards)
         dob = self.date(from: container, forKey: .dob) ?? dob
         emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
         name = self.personName(from: container, forKey: .name) ?? name
         pushNotifications = self.bool(from: container, forKey: .pushNotifications) ?? pushNotifications
-        users = self.daoUserArray(with: configuration, from: container, forKey: .users)
+        users = self.daoUserArray(with: Self.config, from: container, forKey: .users)
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)

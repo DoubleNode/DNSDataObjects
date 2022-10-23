@@ -131,17 +131,19 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
-        images = Self.createImages()
-        strings = Self.createStrings()
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         actionType = try container.decodeIfPresent(Swift.type(of: actionType), forKey: .actionType) ?? actionType
         deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
-        images = self.daoAppActionImages(with: configuration, from: container, forKey: .images) ?? images
-        strings = self.daoAppActionStrings(with: configuration, from: container, forKey: .strings) ?? strings
+        images = self.daoAppActionImages(with: Self.config, from: container, forKey: .images) ?? images
+        strings = self.daoAppActionStrings(with: Self.config, from: container, forKey: .strings) ?? strings
 
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {

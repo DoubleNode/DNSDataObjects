@@ -188,17 +188,21 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        accounts = self.daoAccountArray(with: configuration, from: container, forKey: .accounts)
-        cards = self.daoCardArray(with: configuration, from: container, forKey: .cards)
+        accounts = self.daoAccountArray(with: Self.config, from: container, forKey: .accounts)
+        cards = self.daoCardArray(with: Self.config, from: container, forKey: .cards)
         dob = self.date(from: container, forKey: .dob) ?? dob
         email = self.string(from: container, forKey: .email) ?? email
-        favorites = self.daoActivityTypeArray(with: configuration, from: container, forKey: .favorites)
-        myPlace = self.daoPlace(with: configuration, from: container, forKey: .myPlace) ?? myPlace
+        favorites = self.daoActivityTypeArray(with: Self.config, from: container, forKey: .favorites)
+        myPlace = self.daoPlace(with: Self.config, from: container, forKey: .myPlace) ?? myPlace
         name = self.personName(from: container, forKey: .name) ?? name
         phone = self.string(from: container, forKey: .phone) ?? phone
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type

@@ -132,15 +132,19 @@ open class DAOTransaction: DAOBaseObject, DecodingConfigurationProviding, Encodi
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         amount = self.float(from: container, forKey: .amount) ?? amount
-        card = self.daoCard(with: configuration, from: container, forKey: .card) ?? card
+        card = self.daoCard(with: Self.config, from: container, forKey: .card) ?? card
         confirmation = self.string(from: container, forKey: .confirmation) ?? confirmation
-        order = self.daoOrder(with: configuration, from: container, forKey: .order) ?? order
+        order = self.daoOrder(with: Self.config, from: container, forKey: .order) ?? order
         tax = self.float(from: container, forKey: .tax) ?? tax
         tip = self.float(from: container, forKey: .tip) ?? tip
         type = self.string(from: container, forKey: .type) ?? type

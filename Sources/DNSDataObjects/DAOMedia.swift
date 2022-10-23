@@ -93,10 +93,14 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         url = self.dnsurl(from: container, forKey: .url) ?? url
         preloadUrl = self.dnsurl(from: container, forKey: .preloadUrl) ?? preloadUrl

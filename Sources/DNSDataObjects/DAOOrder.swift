@@ -161,18 +161,22 @@ open class DAOOrder: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
-        items = self.daoOrderItemArray(with: configuration, from: container, forKey: .items)
-        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
+        account = self.daoAccount(with: Self.config, from: container, forKey: .account) ?? account
+        items = self.daoOrderItemArray(with: Self.config, from: container, forKey: .items)
+        place = self.daoPlace(with: Self.config, from: container, forKey: .place) ?? place
         subtotal = self.float(from: container, forKey: .subtotal) ?? subtotal
         tax = self.float(from: container, forKey: .tax) ?? tax
         total = self.float(from: container, forKey: .total) ?? total
-        transaction = self.daoTransaction(with: configuration, from: container, forKey: .transaction) ?? transaction
+        transaction = self.daoTransaction(with: Self.config, from: container, forKey: .transaction) ?? transaction
 
         state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
     }

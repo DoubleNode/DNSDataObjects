@@ -167,13 +167,17 @@ open class DAOPlaceHours: DAOBaseObject, DecodingConfigurationProviding, Encodin
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        events = self.daoPlaceEventArray(with: configuration, from: container, forKey: .events)
-        holidays = self.daoPlaceHolidayArray(with: configuration, from: container, forKey: .holidays)
+        events = self.daoPlaceEventArray(with: Self.config, from: container, forKey: .events)
+        holidays = self.daoPlaceHolidayArray(with: Self.config, from: container, forKey: .holidays)
         monday = try container.decodeIfPresent(Swift.type(of: monday), forKey: .monday) ?? monday
         tuesday = try container.decodeIfPresent(Swift.type(of: tuesday), forKey: .tuesday) ?? tuesday
         wednesday = try container.decodeIfPresent(Swift.type(of: wednesday), forKey: .wednesday) ?? wednesday

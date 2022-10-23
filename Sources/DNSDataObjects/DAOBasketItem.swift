@@ -144,15 +144,19 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
-        basket = self.daoBasket(with: configuration, from: container, forKey: .basket) ?? basket
-        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
-        product = self.daoProduct(with: configuration, from: container, forKey: .product) ?? product
+        account = self.daoAccount(with: Self.config, from: container, forKey: .account) ?? account
+        basket = self.daoBasket(with: Self.config, from: container, forKey: .basket) ?? basket
+        place = self.daoPlace(with: Self.config, from: container, forKey: .place) ?? place
+        product = self.daoProduct(with: Self.config, from: container, forKey: .product) ?? product
         quantity = self.int(from: container, forKey: .quantity) ?? quantity
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {

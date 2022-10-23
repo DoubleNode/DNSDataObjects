@@ -129,17 +129,19 @@ open class DAOSystemEndPoint: DAOBaseObject, DecodingConfigurationProviding, Enc
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
-        currentState = Self.createSystemState()
-        system = Self.createSystem()
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        currentState = self.daoSystemState(with: configuration, from: container, forKey: .currentState) ?? currentState
+        currentState = self.daoSystemState(with: Self.config, from: container, forKey: .currentState) ?? currentState
         name = self.dnsstring(from: container, forKey: .name) ?? name
-        system = self.daoSystem(with: configuration, from: container, forKey: .system) ?? system
-        historyState = self.daoSystemStateArray(with: configuration, from: container, forKey: .historyState)
+        system = self.daoSystem(with: Self.config, from: container, forKey: .system) ?? system
+        historyState = self.daoSystemStateArray(with: Self.config, from: container, forKey: .historyState)
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)

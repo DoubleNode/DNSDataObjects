@@ -138,14 +138,18 @@ open class DAOOrderItem: DAOBaseObject, DecodingConfigurationProviding, Encoding
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
-        order = self.daoOrder(with: configuration, from: container, forKey: .order) ?? order
-        place = self.daoPlace(with: configuration, from: container, forKey: .place) ?? place
+        account = self.daoAccount(with: Self.config, from: container, forKey: .account) ?? account
+        order = self.daoOrder(with: Self.config, from: container, forKey: .order) ?? order
+        place = self.daoPlace(with: Self.config, from: container, forKey: .place) ?? place
         quantity = self.int(from: container, forKey: .quantity) ?? quantity
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {

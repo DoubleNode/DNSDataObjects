@@ -131,19 +131,24 @@ open class DAOAccountLinkRequest: DAOChangeRequest, DecodingConfigurationProvidi
 
     // MARK: - CodableWithConfiguration protocol methods -
     required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: DAOChangeRequest.Config) throws {
-        fatalError("init(from:configuration:) has not been implemented")
+        try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
     }
     required public init(from decoder: Decoder, configuration: Config) throws {
         try super.init(from: decoder, configuration: configuration)
+        try self.commonInit(from: decoder)
+    }
+    private func commonInit(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         approved = self.time(from: container, forKey: .approved) ?? approved
         approvedBy = self.string(from: container, forKey: .approvedBy) ?? approvedBy
         requested = self.time(from: container, forKey: .requested) ?? requested
-        account = self.daoAccount(with: configuration, from: container, forKey: .account) ?? account
-        user = self.daoUser(with: configuration, from: container, forKey: .user) ?? user
+        account = self.daoAccount(with: Self.config, from: container, forKey: .account) ?? account
+        user = self.daoUser(with: Self.config, from: container, forKey: .user) ?? user
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
