@@ -13,6 +13,8 @@ import KeyedCodable
 
 public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
     var accountType: DAOAccount.Type { get }
+    func account<K>(from container: KeyedDecodingContainer<K>,
+                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey
     func accountArray<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey
 }

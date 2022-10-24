@@ -22,6 +22,13 @@ public class CFGOrderItemObject: PTCLCFGOrderItemObject {
     public var orderType: DAOOrder.Type = DAOOrder.self
     public var placeType: DAOPlace.Type = DAOPlace.self
 
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(self.accountType, forKey: key,
+                                                  configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAccount].self, forKey: key,
