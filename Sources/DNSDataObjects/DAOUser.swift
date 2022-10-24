@@ -12,6 +12,8 @@ import KeyedCodable
 
 public protocol PTCLCFGDAOUser: PTCLCFGBaseObject {
     var userType: DAOUser.Type { get }
+    func user<K>(from container: KeyedDecodingContainer<K>,
+                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey
     func userArray<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey
 }
@@ -24,6 +26,27 @@ public class CFGUserObject: PTCLCFGUserObject {
     public var activityTypeType: DAOActivityType.Type = DAOActivityType.self
     public var cardType: DAOCard.Type = DAOCard.self
     public var placeType: DAOPlace.Type = DAOPlace.self
+
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func activityType<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOActivityType.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func card<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOCard.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
 
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {

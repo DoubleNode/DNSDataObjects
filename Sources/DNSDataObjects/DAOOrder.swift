@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOOrder: PTCLCFGBaseObject {
     var orderType: DAOOrder.Type { get }
+    func order<K>(from container: KeyedDecodingContainer<K>,
+                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey
     func orderArray<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey
 }
@@ -23,28 +25,45 @@ public class CFGOrderObject: PTCLCFGOrderObject {
     public var placeType: DAOPlace.Type = DAOPlace.self
     public var transactionType: DAOTransaction.Type = DAOTransaction.self
 
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func orderItem<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrderItem? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOOrderItem.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func transaction<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOTransaction? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOTransaction.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func orderItemArray<K>(from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrderItem] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOOrderItem].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOOrderItem].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func placeArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func transactionArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOTransaction].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOTransaction].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

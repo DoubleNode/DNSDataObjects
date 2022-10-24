@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOActivityType: PTCLCFGBaseObject {
     var activityTypeType: DAOActivityType.Type { get }
+    func activityType<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey
     func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey
 }

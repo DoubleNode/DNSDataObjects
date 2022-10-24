@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAppEvent: PTCLCFGBaseObject {
     var appEventType: DAOAppEvent.Type { get }
+    func appEvent<K>(from container: KeyedDecodingContainer<K>,
+                     forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppEvent? where K: CodingKey
     func appEventArray<K>(from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppEvent] where K: CodingKey
 }

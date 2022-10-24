@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoMedia<K>(with configuration: PTCLCFGDAOMedia,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.mediaType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.media(from: container, forKey: key)
     }
     func daoMediaArray<K>(with configuration: PTCLCFGDAOMedia,
                           from container: KeyedDecodingContainer<K>,

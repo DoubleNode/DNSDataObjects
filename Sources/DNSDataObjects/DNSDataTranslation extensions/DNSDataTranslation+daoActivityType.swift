@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoActivityType<K>(with configuration: PTCLCFGDAOActivityType,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.activityTypeType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.activityType(from: container, forKey: key)
     }
     func daoActivityTypeArray<K>(with configuration: PTCLCFGDAOActivityType,
                                  from container: KeyedDecodingContainer<K>,

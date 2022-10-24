@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOProduct: PTCLCFGBaseObject {
     var productType: DAOProduct.Type { get }
+    func product<K>(from container: KeyedDecodingContainer<K>,
+                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOProduct? where K: CodingKey
     func productArray<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOProduct] where K: CodingKey
 }

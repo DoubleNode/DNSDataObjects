@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoBasket<K>(with configuration: PTCLCFGDAOBasket,
                         from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasket? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.basketType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.basket(from: container, forKey: key)
     }
     func daoBasketArray<K>(with configuration: PTCLCFGDAOBasket,
                              from container: KeyedDecodingContainer<K>,

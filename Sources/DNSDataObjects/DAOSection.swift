@@ -11,12 +11,18 @@ import UIKit
 
 public protocol PTCLCFGDAOSection: PTCLCFGBaseObject {
     var sectionType: DAOSection.Type { get }
+    func section<K>(from container: KeyedDecodingContainer<K>,
+                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey
     func sectionArray<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey
 }
 public protocol PTCLCFGDAOSectionSection: PTCLCFGBaseObject {
     var sectionChildType: DAOSection.Type { get }
     var sectionParentType: DAOSection.Type { get }
+    func sectionChild<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey
+    func sectionParent<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey
     func sectionChildArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey
     func sectionParentArray<K>(from container: KeyedDecodingContainer<K>,
@@ -30,22 +36,35 @@ public class CFGSectionObject: PTCLCFGSectionObject {
     public var sectionChildType: DAOSection.Type = DAOSection.self
     public var sectionParentType: DAOSection.Type = DAOSection.self
 
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func sectionChild<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSection.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func sectionParent<K>(from container: KeyedDecodingContainer<K>,
+                               forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSection.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func placeArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func sectionChildArray<K>(from container: KeyedDecodingContainer<K>,
                                    forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOSection].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOSection].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func sectionParentArray<K>(from container: KeyedDecodingContainer<K>,
                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOSection].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOSection].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

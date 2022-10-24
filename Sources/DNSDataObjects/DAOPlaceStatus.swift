@@ -11,6 +11,8 @@ import UIKit
 
 public protocol PTCLCFGDAOPlaceStatus: PTCLCFGBaseObject {
     var placeStatusType: DAOPlaceStatus.Type { get }
+    func placeStatus<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceStatus? where K: CodingKey
     func placeStatusArray<K>(from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceStatus] where K: CodingKey
 }

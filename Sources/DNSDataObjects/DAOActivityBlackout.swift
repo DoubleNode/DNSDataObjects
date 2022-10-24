@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOActivityBlackout: PTCLCFGBaseObject {
     var activityBlackoutType: DAOActivityBlackout.Type { get }
+    func activityBlackout<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey
     func activityBlackoutArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey
 }

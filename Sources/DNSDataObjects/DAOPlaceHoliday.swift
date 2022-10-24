@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOPlaceHoliday: PTCLCFGBaseObject {
     var placeHolidayType: DAOPlaceHoliday.Type { get }
+    func placeHoliday<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHoliday? where K: CodingKey
     func placeHolidayArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHoliday] where K: CodingKey
 }

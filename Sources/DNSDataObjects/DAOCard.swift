@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOCard: PTCLCFGBaseObject {
     var cardType: DAOCard.Type { get }
+    func card<K>(from container: KeyedDecodingContainer<K>,
+                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey
     func cardArray<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey
 }
@@ -19,6 +21,11 @@ public protocol PTCLCFGCardObject: PTCLCFGDAOTransaction {
 }
 public class CFGCardObject: PTCLCFGCardObject {
     public var transactionType: DAOTransaction.Type = DAOTransaction.self
+    open func transaction<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOTransaction? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOTransaction.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func transactionArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOTransaction].self, forKey: key, configuration: self) ?? [] } catch { }

@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAODocument: PTCLCFGBaseObject {
     var documentType: DAODocument.Type { get }
+    func document<K>(from container: KeyedDecodingContainer<K>,
+                     forKey key: KeyedDecodingContainer<K>.Key) -> DAODocument? where K: CodingKey
     func documentArray<K>(from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAODocument] where K: CodingKey
 }

@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOTransaction: PTCLCFGBaseObject {
     var transactionType: DAOTransaction.Type { get }
+    func transaction<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOTransaction? where K: CodingKey
     func transactionArray<K>(from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey
 }
@@ -21,16 +23,25 @@ public class CFGTransactionObject: PTCLCFGTransactionObject {
     public var cardType: DAOCard.Type = DAOCard.self
     public var orderType: DAOOrder.Type = DAOOrder.self
 
+    open func card<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOCard.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func order<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOOrder.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func cardArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOCard].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOCard].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func orderArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOOrder].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOOrder].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

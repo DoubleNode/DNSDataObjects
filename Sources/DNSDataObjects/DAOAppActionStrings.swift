@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAppActionStrings: PTCLCFGBaseObject {
     var appActionStringsType: DAOAppActionStrings.Type { get }
+    func appActionStrings<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionStrings? where K: CodingKey
     func appActionStringsArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey
 }

@@ -12,6 +12,8 @@ import Foundation
 
 public protocol PTCLCFGDAOBeacon: PTCLCFGBaseObject {
     var beaconType: DAOBeacon.Type { get }
+    func beacon<K>(from container: KeyedDecodingContainer<K>,
+                   forKey key: KeyedDecodingContainer<K>.Key) -> DAOBeacon? where K: CodingKey
     func beaconArray<K>(from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBeacon] where K: CodingKey
 }

@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoFaq<K>(with configuration: PTCLCFGDAOFaq,
                    from container: KeyedDecodingContainer<K>,
                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOFaq? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.faqType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.faq(from: container, forKey: key)
     }
     func daoFaqArray<K>(with configuration: PTCLCFGDAOFaq,
                         from container: KeyedDecodingContainer<K>,

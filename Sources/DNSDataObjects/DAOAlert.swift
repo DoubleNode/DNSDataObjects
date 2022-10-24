@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAlert: PTCLCFGBaseObject {
     var alertType: DAOAlert.Type { get }
+    func alert<K>(from container: KeyedDecodingContainer<K>,
+                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey
     func alertArray<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey
 }

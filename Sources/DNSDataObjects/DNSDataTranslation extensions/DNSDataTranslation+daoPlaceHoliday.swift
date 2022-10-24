@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoPlaceHoliday<K>(with configuration: PTCLCFGDAOPlaceHoliday,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHoliday? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.placeHolidayType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.placeHoliday(from: container, forKey: key)
     }
     func daoPlaceHolidayArray<K>(with configuration: PTCLCFGDAOPlaceHoliday,
                                  from container: KeyedDecodingContainer<K>,

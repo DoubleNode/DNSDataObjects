@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAppActionImages: PTCLCFGBaseObject {
     var appActionImagesType: DAOAppActionImages.Type { get }
+    func appActionImages<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionImages? where K: CodingKey
     func appActionImagesArray<K>(from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionImages] where K: CodingKey
 }

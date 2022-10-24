@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOActivity: PTCLCFGBaseObject {
     var activityType: DAOActivity.Type { get }
+    func activity<K>(from container: KeyedDecodingContainer<K>,
+                     forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivity? where K: CodingKey
     func activityArray<K>(from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivity] where K: CodingKey
 }
@@ -18,19 +20,28 @@ public protocol PTCLCFGDAOActivity: PTCLCFGBaseObject {
 public protocol PTCLCFGActivityObject: PTCLCFGDAOActivityType, PTCLCFGDAOActivityBlackout {
 }
 public class CFGActivityObject: PTCLCFGActivityObject {
-    public var activityTypeType: DAOActivityType.Type = DAOActivityType.self
     public var activityBlackoutType: DAOActivityBlackout.Type = DAOActivityBlackout.self
+    public var activityTypeType: DAOActivityType.Type = DAOActivityType.self
 
-    open func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
-                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOActivityType].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
-        return []
+    open func activityBlackout<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOActivityBlackout.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
+    open func activityType<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOActivityType.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func activityBlackoutArray<K>(from container: KeyedDecodingContainer<K>,
                                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOActivityBlackout].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOActivityBlackout].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOActivityType].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAONotification: PTCLCFGBaseObject {
     var notificationType: DAONotification.Type { get }
+    func notification<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAONotification? where K: CodingKey
     func notificationArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAONotification] where K: CodingKey
 }

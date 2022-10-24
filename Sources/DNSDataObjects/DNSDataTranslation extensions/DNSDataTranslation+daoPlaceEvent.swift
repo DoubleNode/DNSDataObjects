@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoPlaceEvent<K>(with configuration: PTCLCFGDAOPlaceEvent,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceEvent? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.placeEventType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.placeEvent(from: container, forKey: key)
     }
     func daoPlaceEventArray<K>(with configuration: PTCLCFGDAOPlaceEvent,
                                from container: KeyedDecodingContainer<K>,

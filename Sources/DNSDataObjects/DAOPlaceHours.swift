@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOPlaceHours: PTCLCFGBaseObject {
     var placeHoursType: DAOPlaceHours.Type { get }
+    func placeHours<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHours? where K: CodingKey
     func placeHoursArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHours] where K: CodingKey
 }
@@ -21,16 +23,25 @@ public class CFGPlaceHoursObject: PTCLCFGPlaceHoursObject {
     public var placeEventType: DAOPlaceEvent.Type = DAOPlaceEvent.self
     public var placeHolidayType: DAOPlaceHoliday.Type = DAOPlaceHoliday.self
 
+    open func placeEvent<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceEvent? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlaceEvent.self, forKey: key, configuration: self) ?? nil} catch { }
+        return nil
+    }
+    open func placeHoliday<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHoliday? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlaceHoliday.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func placeEventArray<K>(from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceEvent] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlaceEvent].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlaceEvent].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func placeHolidayArray<K>(from container: KeyedDecodingContainer<K>,
                                    forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHoliday] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlaceHoliday].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

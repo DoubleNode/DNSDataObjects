@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoBeacon<K>(with configuration: PTCLCFGDAOBeacon,
                       from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOBeacon? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.beaconType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.beacon(from: container, forKey: key)
     }
     func daoBeaconArray<K>(with configuration: PTCLCFGDAOBeacon,
                            from container: KeyedDecodingContainer<K>,

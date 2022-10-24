@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOSystemState: PTCLCFGBaseObject {
     var systemStateType: DAOSystemState.Type { get }
+    func systemState<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemState? where K: CodingKey
     func systemStateArray<K>(from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemState] where K: CodingKey
 }

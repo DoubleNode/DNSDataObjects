@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoAlert<K>(with configuration: PTCLCFGDAOAlert,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.alertType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.alert(from: container, forKey: key)
     }
     func daoAlertArray<K>(with configuration: PTCLCFGDAOAlert,
                           from container: KeyedDecodingContainer<K>,

@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoAppActionImages<K>(with configuration: PTCLCFGDAOAppActionImages,
                                from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionImages? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.appActionImagesType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.appActionImages(from: container, forKey: key)
     }
     func daoAppActionImagesArray<K>(with configuration: PTCLCFGDAOAppActionImages,
                                     from container: KeyedDecodingContainer<K>,

@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOChangeRequest: PTCLCFGBaseObject {
     var changeRequestType: DAOChangeRequest.Type { get }
+    func changeRequest<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOChangeRequest? where K: CodingKey
     func changeRequestArray<K>(from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOChangeRequest] where K: CodingKey
 }

@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOBasketItem: PTCLCFGBaseObject {
     var basketItemType: DAOBasketItem.Type { get }
+    func basketItem<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasketItem? where K: CodingKey
     func basketItemArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasketItem] where K: CodingKey
 }
@@ -22,6 +24,27 @@ public class CFGBasketItemObject: PTCLCFGBasketItemObject {
     public var basketType: DAOBasket.Type = DAOBasket.self
     public var placeType: DAOPlace.Type = DAOPlace.self
     public var productType: DAOProduct.Type = DAOProduct.self
+
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func basket<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasket? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOBasket.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func product<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOProduct? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOProduct.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
 
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {

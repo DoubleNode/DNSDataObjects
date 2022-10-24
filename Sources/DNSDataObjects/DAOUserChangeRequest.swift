@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOUserChangeRequest: PTCLCFGBaseObject {
     var userChangeRequestType: DAOUserChangeRequest.Type { get }
+    func userChangeRequest<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOUserChangeRequest? where K: CodingKey
     func userChangeRequestArray<K>(from container: KeyedDecodingContainer<K>,
                                    forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUserChangeRequest] where K: CodingKey
 }
@@ -20,10 +22,15 @@ public protocol PTCLCFGUserChangeRequestObject: DAOChangeRequest.Config, PTCLCFG
 public class CFGUserChangeRequestObject: PTCLCFGUserChangeRequestObject {
     public var userType: DAOUser.Type = DAOUser.self
 
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func userArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOUser].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOUser].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

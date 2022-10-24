@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoSystemState<K>(with configuration: PTCLCFGDAOSystemState,
                            from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemState? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.systemStateType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.systemState(from: container, forKey: key)
     }
     func daoSystemStateArray<K>(with configuration: PTCLCFGDAOSystemState,
                                 from container: KeyedDecodingContainer<K>,

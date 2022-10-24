@@ -13,6 +13,8 @@ import KeyedCodable
 
 public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
     var accountType: DAOAccount.Type { get }
+    func account<K>(from container: KeyedDecodingContainer<K>,
+                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey
     func accountArray<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey
 }
@@ -22,6 +24,17 @@ public protocol PTCLCFGAccountObject: PTCLCFGDAOCard, PTCLCFGDAOUser {
 public class CFGAccountObject: PTCLCFGAccountObject {
     public var cardType: DAOCard.Type = DAOCard.self
     public var userType: DAOUser.Type = DAOUser.self
+
+    open func card<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOCard.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
 
     open func cardArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {

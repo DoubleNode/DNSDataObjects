@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAppAction: PTCLCFGBaseObject {
     var appActionType: DAOAppAction.Type { get }
+    func appAction<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppAction? where K: CodingKey
     func appActionArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppAction] where K: CodingKey
 }
@@ -21,16 +23,25 @@ public class CFGAppActionObject: PTCLCFGAppActionObject {
     public var appActionImagesType: DAOAppActionImages.Type = DAOAppActionImages.self
     public var appActionStringsType: DAOAppActionStrings.Type = DAOAppActionStrings.self
 
+    open func appActionImages<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionImages? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAppActionImages.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func appActionStrings<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionStrings? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAppActionStrings.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func appActionImagesArray<K>(from container: KeyedDecodingContainer<K>,
                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionImages] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAppActionImages].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAppActionImages].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func appActionStringsArray<K>(from container: KeyedDecodingContainer<K>,
                                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAppActionStrings].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAppActionStrings].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

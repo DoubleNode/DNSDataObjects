@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOPlaceEvent: PTCLCFGBaseObject {
     var placeEventType: DAOPlaceEvent.Type { get }
+    func placeEvent<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceEvent? where K: CodingKey
     func placeEventArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceEvent] where K: CodingKey
 }

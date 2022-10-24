@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOBasket: PTCLCFGBaseObject {
     var basketType: DAOBasket.Type { get }
+    func basket<K>(from container: KeyedDecodingContainer<K>,
+                   forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasket? where K: CodingKey
     func basketArray<K>(from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasket] where K: CodingKey
 }
@@ -21,6 +23,22 @@ public class CFGBasketObject: PTCLCFGBasketObject {
     public var accountType: DAOAccount.Type = DAOAccount.self
     public var basketItemType: DAOBasketItem.Type = DAOBasketItem.self
     public var placeType: DAOPlace.Type = DAOPlace.self
+
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func basketItem<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasketItem? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOBasketItem.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
 
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {

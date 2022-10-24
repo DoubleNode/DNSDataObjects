@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoPlaceHours<K>(with configuration: PTCLCFGDAOPlaceHours,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHours? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.placeHoursType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.placeHours(from: container, forKey: key)
     }
     func daoPlaceHoursArray<K>(with configuration: PTCLCFGDAOPlaceHours,
                                from container: KeyedDecodingContainer<K>,

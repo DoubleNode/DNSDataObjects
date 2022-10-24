@@ -12,6 +12,8 @@ import Foundation
 
 public protocol PTCLCFGDAOPlace: PTCLCFGBaseObject {
     var placeType: DAOPlace.Type { get }
+    func place<K>(from container: KeyedDecodingContainer<K>,
+                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey
     func placeArray<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey
 }
@@ -26,34 +28,55 @@ public class CFGPlaceObject: PTCLCFGPlaceObject {
     public var placeStatusType: DAOPlaceStatus.Type = DAOPlaceStatus.self
     public var sectionType: DAOSection.Type = DAOSection.self
 
+    open func activity<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivity? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOActivity.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func alert<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAlert.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func placeHours<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHours? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlaceHours.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func placeStatus<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceStatus? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlaceStatus.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func section<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSection.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func activityArray<K>(from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivity] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOActivity].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOActivity].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func alertArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAlert].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAlert].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func placeHoursArray<K>(from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHours] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlaceHours].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlaceHours].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func placeStatusArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceStatus] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPlaceStatus].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOPlaceStatus].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func sectionArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOSection].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOSection].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

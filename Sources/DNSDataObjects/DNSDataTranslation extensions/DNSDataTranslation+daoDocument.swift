@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoDocument<K>(with configuration: PTCLCFGDAODocument,
                         from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> DAODocument? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.documentType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.document(from: container, forKey: key)
     }
     func daoDocumentArray<K>(with configuration: PTCLCFGDAODocument,
                              from container: KeyedDecodingContainer<K>,

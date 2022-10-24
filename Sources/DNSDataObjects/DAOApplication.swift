@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOApplication: PTCLCFGBaseObject {
     var applicationType: DAOApplication.Type { get }
+    func application<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOApplication? where K: CodingKey
     func applicationArray<K>(from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOApplication] where K: CodingKey
 }
@@ -19,10 +21,14 @@ public protocol PTCLCFGApplicationObject: PTCLCFGDAOAppEvent {
 }
 public class CFGApplicationObject: PTCLCFGApplicationObject {
     public var appEventType: DAOAppEvent.Type = DAOAppEvent.self
+    open func appEvent<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppEvent? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAppEvent.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func appEventArray<K>(from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppEvent] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAppEvent].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAppEvent].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

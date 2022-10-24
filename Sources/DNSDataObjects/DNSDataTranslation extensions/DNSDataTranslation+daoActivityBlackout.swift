@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoActivityBlackout<K>(with configuration: PTCLCFGDAOActivityBlackout,
                                 from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.activityBlackoutType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.activityBlackout(from: container, forKey: key)
     }
     func daoActivityBlackoutArray<K>(with configuration: PTCLCFGDAOActivityBlackout,
                                      from container: KeyedDecodingContainer<K>,

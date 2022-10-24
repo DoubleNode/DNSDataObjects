@@ -13,9 +13,7 @@ public extension DNSDataTranslation {
     func daoOrder<K>(with configuration: PTCLCFGDAOOrder,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.orderType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.order(from: container, forKey: key)
     }
     func daoOrderArray<K>(with configuration: PTCLCFGDAOOrder,
                           from container: KeyedDecodingContainer<K>,

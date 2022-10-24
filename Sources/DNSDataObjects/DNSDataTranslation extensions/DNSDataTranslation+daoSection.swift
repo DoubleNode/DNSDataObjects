@@ -13,23 +13,17 @@ public extension DNSDataTranslation {
     func daoSection<K>(with configuration: PTCLCFGDAOSection,
                        from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.sectionType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.section(from: container, forKey: key)
     }
     func daoSectionChild<K>(with configuration: PTCLCFGDAOSectionSection,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.sectionChildType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.sectionChild(from: container, forKey: key)
     }
     func daoSectionParent<K>(with configuration: PTCLCFGDAOSectionSection,
                              from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
-        do { return try container.decodeIfPresent(configuration.sectionParentType, forKey: key,
-                                                  configuration: configuration) } catch { }
-        return nil
+        return configuration.sectionParent(from: container, forKey: key)
     }
     func daoSectionArray<K>(with configuration: PTCLCFGDAOSection,
                             from container: KeyedDecodingContainer<K>,

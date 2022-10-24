@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOMedia: PTCLCFGBaseObject {
     var mediaType: DAOMedia.Type { get }
+    func media<K>(from container: KeyedDecodingContainer<K>,
+                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey
     func mediaArray<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey
 }

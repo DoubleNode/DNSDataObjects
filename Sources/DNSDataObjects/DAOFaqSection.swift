@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOFaqSection: PTCLCFGBaseObject {
     var faqSectionType: DAOFaqSection.Type { get }
+    func faqSection<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOFaqSection? where K: CodingKey
     func faqSectionArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaqSection] where K: CodingKey
 }
@@ -19,10 +21,14 @@ public protocol PTCLCFGFaqSectionObject: PTCLCFGDAOFaq {
 }
 public class CFGFaqSectionObject: PTCLCFGFaqSectionObject {
     public var faqType: DAOFaq.Type = DAOFaq.self
+    open func faq<K>(from container: KeyedDecodingContainer<K>,
+                     forKey key: KeyedDecodingContainer<K>.Key) -> DAOFaq? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOFaq.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func faqArray<K>(from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaq] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOFaq].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOFaq].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

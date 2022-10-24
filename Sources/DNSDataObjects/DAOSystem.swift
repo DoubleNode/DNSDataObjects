@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOSystem: PTCLCFGBaseObject {
     var systemType: DAOSystem.Type { get }
+    func system<K>(from container: KeyedDecodingContainer<K>,
+                   forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystem? where K: CodingKey
     func systemArray<K>(from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystem] where K: CodingKey
 }
@@ -21,16 +23,25 @@ public class CFGSystemObject: PTCLCFGSystemObject {
     public var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
     public var systemStateType: DAOSystemState.Type = DAOSystemState.self
 
+    open func systemEndPoint<K>(from container: KeyedDecodingContainer<K>,
+                                forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemEndPoint? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSystemEndPoint.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func systemState<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemState? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSystemState.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func systemEndPointArray<K>(from container: KeyedDecodingContainer<K>,
                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemEndPoint] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func systemStateArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemState] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOSystemState].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOSystemState].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }

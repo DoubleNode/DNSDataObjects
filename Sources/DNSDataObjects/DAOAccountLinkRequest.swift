@@ -11,6 +11,8 @@ import Foundation
 
 public protocol PTCLCFGDAOAccountLinkRequest: PTCLCFGBaseObject {
     var accountLinkRequestType: DAOAccountLinkRequest.Type { get }
+    func accountLinkRequest<K>(from container: KeyedDecodingContainer<K>,
+                               forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccountLinkRequest? where K: CodingKey
     func accountLinkRequestArray<K>(from container: KeyedDecodingContainer<K>,
                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccountLinkRequest] where K: CodingKey
 }
@@ -21,16 +23,25 @@ public class CFGAccountLinkRequestObject: PTCLCFGAccountLinkRequestObject {
     public var accountType: DAOAccount.Type = DAOAccount.self
     public var userType: DAOUser.Type = DAOUser.self
 
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func userArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOUser].self, forKey: key,
-                                                  configuration: self) ?? [] } catch { }
+        do { return try container.decodeIfPresent([DAOUser].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }
