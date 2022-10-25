@@ -67,7 +67,7 @@ open class DAOAccountLinkRequest: DAOChangeRequest, DecodingConfigurationProvidi
         case account, approved, approvedBy, requested, user
     }
     
-    open var approved = Date()
+    open var approved: Date?
     open var approvedBy = ""
     open var requested = Date()
     @CodableConfiguration(from: DAOAccountLinkRequest.self) open var account: DAOAccount? = nil
