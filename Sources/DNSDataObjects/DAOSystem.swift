@@ -174,9 +174,9 @@ open class DAOSystem: DAOBaseObject, DecodingConfigurationProviding, EncodingCon
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.endPoints.hasDiffElementsFrom(rhs.endPoints) ||
+            lhs.historyState.hasDiffElementsFrom(rhs.historyState) ||
             lhs.currentState != rhs.currentState ||
-            lhs.endPoints != rhs.endPoints ||
-            lhs.historyState != rhs.historyState ||
             lhs.message != rhs.message ||
             lhs.name != rhs.name
     }

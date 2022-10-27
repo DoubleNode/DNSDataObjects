@@ -152,8 +152,8 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.faqs.hasDiffElementsFrom(rhs.faqs) ||
             lhs.code != rhs.code ||
-            lhs.faqs != rhs.faqs ||
             lhs.icon != rhs.icon ||
             lhs.title != rhs.title
     }

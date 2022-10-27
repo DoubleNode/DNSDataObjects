@@ -192,10 +192,10 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.children != rhs.children ||
+            lhs.children.hasDiffElementsFrom(rhs.children) ||
+            lhs.places.hasDiffElementsFrom(rhs.places) ||
             lhs.name != rhs.name ||
-            lhs.parent != rhs.parent ||
-            lhs.places != rhs.places
+            lhs.parent != rhs.parent
     }
 
     // MARK: - Equatable protocol methods -

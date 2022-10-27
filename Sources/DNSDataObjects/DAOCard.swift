@@ -158,11 +158,11 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.transactions.hasDiffElementsFrom(rhs.transactions) ||
             lhs.cardNumber != rhs.cardNumber ||
             lhs.expiration != rhs.expiration ||
             lhs.nickname != rhs.nickname ||
-            lhs.pinNumber != rhs.pinNumber ||
-            lhs.transactions != rhs.transactions
+            lhs.pinNumber != rhs.pinNumber
     }
 
     // MARK: - Equatable protocol methods -

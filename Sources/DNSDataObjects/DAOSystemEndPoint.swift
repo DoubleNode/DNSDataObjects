@@ -173,10 +173,10 @@ open class DAOSystemEndPoint: DAOBaseObject, DecodingConfigurationProviding, Enc
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.historyState.hasDiffElementsFrom(rhs.historyState) ||
             lhs.currentState != rhs.currentState ||
             lhs.name != rhs.name ||
-            lhs.system != rhs.system ||
-            lhs.historyState != rhs.historyState
+            lhs.system != rhs.system
     }
 
     // MARK: - Equatable protocol methods -
