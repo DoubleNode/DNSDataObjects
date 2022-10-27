@@ -187,8 +187,8 @@ open class DAOActivity: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.blackouts.hasDiffElementsFrom(rhs.blackouts) ||
             lhs.baseType != rhs.baseType ||
-            lhs.blackouts != rhs.blackouts ||
             lhs.bookingEndTime != rhs.bookingEndTime ||
             lhs.bookingStartTime != rhs.bookingStartTime ||
             lhs.code != rhs.code ||

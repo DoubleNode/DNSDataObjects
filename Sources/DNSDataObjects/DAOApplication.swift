@@ -131,7 +131,7 @@ open class DAOApplication: DAOBaseObject, DecodingConfigurationProviding, Encodi
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.appEvents != rhs.appEvents
+            lhs.appEvents.hasDiffElementsFrom(rhs.appEvents)
     }
 
     // MARK: - Equatable protocol methods -

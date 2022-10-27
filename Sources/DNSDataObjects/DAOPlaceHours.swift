@@ -221,8 +221,8 @@ open class DAOPlaceHours: DAOBaseObject, DecodingConfigurationProviding, Encodin
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.events != rhs.events ||
-            lhs.holidays != rhs.holidays ||
+            lhs.events.hasDiffElementsFrom(rhs.events) ||
+            lhs.holidays.hasDiffElementsFrom(rhs.holidays) ||
             lhs.monday != rhs.monday ||
             lhs.tuesday != rhs.tuesday ||
             lhs.wednesday != rhs.wednesday ||

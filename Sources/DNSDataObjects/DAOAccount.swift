@@ -192,12 +192,12 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.cards != rhs.cards ||
+            lhs.cards.hasDiffElementsFrom(rhs.cards) ||
+            lhs.users.hasDiffElementsFrom(rhs.users) ||
             lhs.dob != rhs.dob ||
             lhs.emailNotifications != rhs.emailNotifications ||
             lhs.name != rhs.name ||
-            lhs.pushNotifications != rhs.pushNotifications ||
-            lhs.users != rhs.users
+            lhs.pushNotifications != rhs.pushNotifications
     }
 
     // MARK: - Equatable protocol methods -
