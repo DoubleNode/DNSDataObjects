@@ -190,7 +190,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         retval.merge([
             field(.accounts): self.accounts.map { $0.asDictionary },
             field(.cards): self.cards.map { $0.asDictionary },
-            field(.dob): self.dob,
+            field(.dob): self.dob?.dnsDate(as: .shortMilitary),
             field(.email): self.email,
             field(.favorites): self.favorites.map { $0.asDictionary },
             field(.name): self.name.asDictionary,
@@ -235,7 +235,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accounts, forKey: .accounts, configuration: configuration)
         try container.encode(cards, forKey: .cards, configuration: configuration)
-        try container.encode(dob, forKey: .dob)
+        try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(email, forKey: .email)
         try container.encode(favorites, forKey: .favorites, configuration: configuration)
         try container.encode(name, forKey: .name)

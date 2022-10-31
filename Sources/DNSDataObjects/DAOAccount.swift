@@ -136,7 +136,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         var retval = super.asDictionary
         retval.merge([
             field(.cards): self.cards.map { $0.asDictionary },
-            field(.dob): self.dob,
+            field(.dob): self.dob?.dnsDate(as: .shortMilitary),
             field(.emailNotifications): self.emailNotifications,
             field(.name): self.name.asDictionary,
             field(.pushNotifications): self.pushNotifications,
@@ -175,7 +175,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(cards, forKey: .cards, configuration: configuration)
-        try container.encode(dob, forKey: .dob)
+        try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(emailNotifications, forKey: .emailNotifications)
         try container.encode(name, forKey: .name)
         try container.encode(pushNotifications, forKey: .pushNotifications)
