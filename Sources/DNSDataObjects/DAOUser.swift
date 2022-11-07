@@ -96,9 +96,11 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case accounts, cards, dob, email, favorites, myPlace, name, phone, type
+        case accounts, cards, consent, consentId, dob, email, favorites, myPlace, name, phone, type
     }
 
+    open var consent: Date?
+    open var consentId: String = ""
     open var dob: Date?
     open var email: String = ""
     open var name = PersonNameComponents()
@@ -128,6 +130,16 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     public var nameShort: String { self.name.dnsFormatName(style: .short) }
     public var nameSortable: String { self.name.dnsSortableName }
 
+    public var hasConsent: Bool {
+        consent != nil && !consentId.isEmpty
+    }
+    public var isMinor: Bool {
+        [.unknown, .child, .youth].contains(self.type)
+    }
+    public var isUnder13: Bool {
+        [.unknown, .child].contains(self.type)
+    }
+
     // MARK: - Initializers -
     required public init() {
         super.init()
@@ -148,6 +160,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     }
     open func update(from object: DAOUser) {
         super.update(from: object)
+        self.consent = object.consent
+        self.consentId = object.consentId
         self.dob = object.dob
         self.email = object.email
         self.name = object.name
@@ -172,6 +186,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         self.accounts = accountsData.compactMap { Self.createAccount(from: $0) }
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
         self.cards = cardsData.compactMap { Self.createCard(from: $0) }
+        self.consent = self.date(from: data[field(.consent)] as Any?) ?? self.consent
+        self.consentId = self.string(from: data[field(.consentId)] as Any?) ?? self.consentId
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
         self.email = self.string(from: data[field(.email)] as Any?) ?? self.email
         let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
@@ -190,6 +206,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         retval.merge([
             field(.accounts): self.accounts.map { $0.asDictionary },
             field(.cards): self.cards.map { $0.asDictionary },
+            field(.consent): self.consent,
+            field(.consentId): self.consentId,
             field(.dob): self.dob?.dnsDate(as: .shortMilitary),
             field(.email): self.email,
             field(.favorites): self.favorites.map { $0.asDictionary },
@@ -222,6 +240,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         let container = try decoder.container(keyedBy: CodingKeys.self)
         accounts = self.daoAccountArray(with: configuration, from: container, forKey: .accounts)
         cards = self.daoCardArray(with: configuration, from: container, forKey: .cards)
+        consent = self.date(from: container, forKey: .consent) ?? consent
+        consentId = self.string(from: container, forKey: .consentId) ?? consentId
         dob = self.date(from: container, forKey: .dob) ?? dob
         email = self.string(from: container, forKey: .email) ?? email
         favorites = self.daoActivityTypeArray(with: configuration, from: container, forKey: .favorites)
@@ -235,6 +255,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accounts, forKey: .accounts, configuration: configuration)
         try container.encode(cards, forKey: .cards, configuration: configuration)
+        try container.encode(consent, forKey: .consent)
+        try container.encode(consentId, forKey: .consentId)
         try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(email, forKey: .email)
         try container.encode(favorites, forKey: .favorites, configuration: configuration)
@@ -257,6 +279,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
             lhs.accounts.hasDiffElementsFrom(rhs.accounts) ||
             lhs.cards.hasDiffElementsFrom(rhs.cards) ||
             lhs.favorites.hasDiffElementsFrom(rhs.favorites) ||
+            lhs.consent != rhs.consent ||
+            lhs.consentId != rhs.consentId ||
             lhs.dob != rhs.dob ||
             lhs.email != rhs.email ||
             lhs.name != rhs.name ||
