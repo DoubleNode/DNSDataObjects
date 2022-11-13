@@ -115,7 +115,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         case hours, name, phone, section, statuses, timeZone
     }
 
-    open var address = ""
+    open var address: DNSPostalAddress = DNSPostalAddress()
     open var code = ""
     open var geohashes: [String] = []
     open var geopoint: CLLocation?
@@ -184,7 +184,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         _ = super.dao(from: data)
         let activitiesData = self.dataarray(from: data[field(.activities)] as Any?)
         self.activities = activitiesData.compactMap { Self.createActivity(from: $0) }
-        self.address = self.string(from: data[field(.address)] as Any?) ?? self.address
+        self.address = self.dnsPostalAddress(from: data[field(.address)] as Any?) ?? self.address
         let alertsData = self.dataarray(from: data[field(.alerts)] as Any?)
         self.alerts = alertsData.compactMap { Self.createAlert(from: $0) }
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
@@ -205,7 +205,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         var retval = super.asDictionary
         retval.merge([
             field(.activities): self.activities.map { $0.asDictionary },
-            field(.address): self.address,
+            field(.address): self.address.asDictionary,
             field(.alerts): self.alerts.map { $0.asDictionary },
             field(.code): self.code,
             field(.geohashes): self.geohashes.map { $0 },
@@ -240,7 +240,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activities = self.daoActivityArray(with: configuration, from: container, forKey: .activities)
-        address = self.string(from: container, forKey: .address) ?? address
+        address = self.dnsPostalAddress(from: container, forKey: .address) ?? address
         alerts = self.daoAlertArray(with: configuration, from: container, forKey: .alerts)
         code = self.string(from: container, forKey: .code) ?? code
         hours = self.daoPlaceHours(with: configuration, from: container, forKey: .hours) ?? hours
