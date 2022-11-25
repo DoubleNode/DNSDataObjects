@@ -162,15 +162,15 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.code = object.code
         self.geohashes = object.geohashes
         self.geopoint = object.geopoint
-        self.name = object.name
         self.phone = object.phone
         self.section = object.section?.copy() as? DAOSection
         self.timeZone = object.timeZone
         // swiftlint:disable force_cast
         self.activities = object.activities.map { $0.copy() as! DAOActivity }
         self.alerts = object.alerts.map { $0.copy() as! DAOAlert }
-        self.statuses = object.statuses.map { $0.copy() as! DAOPlaceStatus }
         self.hours = object.hours.copy() as! DAOPlaceHours
+        self.name = object.name.copy() as! DNSString
+        self.statuses = object.statuses.map { $0.copy() as! DAOPlaceStatus }
         // swiftlint:enable force_cast
     }
 

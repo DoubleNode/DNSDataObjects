@@ -54,8 +54,10 @@ open class DAOActivityBlackout: DAOBaseObject, DecodingConfigurationProviding, E
     open func update(from object: DAOActivityBlackout) {
         super.update(from: object)
         self.endTime = object.endTime
-        self.message = object.message
         self.startTime = object.startTime
+        // swiftlint:disable force_cast
+        self.message = object.message.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

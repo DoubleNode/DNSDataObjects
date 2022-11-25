@@ -101,10 +101,10 @@ open class DAOActivity: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         self.bookingEndTime = object.bookingEndTime
         self.bookingStartTime = object.bookingStartTime
         self.code = object.code
-        self.name = object.name
         // swiftlint:disable force_cast
         self.blackouts = object.blackouts.map { $0.copy() as! DAOActivityBlackout }
         self.baseType = object.baseType.copy() as! DAOActivityType
+        self.name = object.name.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 

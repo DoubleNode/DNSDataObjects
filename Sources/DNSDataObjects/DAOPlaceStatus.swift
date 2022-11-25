@@ -62,10 +62,12 @@ open class DAOPlaceStatus: DAOBaseObject, DecodingConfigurationProviding, Encodi
     open func update(from object: DAOPlaceStatus) {
         super.update(from: object)
         self.endTime = object.endTime
-        self.message = object.message
         self.scope = object.scope
         self.startTime = object.startTime
         self.status = object.status
+        // swiftlint:disable force_cast
+        self.message = object.message.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

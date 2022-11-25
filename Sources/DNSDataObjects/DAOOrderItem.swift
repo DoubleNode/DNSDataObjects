@@ -105,9 +105,6 @@ open class DAOOrderItem: DAOBaseObject, DecodingConfigurationProviding, Encoding
     }
     open func update(from object: DAOOrderItem) {
         super.update(from: object)
-        self.account = object.account
-        self.order = object.order
-        self.place = object.place
         self.quantity = object.quantity
         // swiftlint:disable force_cast
         self.account = object.account?.copy() as? DAOAccount

@@ -94,9 +94,11 @@ open class DAOSystem: DAOBaseObject, DecodingConfigurationProviding, EncodingCon
         self.message = object.message
         self.name = object.name
         // swiftlint:disable force_cast
+        self.currentState = object.currentState.copy() as! DAOSystemState
         self.endPoints = object.endPoints.map { $0.copy() as! DAOSystemEndPoint }
         self.historyState = object.historyState.map { $0.copy() as! DAOSystemState }
-        self.currentState = object.currentState.copy() as! DAOSystemState
+        self.message = object.message.copy() as! DNSString
+        self.name = object.name.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 

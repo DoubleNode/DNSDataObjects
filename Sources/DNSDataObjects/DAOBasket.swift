@@ -101,8 +101,6 @@ open class DAOBasket: DAOBaseObject, DecodingConfigurationProviding, EncodingCon
    }
    open func update(from object: DAOBasket) {
        super.update(from: object)
-       self.account = object.account
-       self.place = object.place
        // swiftlint:disable force_cast
        self.items = object.items.map { $0.copy() as! DAOBasketItem }
        self.account = object.account?.copy() as? DAOAccount

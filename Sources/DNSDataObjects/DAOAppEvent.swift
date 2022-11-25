@@ -78,7 +78,9 @@ open class DAOAppEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         self.endTime = object.endTime
         self.priority = object.priority
         self.startTime = object.startTime
-        self.title = object.title
+        // swiftlint:disable force_cast
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

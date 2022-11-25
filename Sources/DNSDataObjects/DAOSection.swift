@@ -118,6 +118,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         self.parent = object.parent?.copy() as? DAOSection
         // swiftlint:disable force_cast
         self.children = object.children.map { $0.copy() as! DAOSection }
+        self.name = object.name.copy() as! DNSString
         self.places = object.places.map { $0.copy() as! DAOPlace }
         // swiftlint:enable force_cast
     }

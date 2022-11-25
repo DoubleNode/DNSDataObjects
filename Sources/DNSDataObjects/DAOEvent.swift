@@ -70,10 +70,12 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     open func update(from object: DAOEvent) {
         super.update(from: object)
-        self.about = object.about
-        self.days = object.days
         self.distribution = object.distribution
-        self.title = object.title
+        // swiftlint:disable force_cast
+        self.about = object.about.copy() as! DNSString
+        self.days = object.days.map { $0.copy() as! DAOEventDay }
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

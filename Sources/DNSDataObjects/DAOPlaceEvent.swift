@@ -65,10 +65,12 @@ open class DAOPlaceEvent: DAOBaseObject, DecodingConfigurationProviding, Encodin
     open func update(from object: DAOPlaceEvent) {
         super.update(from: object)
         self.endDate = object.endDate
-        self.name = object.name
         self.startDate = object.startDate
         self.timeZone = object.timeZone
         self.type = object.type
+        // swiftlint:disable force_cast
+        self.name = object.name.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

@@ -58,7 +58,9 @@ open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, Encod
     open func update(from object: DAOActivityType) {
         super.update(from: object)
         self.code = object.code
-        self.name = object.name
+        // swiftlint:disable force_cast
+        self.name = object.name.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

@@ -54,10 +54,12 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     }
     open func update(from object: DAOProduct) {
         super.update(from: object)
-        self.about = object.about
         self.price = object.price
         self.sku = object.sku
-        self.title = object.title
+        // swiftlint:disable force_cast
+        self.about = object.about.copy() as! DNSString
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

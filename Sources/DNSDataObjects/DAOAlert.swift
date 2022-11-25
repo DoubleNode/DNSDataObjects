@@ -86,14 +86,16 @@ open class DAOAlert: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func update(from object: DAOAlert) {
         super.update(from: object)
         self.endTime = object.endTime
-        self.imageUrl = object.imageUrl
         self.name = object.name
         self.priority = object.priority
         self.scope = object.scope
         self.startTime = object.startTime
         self.status = object.status
-        self.tagLine = object.tagLine
-        self.title = object.title
+        // swiftlint:disable force_cast
+        self.imageUrl = object.imageUrl.copy() as! DNSURL
+        self.tagLine = object.tagLine.copy() as! DNSString
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

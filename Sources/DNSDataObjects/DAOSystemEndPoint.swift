@@ -93,10 +93,10 @@ open class DAOSystemEndPoint: DAOBaseObject, DecodingConfigurationProviding, Enc
     }
     open func update(from object: DAOSystemEndPoint) {
         super.update(from: object)
-        self.name = object.name
         // swiftlint:disable force_cast
-        self.historyState = object.historyState.map { $0.copy() as! DAOSystemState }
         self.currentState = object.currentState.copy() as! DAOSystemState
+        self.historyState = object.historyState.map { $0.copy() as! DAOSystemState }
+        self.name = object.name.copy() as! DNSString
         self.system = object.system.copy() as! DAOSystem
         // swiftlint:enable force_cast
     }

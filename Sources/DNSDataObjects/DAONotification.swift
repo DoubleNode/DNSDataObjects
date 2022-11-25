@@ -58,10 +58,12 @@ open class DAONotification: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     open func update(from object: DAONotification) {
         super.update(from: object)
-        self.body = object.body
         self.deepLink = object.deepLink
-        self.title = object.title
         self.type = object.type
+        // swiftlint:disable force_cast
+        self.body = object.body.copy() as! DNSString
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

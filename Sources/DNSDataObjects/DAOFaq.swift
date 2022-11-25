@@ -80,10 +80,10 @@ open class DAOFaq: DAOBaseObject, DecodingConfigurationProviding, EncodingConfig
     }
     open func update(from object: DAOFaq) {
         super.update(from: object)
-        self.question = object.question
-        self.answer = object.answer
         // swiftlint:disable force_cast
         self.section = object.section.copy() as! DAOFaqSection
+        self.question = object.question.copy() as! DNSString
+        self.answer = object.answer.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 

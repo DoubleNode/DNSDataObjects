@@ -54,10 +54,12 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     open func update(from object: DAOEventDayItem) {
         super.update(from: object)
-        self.about = object.about
         self.endTimeOfDay = object.endTimeOfDay
         self.startTimeOfDay = object.startTimeOfDay
-        self.title = object.title
+        // swiftlint:disable force_cast
+        self.about = object.about.copy() as! DNSString
+        self.title = object.title.copy() as! DNSString
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -

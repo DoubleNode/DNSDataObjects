@@ -78,9 +78,9 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
         super.update(from: object)
         self.code = object.code
         self.icon = object.icon
-        self.title = object.title
         // swiftlint:disable force_cast
         self.faqs = object.faqs.map { $0.copy() as! DAOFaq }
+        self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 
