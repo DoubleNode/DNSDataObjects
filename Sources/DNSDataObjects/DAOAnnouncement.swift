@@ -36,7 +36,7 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
 
     open var body = DNSString()
     open var distribution = DNSVisibility.everyone
-    open var endTime = Date()
+    open var endTime = Date().nextMonth
     open var startTime = Date()
     open var title = DNSString()
     
@@ -72,9 +72,9 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
         self.body = self.dnsstring(from: data[field(.body)] as Any?) ?? self.body
         let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
         self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
-        self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
+        self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.startTime.nextMonth
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -109,9 +109,9 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = self.dnsstring(from: container, forKey: .body) ?? body
-        endTime = self.time(from: container, forKey: .endTime) ?? endTime
         startTime = self.time(from: container, forKey: .startTime) ?? startTime
         title = self.dnsstring(from: container, forKey: .title) ?? title
+        endTime = self.time(from: container, forKey: .endTime) ?? startTime.nextMonth
 
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
     }
