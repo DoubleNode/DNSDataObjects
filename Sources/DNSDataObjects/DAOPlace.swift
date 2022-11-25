@@ -18,12 +18,14 @@ public protocol PTCLCFGDAOPlace: PTCLCFGBaseObject {
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey
 }
 
-public protocol PTCLCFGPlaceObject: PTCLCFGDAOActivity, PTCLCFGDAOAlert, PTCLCFGDAOPlaceHours,
-                                    PTCLCFGDAOPlaceStatus, PTCLCFGDAOSection {
+public protocol PTCLCFGPlaceObject: PTCLCFGDAOActivity, PTCLCFGDAOAlert, PTCLCFGDAOAnnouncement, PTCLCFGDAOEvent,
+                                    PTCLCFGDAOPlaceHours, PTCLCFGDAOPlaceStatus, PTCLCFGDAOSection {
 }
 public class CFGPlaceObject: PTCLCFGPlaceObject {
     public var activityType: DAOActivity.Type = DAOActivity.self
     public var alertType: DAOAlert.Type = DAOAlert.self
+    public var announcementType: DAOAnnouncement.Type = DAOAnnouncement.self
+    public var eventType: DAOEvent.Type = DAOEvent.self
     public var placeHoursType: DAOPlaceHours.Type = DAOPlaceHours.self
     public var placeStatusType: DAOPlaceStatus.Type = DAOPlaceStatus.self
     public var sectionType: DAOSection.Type = DAOSection.self
@@ -36,6 +38,16 @@ public class CFGPlaceObject: PTCLCFGPlaceObject {
     open func alert<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOAlert.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func announcement<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOAnnouncement? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAnnouncement.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func event<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOEvent? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOEvent.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
     open func placeHours<K>(from container: KeyedDecodingContainer<K>,
@@ -62,6 +74,16 @@ public class CFGPlaceObject: PTCLCFGPlaceObject {
     open func alertArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAlert].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func announcementArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAnnouncement] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAnnouncement].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func eventArray<K>(from container: KeyedDecodingContainer<K>,
+                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOEvent] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOEvent].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
     open func placeHoursArray<K>(from container: KeyedDecodingContainer<K>,
@@ -96,6 +118,14 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open class func createAlert(from object: DAOAlert) -> DAOAlert { config.alertType.init(from: object) }
     open class func createAlert(from data: DNSDataDictionary) -> DAOAlert? { config.alertType.init(from: data) }
 
+    open class func createAnnouncement() -> DAOAnnouncement { config.announcementType.init() }
+    open class func createAnnouncement(from object: DAOAnnouncement) -> DAOAnnouncement { config.announcementType.init(from: object) }
+    open class func createAnnouncement(from data: DNSDataDictionary) -> DAOAnnouncement? { config.announcementType.init(from: data) }
+
+    open class func createEvent() -> DAOEvent { config.eventType.init() }
+    open class func createEvent(from object: DAOEvent) -> DAOEvent { config.eventType.init(from: object) }
+    open class func createEvent(from data: DNSDataDictionary) -> DAOEvent? { config.eventType.init(from: data) }
+
     open class func createPlaceHours() -> DAOPlaceHours { config.placeHoursType.init() }
     open class func createPlaceHours(from object: DAOPlaceHours) -> DAOPlaceHours { config.placeHoursType.init(from: object) }
     open class func createPlaceHours(from data: DNSDataDictionary) -> DAOPlaceHours? { config.placeHoursType.init(from: data) }
@@ -111,8 +141,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case activities, address, alerts, code, geohashes, geopoint
-        case hours, name, phone, section, statuses, timeZone
+        case activities, address, alerts, announcements, code, events, geohashes
+        case geopoint, hours, name, phone, section, statuses, timeZone
     }
 
     open var address: DNSPostalAddress = DNSPostalAddress()
@@ -123,6 +153,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open var phone = ""
     @CodableConfiguration(from: DAOPlace.self) open var activities: [DAOActivity] = []
     @CodableConfiguration(from: DAOPlace.self) open var alerts: [DAOAlert] = []
+    @CodableConfiguration(from: DAOPlace.self) open var announcements: [DAOAnnouncement] = []
+    @CodableConfiguration(from: DAOPlace.self) open var events: [DAOEvent] = []
     @CodableConfiguration(from: DAOPlace.self) open var hours: DAOPlaceHours = DAOPlaceHours()
     @CodableConfiguration(from: DAOPlace.self) open var section: DAOSection? = nil
     @CodableConfiguration(from: DAOPlace.self) open var statuses: [DAOPlaceStatus] = [] {
@@ -168,6 +200,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         // swiftlint:disable force_cast
         self.activities = object.activities.map { $0.copy() as! DAOActivity }
         self.alerts = object.alerts.map { $0.copy() as! DAOAlert }
+        self.announcements = object.announcements.map { $0.copy() as! DAOAnnouncement }
+        self.events = object.events.map { $0.copy() as! DAOEvent }
         self.hours = object.hours.copy() as! DAOPlaceHours
         self.name = object.name.copy() as! DNSString
         self.statuses = object.statuses.map { $0.copy() as! DAOPlaceStatus }
@@ -187,7 +221,11 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.address = self.dnsPostalAddress(from: data[field(.address)] as Any?) ?? self.address
         let alertsData = self.dataarray(from: data[field(.alerts)] as Any?)
         self.alerts = alertsData.compactMap { Self.createAlert(from: $0) }
+        let announcementsData = self.dataarray(from: data[field(.announcements)] as Any?)
+        self.announcements = announcementsData.compactMap { Self.createAnnouncement(from: $0) }
         self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
+        let eventsData = self.dataarray(from: data[field(.events)] as Any?)
+        self.events = eventsData.compactMap { Self.createEvent(from: $0) }
         let geohashesData = self.array(from: data[field(.geohashes)] as Any?)
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
         let hoursData = self.dictionary(from: data[field(.hours)] as Any?)
@@ -207,7 +245,9 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             field(.activities): self.activities.map { $0.asDictionary },
             field(.address): self.address.asDictionary,
             field(.alerts): self.alerts.map { $0.asDictionary },
+            field(.announcements): self.announcements.map { $0.asDictionary },
             field(.code): self.code,
+            field(.events): self.events.map { $0.asDictionary },
             field(.geohashes): self.geohashes.map { $0 },
             field(.geopoint): self.geopoint?.asDictionary,
             field(.hours): self.hours.asDictionary,
@@ -242,7 +282,9 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         activities = self.daoActivityArray(with: configuration, from: container, forKey: .activities)
         address = self.dnsPostalAddress(from: container, forKey: .address) ?? address
         alerts = self.daoAlertArray(with: configuration, from: container, forKey: .alerts)
+        announcements = self.daoAnnouncementArray(with: configuration, from: container, forKey: .announcements)
         code = self.string(from: container, forKey: .code) ?? code
+        events = self.daoEventArray(with: configuration, from: container, forKey: .events)
         hours = self.daoPlaceHours(with: configuration, from: container, forKey: .hours) ?? hours
         name = self.dnsstring(from: container, forKey: .name) ?? name
         phone = self.string(from: container, forKey: .phone) ?? phone
@@ -260,7 +302,9 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         try container.encode(activities, forKey: .activities, configuration: configuration)
         try container.encode(address, forKey: .address)
         try container.encode(alerts, forKey: .alerts, configuration: configuration)
+        try container.encode(announcements, forKey: .announcements, configuration: configuration)
         try container.encode(code, forKey: .code)
+        try container.encode(events, forKey: .events, configuration: configuration)
         try container.encode(geohashes, forKey: .geohashes)
         try container.encode(geopoint?.asDictionary as? [String: Double], forKey: .geopoint)
         try container.encode(hours, forKey: .hours, configuration: configuration)
@@ -283,6 +327,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         return super.isDiffFrom(rhs) ||
             lhs.activities.hasDiffElementsFrom(rhs.activities) ||
             lhs.alerts.hasDiffElementsFrom(rhs.alerts) ||
+            lhs.announcements.hasDiffElementsFrom(rhs.announcements) ||
+            lhs.events.hasDiffElementsFrom(rhs.events) ||
             lhs.statuses.hasDiffElementsFrom(rhs.statuses) ||
             lhs.address != rhs.address ||
             lhs.code != rhs.code ||
