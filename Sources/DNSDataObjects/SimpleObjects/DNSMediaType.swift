@@ -11,8 +11,9 @@ import Foundation
 
 public enum DNSMediaType: String, CaseIterable, Codable {
     case unknown
-    case staticImage
     case animatedImage
     case pdfDocument
+    case staticImage
+    case text
     case video
 }
