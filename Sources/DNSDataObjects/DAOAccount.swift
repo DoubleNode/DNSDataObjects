@@ -19,27 +19,38 @@ public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey
 }
 
-public protocol PTCLCFGAccountObject: PTCLCFGDAOCard, PTCLCFGDAOUser {
+public protocol PTCLCFGAccountObject: PTCLCFGDAOCard, PTCLCFGDAOMedia, PTCLCFGDAOUser {
 }
 public class CFGAccountObject: PTCLCFGAccountObject {
     public var cardType: DAOCard.Type = DAOCard.self
-    public var userType: DAOUser.Type = DAOUser.self
-
     open func card<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOCard.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func user<K>(from container: KeyedDecodingContainer<K>,
-                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-
     open func cardArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOCard].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
+    }
+
+    public var mediaType: DAOMedia.Type = DAOMedia.self
+    open func media<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOMedia.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func mediaArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOMedia].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
+    public var userType: DAOUser.Type = DAOUser.self
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
     open func userArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
@@ -59,6 +70,10 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     open class func createCard(from object: DAOCard) -> DAOCard { config.cardType.init(from: object) }
     open class func createCard(from data: DNSDataDictionary) -> DAOCard? { config.cardType.init(from: data) }
 
+    open class func createMedia() -> DAOMedia { config.mediaType.init() }
+    open class func createMedia(from object: DAOMedia) -> DAOMedia { config.mediaType.init(from: object) }
+    open class func createMedia(from data: DNSDataDictionary) -> DAOMedia? { config.mediaType.init(from: data) }
+
     open class func createUser() -> DAOUser { config.userType.init() }
     open class func createUser(from object: DAOUser) -> DAOUser { config.userType.init(from: object) }
     open class func createUser(from data: DNSDataDictionary) -> DAOUser? { config.userType.init(from: data) }
@@ -66,13 +81,14 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case cards, dob, emailNotifications, name, pushNotifications, users
+        case avatar, cards, dob, emailNotifications, name, pushNotifications, users
     }
 
     open var dob: Date?
     open var emailNotifications = false
     open var name = PersonNameComponents()
     open var pushNotifications = false
+    @CodableConfiguration(from: DAOAccount.self) open var avatar: DAOMedia? = nil
     @CodableConfiguration(from: DAOAccount.self) open var cards: [DAOCard] = []
     @CodableConfiguration(from: DAOAccount.self) open var users: [DAOUser] = []
 
@@ -107,6 +123,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         self.name = object.name
         self.pushNotifications = object.pushNotifications
         // swiftlint:disable force_cast
+        self.avatar = object.avatar?.copy() as? DAOMedia
         self.cards = object.cards.map { $0.copy() as! DAOCard }
         self.users = object.users.map { $0.copy() as! DAOUser }
         // swiftlint:enable force_cast
@@ -119,6 +136,8 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAccount {
         _ = super.dao(from: data)
+        let avatarData = self.dictionary(from: data[field(.avatar)] as Any?)
+        self.avatar = Self.createMedia(from: avatarData) ?? self.avatar
         let cardsData = self.dataarray(from: data[field(.cards)] as Any?)
         self.cards = cardsData.compactMap { Self.createCard(from: $0) }
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
@@ -134,6 +153,11 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
+        if let avatar = self.avatar {
+            retval.merge([
+                field(.avatar): avatar.asDictionary,
+            ]) { (current, _) in current }
+        }
         retval.merge([
             field(.cards): self.cards.map { $0.asDictionary },
             field(.dob): self.dob?.dnsDate(as: .shortMilitary),
@@ -164,6 +188,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        avatar = self.daoMedia(with: configuration, from: container, forKey: .avatar)
         cards = self.daoCardArray(with: configuration, from: container, forKey: .cards)
         dob = self.date(from: container, forKey: .dob) ?? dob
         emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
@@ -174,6 +199,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(avatar, forKey: .avatar, configuration: configuration)
         try container.encode(cards, forKey: .cards, configuration: configuration)
         try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(emailNotifications, forKey: .emailNotifications)
@@ -194,6 +220,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         return super.isDiffFrom(rhs) ||
             lhs.cards.hasDiffElementsFrom(rhs.cards) ||
             lhs.users.hasDiffElementsFrom(rhs.users) ||
+            lhs.avatar != rhs.avatar ||
             lhs.dob != rhs.dob ||
             lhs.emailNotifications != rhs.emailNotifications ||
             lhs.name != rhs.name ||
