@@ -17,9 +17,32 @@ public protocol PTCLCFGDAOAnnouncement: PTCLCFGBaseObject {
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAnnouncement] where K: CodingKey
 }
 
-public protocol PTCLCFGAnnouncementObject: PTCLCFGBaseObject {
+public protocol PTCLCFGAnnouncementObject: PTCLCFGDAOChat, PTCLCFGDAOMedia {
 }
 public class CFGAnnouncementObject: PTCLCFGAnnouncementObject {
+    public var chatType: DAOChat.Type = DAOChat.self
+    open func chat<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOChat? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOChat.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func chatArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOChat] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOChat].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
+    public var mediaType: DAOMedia.Type = DAOMedia.self
+    open func media<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOMedia.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func mediaArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOMedia].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
 open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAnnouncementObject
@@ -28,10 +51,19 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
+    // MARK: - Class Factory methods -
+    open class func createChat() -> DAOChat { config.chatType.init() }
+    open class func createChat(from object: DAOChat) -> DAOChat { config.chatType.init(from: object) }
+    open class func createChat(from data: DNSDataDictionary) -> DAOChat? { config.chatType.init(from: data) }
+
+    open class func createMedia() -> DAOMedia { config.mediaType.init() }
+    open class func createMedia(from object: DAOMedia) -> DAOMedia { config.mediaType.init(from: object) }
+    open class func createMedia(from data: DNSDataDictionary) -> DAOMedia? { config.mediaType.init(from: data) }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case body, distribution, endTime, startTime, title
+        case body, chat, distribution, endTime, mediaItems, startTime, title
     }
 
     open var body = DNSString()
@@ -39,7 +71,9 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     open var endTime = Date().nextMonth
     open var startTime = Date()
     open var title = DNSString()
-    
+    @CodableConfiguration(from: DAOAnnouncement.self) open var chat = DAOChat()
+    @CodableConfiguration(from: DAOAnnouncement.self) open var mediaItems: [DAOMedia] = []
+
     // MARK: - Initializers -
     required public init() {
         super.init()
@@ -60,6 +94,8 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
         self.startTime = object.startTime
         // swiftlint:disable force_cast
         self.body = object.body.copy() as! DNSString
+        self.chat = object.chat.copy() as! DAOChat
+        self.mediaItems = object.mediaItems.map { $0.copy() as! DAOMedia }
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -72,8 +108,12 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     override open func dao(from data: DNSDataDictionary) -> DAOAnnouncement {
         _ = super.dao(from: data)
         self.body = self.dnsstring(from: data[field(.body)] as Any?) ?? self.body
+        let chatData = self.dictionary(from: data[field(.chat)] as Any?)
+        self.chat = Self.createChat(from: chatData) ?? self.chat
         let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
         self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
+        let mediaItemsData = self.dataarray(from: data[field(.mediaItems)] as Any?)
+        self.mediaItems = mediaItemsData.compactMap { Self.createMedia(from: $0) }
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.startTime.nextMonth
@@ -83,8 +123,10 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
         var retval = super.asDictionary
         retval.merge([
             field(.body): self.body.asDictionary,
+            field(.chat): self.chat.asDictionary,
             field(.distribution): self.distribution.rawValue,
             field(.endTime): self.endTime,
+            field(.mediaItems): self.mediaItems.map { $0.asDictionary },
             field(.startTime): self.startTime,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
@@ -111,18 +153,21 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = self.dnsstring(from: container, forKey: .body) ?? body
+        chat = self.daoChat(with: configuration, from: container, forKey: .chat) ?? chat
+        distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
+        endTime = self.time(from: container, forKey: .endTime) ?? startTime.nextMonth
+        mediaItems = self.daoMediaArray(with: configuration, from: container, forKey: .mediaItems)
         startTime = self.time(from: container, forKey: .startTime) ?? startTime
         title = self.dnsstring(from: container, forKey: .title) ?? title
-        endTime = self.time(from: container, forKey: .endTime) ?? startTime.nextMonth
-
-        distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
+        try container.encode(chat, forKey: .chat, configuration: configuration)
         try container.encode(distribution, forKey: .distribution)
         try container.encode(endTime, forKey: .endTime)
+        try container.encode(mediaItems, forKey: .mediaItems, configuration: configuration)
         try container.encode(startTime, forKey: .startTime)
         try container.encode(title, forKey: .title)
     }
@@ -137,7 +182,9 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||
             lhs.body != rhs.body ||
+            lhs.chat != rhs.chat ||
             lhs.distribution != rhs.distribution ||
             lhs.endTime != rhs.endTime ||
             lhs.startTime != rhs.startTime ||
