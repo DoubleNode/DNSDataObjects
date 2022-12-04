@@ -13,5 +13,6 @@ public enum DNSMediaType: String, CaseIterable, Codable {
     case unknown
     case staticImage
     case animatedImage
+    case pdfDocument
     case video
 }

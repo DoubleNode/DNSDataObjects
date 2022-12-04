@@ -263,8 +263,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(email, forKey: .email)
         try container.encode(favorites, forKey: .favorites, configuration: configuration)
-        try container.encode(name, forKey: .name)
         try container.encode(myPlace, forKey: .myPlace, configuration: configuration)
+        try container.encode(name, forKey: .name)
         try container.encode(phone, forKey: .phone)
         try container.encode(type, forKey: .type)
     }
@@ -286,8 +286,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
             lhs.consentBy != rhs.consentBy ||
             lhs.dob != rhs.dob ||
             lhs.email != rhs.email ||
-            lhs.name != rhs.name ||
             lhs.myPlace != rhs.myPlace ||
+            lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
             lhs.type != rhs.type
     }
