@@ -125,6 +125,9 @@ open class DAOPlaceEvent: DAOBaseObject, DecodingConfigurationProviding, Encodin
         timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
         type = self.string(from: container, forKey: .type) ?? type
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

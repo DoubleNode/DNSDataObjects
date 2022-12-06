@@ -110,6 +110,9 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         startTimeOfDay = self.timeOfDay(from: container, forKey: .startTimeOfDay) ?? startTimeOfDay
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

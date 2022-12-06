@@ -117,6 +117,9 @@ open class DAOChatMessage: DAOBaseObject, DecodingConfigurationProviding, Encodi
         body = self.string(from: container, forKey: .body) ?? body
         chat = self.daoChat(with: configuration, from: container, forKey: .chat) ?? chat
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

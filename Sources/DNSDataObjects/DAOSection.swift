@@ -174,6 +174,9 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         parent = self.daoSectionParent(with: configuration, from: container, forKey: .parent) ?? parent
         places = self.daoPlaceArray(with: configuration, from: container, forKey: .places)
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

@@ -197,6 +197,9 @@ open class DAOPlaceHours: DAOBaseObject, DecodingConfigurationProviding, Encodin
         saturday = try container.decodeIfPresent(Swift.type(of: saturday), forKey: .saturday) ?? saturday
         sunday = try container.decodeIfPresent(Swift.type(of: sunday), forKey: .sunday) ?? sunday
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

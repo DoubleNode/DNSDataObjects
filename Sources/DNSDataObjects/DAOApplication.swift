@@ -115,6 +115,9 @@ open class DAOApplication: DAOBaseObject, DecodingConfigurationProviding, Encodi
         let container = try decoder.container(keyedBy: CodingKeys.self)
         appEvents = self.daoAppEventArray(with: configuration, from: container, forKey: .appEvents)
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

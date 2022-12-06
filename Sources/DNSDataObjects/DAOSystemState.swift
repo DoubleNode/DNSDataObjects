@@ -125,6 +125,9 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         stateOverride = try container.decodeIfPresent(Swift.type(of: stateOverride), forKey: .stateOverride) ?? stateOverride
         totalPoints = try container.decodeIfPresent(Swift.type(of: totalPoints), forKey: .totalPoints) ?? totalPoints
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

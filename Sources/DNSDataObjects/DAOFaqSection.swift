@@ -133,6 +133,9 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
         icon = self.string(from: container, forKey: .icon) ?? icon
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

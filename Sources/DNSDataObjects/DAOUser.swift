@@ -253,6 +253,9 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         phone = self.string(from: container, forKey: .phone) ?? phone
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

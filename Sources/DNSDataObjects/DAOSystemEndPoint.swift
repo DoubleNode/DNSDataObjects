@@ -154,6 +154,9 @@ open class DAOSystemEndPoint: DAOBaseObject, DecodingConfigurationProviding, Enc
         system = self.daoSystem(with: configuration, from: container, forKey: .system) ?? system
         historyState = self.daoSystemStateArray(with: configuration, from: container, forKey: .historyState)
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

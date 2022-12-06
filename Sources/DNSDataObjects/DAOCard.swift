@@ -138,6 +138,9 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         pinNumber = self.string(from: container, forKey: .pinNumber) ?? pinNumber
         transactions = self.daoTransactionArray(with: configuration, from: container, forKey: .transactions)
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)

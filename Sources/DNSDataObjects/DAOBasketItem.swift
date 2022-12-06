@@ -182,6 +182,9 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         product = self.daoProduct(with: configuration, from: container, forKey: .product) ?? product
         quantity = self.int(from: container, forKey: .quantity) ?? quantity
     }
+    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+        try self.encode(to: encoder, configuration: Self.config)
+    }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
