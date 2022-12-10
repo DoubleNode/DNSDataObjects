@@ -14,7 +14,8 @@ public extension Sequence where Element: DAOBaseObject {
     var count: Int { return reduce(0) { acc, row in acc + 1 } }
 
     func hasDiffElementsFrom(_ rhs: [DAOBaseObject]) -> Bool {
-        var anyNonMatches = (self.count != rhs.count)
+        guard self.count == rhs.count else { return true }
+        var anyNonMatches = false
         self.forEach { lhsElement in
             let foundMatch = rhs.reduce(false) { $0 || !lhsElement.isDiffFrom($1) }
             if !foundMatch {
