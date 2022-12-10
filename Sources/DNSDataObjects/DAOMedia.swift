@@ -31,11 +31,12 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case path, preloadUrl, type, url
+        case path, preloadUrl, title, type, url
     }
 
     open var path = ""
     open var preloadUrl = DNSURL()
+    open var title = DNSString()
     open var type: DNSMediaType = .unknown
     open var url = DNSURL()
 
@@ -59,6 +60,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func update(from object: DAOMedia) {
         super.update(from: object)
         self.path = object.path
+        self.title = object.title
         self.type = object.type
         // swiftlint:disable force_cast
         self.preloadUrl = object.preloadUrl.copy() as! DNSURL
@@ -76,6 +78,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         let typeData = self.string(from: data[field(.type)] as Any?) ?? self.type.rawValue
         self.path = self.string(from: data[field(.path)] as Any?) ?? self.path
         self.preloadUrl = self.dnsurl(from: data[field(.preloadUrl)] as Any?) ?? self.preloadUrl
+        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         self.type = DNSMediaType(rawValue: typeData) ?? .unknown
         self.url = self.dnsurl(from: data[field(.url)] as Any?) ?? self.url
         return self
@@ -85,6 +88,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         retval.merge([
             field(.path): self.path,
             field(.preloadUrl): self.preloadUrl.asDictionary,
+            field(.title): self.title.asDictionary,
             field(.type): self.type.rawValue,
             field(.url): self.url.asDictionary,
         ]) { (current, _) in current }
@@ -112,6 +116,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         let container = try decoder.container(keyedBy: CodingKeys.self)
         path = try container.decodeIfPresent(Swift.type(of: path), forKey: .path) ?? path
         preloadUrl = self.dnsurl(from: container, forKey: .preloadUrl) ?? preloadUrl
+        title = self.dnsstring(from: container, forKey: .title) ?? title
         url = self.dnsurl(from: container, forKey: .url) ?? url
         type = try container.decodeIfPresent(Swift.type(of: type), forKey: .type) ?? type
     }
@@ -123,6 +128,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(path, forKey: .path)
         try container.encode(preloadUrl, forKey: .preloadUrl)
+        try container.encode(title, forKey: .title)
         try container.encode(type, forKey: .type)
         try container.encode(url, forKey: .url)
     }
@@ -139,6 +145,7 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         return super.isDiffFrom(rhs) ||
             lhs.path != rhs.path ||
             lhs.preloadUrl != rhs.preloadUrl ||
+            lhs.title != rhs.title ||
             lhs.type != rhs.type ||
             lhs.url != rhs.url
     }
