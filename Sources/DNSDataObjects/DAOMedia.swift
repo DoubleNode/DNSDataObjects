@@ -154,7 +154,13 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     static public func !=(lhs: DAOMedia, rhs: DAOMedia) -> Bool {
         lhs.isDiffFrom(rhs)
     }
+    static public func !=(lhs: DAOMedia, rhs: DAOMedia?) -> Bool {
+        lhs.isDiffFrom(rhs)
+    }
     static public func ==(lhs: DAOMedia, rhs: DAOMedia) -> Bool {
+        !lhs.isDiffFrom(rhs)
+    }
+    static public func ==(lhs: DAOMedia, rhs: DAOMedia?) -> Bool {
         !lhs.isDiffFrom(rhs)
     }
 }
