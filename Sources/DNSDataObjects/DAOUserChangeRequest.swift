@@ -152,8 +152,8 @@ open class DAOUserChangeRequest: DAOChangeRequest, DecodingConfigurationProvidin
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.requestedRole != rhs.requestedRole ||
-            lhs.user != rhs.user
+            (lhs.user?.isDiffFrom(rhs.user) ?? (lhs.user != rhs.user)) ||
+            lhs.requestedRole != rhs.requestedRole
     }
 
     // MARK: - Equatable protocol methods -

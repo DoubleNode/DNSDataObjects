@@ -282,6 +282,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            (lhs.myPlace?.isDiffFrom(rhs.myPlace) ?? (lhs.myPlace != rhs.myPlace)) ||
             lhs.accounts.hasDiffElementsFrom(rhs.accounts) ||
             lhs.cards.hasDiffElementsFrom(rhs.cards) ||
             lhs.favorites.hasDiffElementsFrom(rhs.favorites) ||
@@ -289,7 +290,6 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
             lhs.consentBy != rhs.consentBy ||
             lhs.dob != rhs.dob ||
             lhs.email != rhs.email ||
-            lhs.myPlace != rhs.myPlace ||
             lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
             lhs.type != rhs.type

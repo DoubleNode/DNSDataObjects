@@ -185,10 +185,10 @@ open class DAOTransaction: DAOBaseObject, DecodingConfigurationProviding, Encodi
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            (lhs.card?.isDiffFrom(rhs.card) ?? (lhs.card != rhs.card)) ||
+            (lhs.order?.isDiffFrom(rhs.order) ?? (lhs.order != rhs.order)) ||
             lhs.amount != rhs.amount ||
-            lhs.card != rhs.card ||
             lhs.confirmation != rhs.confirmation ||
-            lhs.order != rhs.order ||
             lhs.tax != rhs.tax ||
             lhs.tip != rhs.tip ||
             lhs.type != rhs.type

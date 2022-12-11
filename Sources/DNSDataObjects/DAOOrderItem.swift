@@ -186,9 +186,9 @@ open class DAOOrderItem: DAOBaseObject, DecodingConfigurationProviding, Encoding
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.account != rhs.account ||
-            lhs.order != rhs.order ||
-            lhs.place != rhs.place ||
+            (lhs.account?.isDiffFrom(rhs.account) ?? (lhs.account != rhs.account)) ||
+            (lhs.order?.isDiffFrom(rhs.order) ?? (lhs.order != rhs.order)) ||
+            (lhs.place?.isDiffFrom(rhs.place) ?? (lhs.place != rhs.place)) ||
             lhs.quantity != rhs.quantity
     }
 

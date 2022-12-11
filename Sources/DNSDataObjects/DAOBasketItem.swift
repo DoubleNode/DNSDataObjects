@@ -205,10 +205,10 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.account != rhs.account ||
-            lhs.basket != rhs.basket ||
-            lhs.place != rhs.place ||
-            lhs.product != rhs.product ||
+            (lhs.account?.isDiffFrom(rhs.account) ?? (lhs.account != rhs.account)) ||
+            (lhs.basket?.isDiffFrom(rhs.basket) ?? (lhs.basket != rhs.basket)) ||
+            (lhs.place?.isDiffFrom(rhs.place) ?? (lhs.place != rhs.place)) ||
+            (lhs.product?.isDiffFrom(rhs.product) ?? (lhs.product != rhs.product)) ||
             lhs.quantity != rhs.quantity
     }
 
