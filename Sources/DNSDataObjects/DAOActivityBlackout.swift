@@ -17,9 +17,20 @@ public protocol PTCLCFGDAOActivityBlackout: PTCLCFGBaseObject {
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey
 }
 
-public protocol PTCLCFGActivityBlackoutObject: PTCLCFGBaseObject {
+public protocol PTCLCFGActivityBlackoutObject: PTCLCFGDAOActivityBlackout {
 }
 public class CFGActivityBlackoutObject: PTCLCFGActivityBlackoutObject {
+    public var activityBlackoutType: DAOActivityBlackout.Type = DAOActivityBlackout.self
+    open func activityBlackout<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOActivityBlackout.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func activityBlackoutArray<K>(from container: KeyedDecodingContainer<K>,
+                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOActivityBlackout].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
 open class DAOActivityBlackout: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGActivityBlackoutObject
@@ -27,6 +38,11 @@ open class DAOActivityBlackout: DAOBaseObject, DecodingConfigurationProviding, E
 
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
+
+    // MARK: - Class Factory methods -
+    open class func createActivityBlackout() -> DAOActivityBlackout { config.activityBlackoutType.init() }
+    open class func createActivityBlackout(from object: DAOActivityBlackout) -> DAOActivityBlackout { config.activityBlackoutType.init(from: object) }
+    open class func createActivityBlackout(from data: DNSDataDictionary) -> DAOActivityBlackout? { config.activityBlackoutType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

@@ -17,27 +17,38 @@ public protocol PTCLCFGDAOAccountLinkRequest: PTCLCFGBaseObject {
                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccountLinkRequest] where K: CodingKey
 }
 
-public protocol PTCLCFGAccountLinkRequestObject: DAOChangeRequest.Config, PTCLCFGDAOAccount, PTCLCFGDAOUser {
+public protocol PTCLCFGAccountLinkRequestObject: DAOChangeRequest.Config, PTCLCFGDAOAccount, PTCLCFGDAOAccountLinkRequest, PTCLCFGDAOUser {
 }
 public class CFGAccountLinkRequestObject: PTCLCFGAccountLinkRequestObject {
     public var accountType: DAOAccount.Type = DAOAccount.self
-    public var userType: DAOUser.Type = DAOUser.self
-
     open func account<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func user<K>(from container: KeyedDecodingContainer<K>,
-                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
+    }
+
+    public var accountLinkRequestType: DAOAccountLinkRequest.Type = DAOAccountLinkRequest.self
+    open func accountLinkRequest<K>(from container: KeyedDecodingContainer<K>,
+                                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccountLinkRequest? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccountLinkRequest.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func accountLinkRequestArray<K>(from container: KeyedDecodingContainer<K>,
+                                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccountLinkRequest] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccountLinkRequest].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
+    public var userType: DAOUser.Type = DAOUser.self
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
     open func userArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
@@ -56,6 +67,10 @@ open class DAOAccountLinkRequest: DAOChangeRequest, DecodingConfigurationProvidi
     open class func createAccount() -> DAOAccount { config.accountType.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
+
+    open class func createAccountLinkRequest() -> DAOAccountLinkRequest { config.accountLinkRequestType.init() }
+    open class func createAccountLinkRequest(from object: DAOAccountLinkRequest) -> DAOAccountLinkRequest { config.accountLinkRequestType.init(from: object) }
+    open class func createAccountLinkRequest(from data: DNSDataDictionary) -> DAOAccountLinkRequest? { config.accountLinkRequestType.init(from: data) }
 
     open class func createUser() -> DAOUser { config.userType.init() }
     open class func createUser(from object: DAOUser) -> DAOUser { config.userType.init(from: object) }

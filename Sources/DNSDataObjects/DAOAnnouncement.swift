@@ -17,9 +17,21 @@ public protocol PTCLCFGDAOAnnouncement: PTCLCFGBaseObject {
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAnnouncement] where K: CodingKey
 }
 
-public protocol PTCLCFGAnnouncementObject: PTCLCFGDAOChat, PTCLCFGDAOMedia {
+public protocol PTCLCFGAnnouncementObject: PTCLCFGDAOAnnouncement, PTCLCFGDAOChat, PTCLCFGDAOMedia {
 }
 public class CFGAnnouncementObject: PTCLCFGAnnouncementObject {
+    public var announcementType: DAOAnnouncement.Type = DAOAnnouncement.self
+    open func announcement<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOAnnouncement? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAnnouncement.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func announcementArray<K>(from container: KeyedDecodingContainer<K>,
+                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAnnouncement] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAnnouncement].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
     public var chatType: DAOChat.Type = DAOChat.self
     open func chat<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOChat? where K: CodingKey {
@@ -52,6 +64,10 @@ open class DAOAnnouncement: DAOBaseObject, DecodingConfigurationProviding, Encod
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
+    open class func createAnnouncement() -> DAOAnnouncement { config.announcementType.init() }
+    open class func createAnnouncement(from object: DAOAnnouncement) -> DAOAnnouncement { config.announcementType.init(from: object) }
+    open class func createAnnouncement(from data: DNSDataDictionary) -> DAOAnnouncement? { config.announcementType.init(from: data) }
+
     open class func createChat() -> DAOChat { config.chatType.init() }
     open class func createChat(from object: DAOChat) -> DAOChat { config.chatType.init(from: object) }
     open class func createChat(from data: DNSDataDictionary) -> DAOChat? { config.chatType.init(from: data) }

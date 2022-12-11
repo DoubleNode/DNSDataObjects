@@ -19,9 +19,21 @@ public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey
 }
 
-public protocol PTCLCFGAccountObject: PTCLCFGDAOCard, PTCLCFGDAOMedia, PTCLCFGDAOUser {
+public protocol PTCLCFGAccountObject: PTCLCFGDAOAccount, PTCLCFGDAOCard, PTCLCFGDAOMedia, PTCLCFGDAOUser {
 }
 public class CFGAccountObject: PTCLCFGAccountObject {
+    public var accountType: DAOAccount.Type = DAOAccount.self
+    open func account<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
     public var cardType: DAOCard.Type = DAOCard.self
     open func card<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
@@ -66,6 +78,10 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
+    open class func createAccount() -> DAOAccount { config.accountType.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { config.accountType.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { config.accountType.init(from: data) }
+
     open class func createCard() -> DAOCard { config.cardType.init() }
     open class func createCard(from object: DAOCard) -> DAOCard { config.cardType.init(from: object) }
     open class func createCard(from data: DNSDataDictionary) -> DAOCard? { config.cardType.init(from: data) }

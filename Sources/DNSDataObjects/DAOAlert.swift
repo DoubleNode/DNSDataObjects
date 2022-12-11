@@ -17,9 +17,20 @@ public protocol PTCLCFGDAOAlert: PTCLCFGBaseObject {
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey
 }
 
-public protocol PTCLCFGAlertObject: PTCLCFGBaseObject {
+public protocol PTCLCFGAlertObject: PTCLCFGDAOAlert {
 }
 public class CFGAlertObject: PTCLCFGAlertObject {
+    public var alertType: DAOAlert.Type = DAOAlert.self
+    open func alert<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAlert.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func alertArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAlert].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
 open class DAOAlert: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAlertObject
@@ -32,6 +43,11 @@ open class DAOAlert: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
         public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
     }
+
+    // MARK: - Class Factory methods -
+    open class func createAlert() -> DAOAlert { config.alertType.init() }
+    open class func createAlert(from object: DAOAlert) -> DAOAlert { config.alertType.init(from: object) }
+    open class func createAlert(from data: DNSDataDictionary) -> DAOAlert? { config.alertType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }

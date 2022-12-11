@@ -21,23 +21,22 @@ public protocol PTCLCFGTransactionObject: PTCLCFGDAOCard, PTCLCFGDAOOrder {
 }
 public class CFGTransactionObject: PTCLCFGTransactionObject {
     public var cardType: DAOCard.Type = DAOCard.self
-    public var orderType: DAOOrder.Type = DAOOrder.self
-
     open func card<K>(from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOCard? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOCard.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func order<K>(from container: KeyedDecodingContainer<K>,
-                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOOrder.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-
     open func cardArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOCard] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOCard].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
+    }
+
+    public var orderType: DAOOrder.Type = DAOOrder.self
+    open func order<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOOrder.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
     open func orderArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey {
@@ -60,7 +59,7 @@ open class DAOTransaction: DAOBaseObject, DecodingConfigurationProviding, Encodi
     open class func createOrder() -> DAOOrder { config.orderType.init() }
     open class func createOrder(from object: DAOOrder) -> DAOOrder { config.orderType.init(from: object) }
     open class func createOrder(from data: DNSDataDictionary) -> DAOOrder? { config.orderType.init(from: data) }
-    
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {

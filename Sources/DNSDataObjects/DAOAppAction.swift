@@ -53,13 +53,13 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
-    open class func createImages() -> DAOAppActionImages { config.appActionImagesType.init() }
-    open class func createImages(from object: DAOAppActionImages) -> DAOAppActionImages { config.appActionImagesType.init(from: object) }
-    open class func createImages(from data: DNSDataDictionary) -> DAOAppActionImages? { config.appActionImagesType.init(from: data) }
+    open class func createAppActionImages() -> DAOAppActionImages { config.appActionImagesType.init() }
+    open class func createAppActionImages(from object: DAOAppActionImages) -> DAOAppActionImages { config.appActionImagesType.init(from: object) }
+    open class func createAppActionImages(from data: DNSDataDictionary) -> DAOAppActionImages? { config.appActionImagesType.init(from: data) }
 
-    open class func createStrings() -> DAOAppActionStrings { config.appActionStringsType.init() }
-    open class func createStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { config.appActionStringsType.init(from: object) }
-    open class func createStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { config.appActionStringsType.init(from: data) }
+    open class func createAppActionStrings() -> DAOAppActionStrings { config.appActionStringsType.init() }
+    open class func createAppActionStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { config.appActionStringsType.init(from: object) }
+    open class func createAppActionStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { config.appActionStringsType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -74,20 +74,20 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
 
     // MARK: - Initializers -
     required public init() {
-        images = Self.createImages()
-        strings = Self.createStrings()
+        images = Self.createAppActionImages()
+        strings = Self.createAppActionStrings()
         super.init()
     }
     required public init(id: String) {
-        images = Self.createImages()
-        strings = Self.createStrings()
+        images = Self.createAppActionImages()
+        strings = Self.createAppActionStrings()
         super.init(id: id)
     }
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOAppAction) {
-        images = Self.createImages()
-        strings = Self.createStrings()
+        images = Self.createAppActionImages()
+        strings = Self.createAppActionStrings()
         super.init(from: object)
         self.update(from: object)
     }
@@ -104,8 +104,8 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
-        images = Self.createImages()
-        strings = Self.createStrings()
+        images = Self.createAppActionImages()
+        strings = Self.createAppActionStrings()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAppAction {
@@ -115,10 +115,10 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
         // images section
         let imagesData = self.dictionary(from: data[field(.images)] as Any?)
-        self.images = Self.createImages(from: imagesData) ?? self.images
+        self.images = Self.createAppActionImages(from: imagesData) ?? self.images
         // strings section
         let stringsData = self.dictionary(from: data[field(.strings)] as Any?)
-        self.strings = Self.createStrings(from: stringsData) ?? self.strings
+        self.strings = Self.createAppActionStrings(from: stringsData) ?? self.strings
         return self
     }
     override open var asDictionary: DNSDataDictionary {

@@ -21,45 +21,46 @@ public protocol PTCLCFGOrderObject: PTCLCFGDAOAccount, PTCLCFGDAOOrderItem, PTCL
 }
 public class CFGOrderObject: PTCLCFGOrderObject {
     public var accountType: DAOAccount.Type = DAOAccount.self
-    public var orderItemType: DAOOrderItem.Type = DAOOrderItem.self
-    public var placeType: DAOPlace.Type = DAOPlace.self
-    public var transactionType: DAOTransaction.Type = DAOTransaction.self
-
     open func account<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOAccount.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func orderItem<K>(from container: KeyedDecodingContainer<K>,
-                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrderItem? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOOrderItem.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-    open func place<K>(from container: KeyedDecodingContainer<K>,
-                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-    open func transaction<K>(from container: KeyedDecodingContainer<K>,
-                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOTransaction? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOTransaction.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
                               forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
+    }
+
+    public var orderItemType: DAOOrderItem.Type = DAOOrderItem.self
+    open func orderItem<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrderItem? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOOrderItem.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
     open func orderItemArray<K>(from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrderItem] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOOrderItem].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
+
+    public var placeType: DAOPlace.Type = DAOPlace.self
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func placeArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
+    }
+
+    public var transactionType: DAOTransaction.Type = DAOTransaction.self
+    open func transaction<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOTransaction? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOTransaction.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
     }
     open func transactionArray<K>(from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOTransaction] where K: CodingKey {

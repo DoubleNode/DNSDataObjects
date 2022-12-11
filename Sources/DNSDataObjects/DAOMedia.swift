@@ -17,9 +17,20 @@ public protocol PTCLCFGDAOMedia: PTCLCFGBaseObject {
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey
 }
 
-public protocol PTCLCFGMediaObject: PTCLCFGBaseObject {
+public protocol PTCLCFGMediaObject: PTCLCFGDAOMedia {
 }
 public class CFGMediaObject: PTCLCFGMediaObject {
+    public var mediaType: DAOMedia.Type = DAOMedia.self
+    open func media<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOMedia.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func mediaArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOMedia].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
 open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGMediaObject
@@ -27,6 +38,11 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
 
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
+
+    // MARK: - Class Factory methods -
+    open class func createMedia() -> DAOMedia { config.mediaType.init() }
+    open class func createMedia(from object: DAOMedia) -> DAOMedia { config.mediaType.init(from: object) }
+    open class func createMedia(from data: DNSDataDictionary) -> DAOMedia? { config.mediaType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
