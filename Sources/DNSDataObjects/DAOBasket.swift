@@ -177,9 +177,9 @@ open class DAOBasket: DAOBaseObject, DecodingConfigurationProviding, EncodingCon
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.items.hasDiffElementsFrom(rhs.items) ||
-            lhs.account != rhs.account ||
-            lhs.place != rhs.place
+            (lhs.account?.isDiffFrom(rhs.account) ?? true) ||
+            (lhs.place?.isDiffFrom(rhs.place) ?? true) ||
+            lhs.items.hasDiffElementsFrom(rhs.items)
     }
 
     // MARK: - Equatable protocol methods -

@@ -225,9 +225,9 @@ open class DAOOrder: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            (lhs.account?.isDiffFrom(rhs.account) ?? true) ||
+            (lhs.place?.isDiffFrom(rhs.place) ?? true) ||
             lhs.items.hasDiffElementsFrom(rhs.items) ||
-            lhs.account != rhs.account ||
-            lhs.place != rhs.place ||
             lhs.state != rhs.state ||
             lhs.subtotal != rhs.subtotal ||
             lhs.tax != rhs.tax ||

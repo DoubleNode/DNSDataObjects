@@ -383,6 +383,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            (lhs.logo?.isDiffFrom(rhs.logo) ?? true) ||
+            (lhs.section?.isDiffFrom(rhs.section) ?? true) ||
             lhs.activities.hasDiffElementsFrom(rhs.activities) ||
             lhs.alerts.hasDiffElementsFrom(rhs.alerts) ||
             lhs.announcements.hasDiffElementsFrom(rhs.announcements) ||
@@ -394,10 +396,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             lhs.geohashes != rhs.geohashes ||
             lhs.geopoint != rhs.geopoint ||
             lhs.hours != rhs.hours ||
-            lhs.logo != rhs.logo ||
             lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
-            lhs.section != rhs.section ||
             lhs.timeZone != rhs.timeZone
     }
 

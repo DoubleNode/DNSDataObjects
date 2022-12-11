@@ -221,9 +221,9 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            (lhs.avatar?.isDiffFrom(rhs.avatar) ?? true) ||
             lhs.cards.hasDiffElementsFrom(rhs.cards) ||
             lhs.users.hasDiffElementsFrom(rhs.users) ||
-            lhs.avatar != rhs.avatar ||
             lhs.dob != rhs.dob ||
             lhs.emailNotifications != rhs.emailNotifications ||
             lhs.name != rhs.name ||
