@@ -76,10 +76,10 @@ open class DAOMedia: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func update(from object: DAOMedia) {
         super.update(from: object)
         self.path = object.path
-        self.title = object.title
         self.type = object.type
         // swiftlint:disable force_cast
         self.preloadUrl = object.preloadUrl.copy() as! DNSURL
+        self.title = object.title.copy() as! DNSString
         self.url = object.url.copy() as! DNSURL
         // swiftlint:enable force_cast
     }
