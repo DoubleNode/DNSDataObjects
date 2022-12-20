@@ -11,18 +11,22 @@ import UIKit
 
 open class DNSMediaDisplay: Equatable, NSCopying {
     open var imageView: UIImageView
+    open var placeholderImage: UIImage?
     open var progressView: UIProgressView?
     open var secondaryImageViews: [UIImageView] = []
-    
+
     public init(imageView: UIImageView,
+                placeholderImage: UIImage? = nil,
                 progressView: UIProgressView? = nil,
                 secondaryImageViews: [UIImageView] = []) {
         self.imageView = imageView
         self.progressView = progressView
         self.secondaryImageViews = secondaryImageViews
+        self.contentInit()
     }
-    
-    open func display(from media: DAOMedia) { }
+
+    open func contentInit() { }
+    open func display(from media: DAOMedia?) { }
 
     // NSCopying protocol methods
     open func copy(with zone: NSZone? = nil) -> Any {
