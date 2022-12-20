@@ -11,9 +11,16 @@ import DNSCoreThreading
 import UIKit
 
 open class DNSMediaDisplayVideo: DNSMediaDisplayStaticImage {
-    override open func display(from media: DAOMedia) {
+    override open func display(from media: DAOMedia?) {
         DNSUIThread.run {
-            guard let url = media.url.asURL else { return }
+            guard let media else {
+                self.imageView.image = self.placeholderImage
+                return
+            }
+            guard let url = media.url.asURL else {
+                self.imageView.image = self.placeholderImage
+                return
+            }
             guard let preloadUrl = media.preloadUrl.asURL else {
                 self.utilityDisplayVideo(url: url)
                 return
