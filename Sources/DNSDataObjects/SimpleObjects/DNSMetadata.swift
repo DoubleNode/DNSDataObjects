@@ -13,8 +13,8 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case uid, created, synced, updated, status, createdBy, updatedBy
-        case genericValues
+        case created, createdBy, status, synced, uid, updated, updatedBy
+        case genericValues, userMetadata, likes, views
     }
     
     public var uid: UUID = UUID()
@@ -28,7 +28,10 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     public var updatedBy = ""
     
     public var genericValues: DNSDataDictionary = [:]
-    
+    public var userMetadata: DNSUserMetadata?
+    public var likes: UInt = 0
+    public var views: UInt = 0
+
     // MARK: - Initializers -
     required override public init() {
         super.init()
@@ -48,6 +51,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.createdBy = object.createdBy
         self.updatedBy = object.updatedBy
         self.genericValues = object.genericValues
+        self.userMetadata = object.userMetadata
+        self.likes = object.likes
+        self.views = object.views
     }
     
     // MARK: - DAO translation methods -
@@ -64,6 +70,10 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.createdBy = self.string(from: data[field(.createdBy)] as Any?) ?? self.createdBy
         self.updatedBy = self.string(from: data[field(.updatedBy)] as Any?) ?? self.updatedBy
         self.genericValues = self.dictionary(from: data[field(.genericValues)] as Any?)
+        let userMetadata = self.dictionary(from: data[field(.userMetadata)] as Any?)
+        self.userMetadata = DNSUserMetadata(from: userMetadata)
+        self.likes = self.uint(from: data[field(.likes)] as Any?) ?? self.likes
+        self.views = self.uint(from: data[field(.views)] as Any?) ?? self.views
         return self
     }
     open var asDictionary: DNSDataDictionary {
@@ -76,6 +86,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
             field(.createdBy): self.createdBy,
             field(.updatedBy): self.updatedBy,
             field(.genericValues): self.genericValues,
+            field(.userMetadata): self.userMetadata,
+            field(.likes): self.likes,
+            field(.views): self.views,
         ]
         return retval
     }
@@ -91,6 +104,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         status = self.string(from: container, forKey: .status) ?? status
         createdBy = self.string(from: container, forKey: .createdBy) ?? createdBy
         updatedBy = self.string(from: container, forKey: .updatedBy) ?? updatedBy
+        userMetadata = try container.decodeIfPresent(DNSUserMetadata.self, forKey: .userMetadata)
+        likes = self.uint(from: container, forKey: .likes) ?? likes
+        views = self.uint(from: container, forKey: .views) ?? views
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -101,6 +117,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         try container.encode(status, forKey: .status)
         try container.encode(createdBy, forKey: .createdBy)
         try container.encode(updatedBy, forKey: .updatedBy)
+        try container.encode(userMetadata, forKey: .userMetadata)
+        try container.encode(likes, forKey: .likes)
+        try container.encode(views, forKey: .views)
     }
     
     // MARK: - NSCopying protocol methods -
@@ -117,7 +136,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
             lhs.updated != rhs.updated ||
             lhs.status != rhs.status ||
             lhs.createdBy != rhs.createdBy ||
-            lhs.updatedBy != rhs.updatedBy
+            lhs.updatedBy != rhs.updatedBy ||
+            lhs.likes != rhs.likes ||
+            lhs.views != rhs.views
     }
 
     // MARK: - Equatable protocol methods -

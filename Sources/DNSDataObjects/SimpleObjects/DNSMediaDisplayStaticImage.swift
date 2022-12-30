@@ -42,6 +42,7 @@ open class DNSMediaDisplayStaticImage: DNSMediaDisplay {
                       },
                       imageTransition: UIImageView.ImageTransition.crossDissolve(0.2),
                       completion: { imageDataResponse in
+                        self.progressView?.isHidden = true
                         if case .success(let image) = imageDataResponse.result {
                             self.secondaryImageViews.forEach { $0.image = image }
                             completion?(true)
