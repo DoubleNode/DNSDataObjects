@@ -53,6 +53,7 @@ open class DNSMediaDisplayAnimatedImage: DNSMediaDisplayStaticImage {
                       },
                       imageTransition: UIImageView.ImageTransition.crossDissolve(0.2),
                       completion: { response in
+                        self.progressView?.isHidden = true
                         self.secondaryImageViews.forEach { $0.image = nil }
                         DNSUIThread.run(after: 0.5) {
                             self.secondaryImageViews.forEach { $0.image = nil }
