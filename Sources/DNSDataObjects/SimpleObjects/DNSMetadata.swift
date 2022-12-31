@@ -14,7 +14,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case created, createdBy, status, synced, uid, updated, updatedBy
-        case genericValues, userMetadata, likes, views
+        case genericValues, reactions, reactionCounts, userReaction, views
     }
     
     public var uid: UUID = UUID()
@@ -28,8 +28,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
     public var updatedBy = ""
     
     public var genericValues: DNSDataDictionary = [:]
-    public var userMetadata: DNSUserMetadata?
-    public var likes: UInt = 0
+    public var reactions: [String: DNSUserReaction] = [:]
+    public var reactionCounts = DNSReactionCounts()
+    public var userReaction: DNSUserReaction?
     public var views: UInt = 0
 
     // MARK: - Initializers -
@@ -51,8 +52,14 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.createdBy = object.createdBy
         self.updatedBy = object.updatedBy
         self.genericValues = object.genericValues
-        self.userMetadata = object.userMetadata
-        self.likes = object.likes
+        // swiftlint:disable force_cast
+        self.reactions = [:]
+        object.reactions.forEach { key, value in
+            self.reactions[key] = (value.copy() as! DNSUserReaction)
+        }
+        self.reactionCounts = object.reactionCounts.copy() as! DNSReactionCounts
+        // swiftlint:enable force_cast
+        self.userReaction = object.userReaction?.copy() as? DNSUserReaction
         self.views = object.views
     }
     
@@ -70,13 +77,23 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         self.createdBy = self.string(from: data[field(.createdBy)] as Any?) ?? self.createdBy
         self.updatedBy = self.string(from: data[field(.updatedBy)] as Any?) ?? self.updatedBy
         self.genericValues = self.dictionary(from: data[field(.genericValues)] as Any?)
-        let userMetadata = self.dictionary(from: data[field(.userMetadata)] as Any?)
-        self.userMetadata = DNSUserMetadata(from: userMetadata)
-        self.likes = self.uint(from: data[field(.likes)] as Any?) ?? self.likes
+        let reactionsData: [String: DNSDataDictionary] = data[field(.reactions)] as? [String: DNSDataDictionary] ?? [:]
+        self.reactions = [:]
+        reactionsData.forEach { key, value in
+            self.reactions[key] = DNSUserReaction(from: value)
+        }
+        let reactionCountsData = self.dictionary(from: data[field(.reactionCounts)] as Any?)
+        self.reactionCounts = DNSReactionCounts(from: reactionCountsData)
+        let userReactionData = self.dictionary(from: data[field(.userReaction)] as Any?)
+        self.userReaction = DNSUserReaction(from: userReactionData)
         self.views = self.uint(from: data[field(.views)] as Any?) ?? self.views
         return self
     }
     open var asDictionary: DNSDataDictionary {
+        var reactionsData: [String: DNSDataDictionary] = [:]
+        self.reactions.forEach { key, value in
+            reactionsData[key] = value.asDictionary
+        }
         let retval: DNSDataDictionary = [
             field(.uid): self.uid,
             field(.created): self.created,
@@ -86,8 +103,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
             field(.createdBy): self.createdBy,
             field(.updatedBy): self.updatedBy,
             field(.genericValues): self.genericValues,
-            field(.userMetadata): self.userMetadata,
-            field(.likes): self.likes,
+            field(.reactions): reactionsData,
+            field(.reactionCounts): self.reactionCounts,
+            field(.userReaction): self.userReaction,
             field(.views): self.views,
         ]
         return retval
@@ -104,8 +122,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         status = self.string(from: container, forKey: .status) ?? status
         createdBy = self.string(from: container, forKey: .createdBy) ?? createdBy
         updatedBy = self.string(from: container, forKey: .updatedBy) ?? updatedBy
-        userMetadata = try container.decodeIfPresent(DNSUserMetadata.self, forKey: .userMetadata)
-        likes = self.uint(from: container, forKey: .likes) ?? likes
+        reactions = try container.decodeIfPresent([String: DNSUserReaction].self, forKey: .reactions) ?? [:]
+        reactionCounts = try container.decodeIfPresent(DNSReactionCounts.self, forKey: .reactionCounts) ?? reactionCounts
+        userReaction = try container.decodeIfPresent(DNSUserReaction.self, forKey: .userReaction)
         views = self.uint(from: container, forKey: .views) ?? views
     }
     open func encode(to encoder: Encoder) throws {
@@ -117,8 +136,9 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         try container.encode(status, forKey: .status)
         try container.encode(createdBy, forKey: .createdBy)
         try container.encode(updatedBy, forKey: .updatedBy)
-        try container.encode(userMetadata, forKey: .userMetadata)
-        try container.encode(likes, forKey: .likes)
+        try container.encode(reactions, forKey: .reactions)
+        try container.encode(reactionCounts, forKey: .reactionCounts)
+        try container.encode(userReaction, forKey: .userReaction)
         try container.encode(views, forKey: .views)
     }
     
@@ -137,7 +157,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
             lhs.status != rhs.status ||
             lhs.createdBy != rhs.createdBy ||
             lhs.updatedBy != rhs.updatedBy ||
-            lhs.likes != rhs.likes ||
+            lhs.reactionCounts != rhs.reactionCounts ||
             lhs.views != rhs.views
     }
 
