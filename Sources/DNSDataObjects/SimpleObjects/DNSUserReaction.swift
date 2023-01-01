@@ -24,6 +24,14 @@ public class DNSUserReaction: DNSDataTranslation, Codable {
     public var viewed = false
     public var viewedOn: Date?
 
+    public var isAngered: Bool { reaction == .angered }
+    public var isCared: Bool { reaction == .cared }
+    public var isHumored: Bool { reaction == .humored }
+    public var isLiked: Bool { reaction == .liked }
+    public var isLoved: Bool { reaction == .loved }
+    public var isSaddened: Bool { reaction == .saddened }
+    public var isWowed: Bool { reaction == .wowed }
+
     // MARK: - Initializers -
     required override public init() {
         super.init()
