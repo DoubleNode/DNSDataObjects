@@ -25,3 +25,18 @@ public extension Sequence where Element: DAOBaseObject {
         return anyNonMatches
     }
 }
+public extension Sequence where Element: DNSNote {
+    var count: Int { return reduce(0) { acc, row in acc + 1 } }
+
+    func hasDiffElementsFrom(_ rhs: [DNSNote]) -> Bool {
+        guard self.count == rhs.count else { return true }
+        var anyNonMatches = false
+        self.forEach { lhsElement in
+            let foundMatch = rhs.reduce(false) { $0 || !lhsElement.isDiffFrom($1) }
+            if !foundMatch {
+                anyNonMatches = true
+            }
+        }
+        return anyNonMatches
+    }
+}

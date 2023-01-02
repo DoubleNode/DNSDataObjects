@@ -47,12 +47,13 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case about, days, distribution, title
+        case body, days, distribution, enabled, title
     }
 
-    open var about = DNSString()
+    open var body = DNSString()
     open var days: [DAOEventDay] = []
     open var distribution = DNSVisibility.everyone
+    open var enabled = false
     open var title = DNSString()
     
     // MARK: - Initializers -
@@ -71,8 +72,9 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func update(from object: DAOEvent) {
         super.update(from: object)
         self.distribution = object.distribution
+        self.enabled = object.enabled
         // swiftlint:disable force_cast
-        self.about = object.about.copy() as! DNSString
+        self.body = object.body.copy() as! DNSString
         self.days = object.days.map { $0.copy() as! DAOEventDay }
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
@@ -85,20 +87,22 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     override open func dao(from data: DNSDataDictionary) -> DAOEvent {
         _ = super.dao(from: data)
-        self.about = self.dnsstring(from: data[field(.about)] as Any?) ?? self.about
+        self.body = self.dnsstring(from: data[field(.body)] as Any?) ?? self.body
         let daysData = self.dataarray(from: data[field(.days)] as Any?)
         self.days = daysData.compactMap { Self.createEventDay(from: $0) }
         let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
         self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
+        self.enabled = self.bool(from: data[field(.enabled)] as Any?) ?? self.enabled
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.about): self.about.asDictionary,
+            field(.body): self.body.asDictionary,
             field(.days): self.days.map { $0.asDictionary },
             field(.distribution): self.distribution.rawValue,
+            field(.enabled): self.enabled,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
@@ -123,11 +127,11 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        about = self.dnsstring(from: container, forKey: .about) ?? about
+        body = self.dnsstring(from: container, forKey: .body) ?? body
         days = self.daoEventDayArray(with: configuration, from: container, forKey: .days)
-        title = self.dnsstring(from: container, forKey: .title) ?? title
-
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
+        enabled = self.bool(from: container, forKey: .enabled) ?? enabled
+        title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -135,9 +139,10 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(about, forKey: .about)
+        try container.encode(body, forKey: .body)
         try container.encode(days, forKey: .days, configuration: configuration)
         try container.encode(distribution, forKey: .distribution)
+        try container.encode(enabled, forKey: .enabled)
         try container.encode(title, forKey: .title)
     }
 
@@ -152,8 +157,9 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.days.hasDiffElementsFrom(rhs.days) ||
-            lhs.about != rhs.about ||
+            lhs.body != rhs.body ||
             lhs.distribution != rhs.distribution ||
+            lhs.enabled != rhs.enabled ||
             lhs.title != rhs.title
     }
 

@@ -12,5 +12,6 @@ import UIKit
 public enum DNSVisibility: String, CaseIterable, Codable {
     case adultsOnly
     case everyone
+    case staffCadets
     case staffOnly
 }
