@@ -31,12 +31,12 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case about, endTimeOfDay, startTimeOfDay, title
+        case endTime, startTime, subtitle, title
     }
 
-    open var about = DNSString()
-    open var endTimeOfDay = DNSTimeOfDay()
-    open var startTimeOfDay = DNSTimeOfDay()
+    open var endTime = DNSTimeOfDay()
+    open var startTime = DNSTimeOfDay()
+    open var subtitle = DNSString()
     open var title = DNSString()
     
     // MARK: - Initializers -
@@ -54,10 +54,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     open func update(from object: DAOEventDayItem) {
         super.update(from: object)
-        self.endTimeOfDay = object.endTimeOfDay
-        self.startTimeOfDay = object.startTimeOfDay
+        self.endTime = object.endTime
+        self.startTime = object.startTime
         // swiftlint:disable force_cast
-        self.about = object.about.copy() as! DNSString
+        self.subtitle = object.subtitle.copy() as! DNSString
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -69,18 +69,18 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     override open func dao(from data: DNSDataDictionary) -> DAOEventDayItem {
         _ = super.dao(from: data)
-        self.about = self.dnsstring(from: data[field(.about)] as Any?) ?? self.about
-        self.endTimeOfDay = self.timeOfDay(from: data[field(.endTimeOfDay)] as Any?) ?? self.endTimeOfDay
-        self.startTimeOfDay = self.timeOfDay(from: data[field(.startTimeOfDay)] as Any?) ?? self.startTimeOfDay
+        self.endTime = self.timeOfDay(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.startTime = self.timeOfDay(from: data[field(.startTime)] as Any?) ?? self.startTime
+        self.subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self.subtitle
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.about): self.about.asDictionary,
-            field(.endTimeOfDay): self.endTimeOfDay,
-            field(.startTimeOfDay): self.startTimeOfDay,
+            field(.endTime): self.endTime,
+            field(.startTime): self.startTime,
+            field(.subtitle): self.subtitle.asDictionary,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
@@ -105,9 +105,9 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        about = self.dnsstring(from: container, forKey: .about) ?? about
-        endTimeOfDay = self.timeOfDay(from: container, forKey: .endTimeOfDay) ?? endTimeOfDay
-        startTimeOfDay = self.timeOfDay(from: container, forKey: .startTimeOfDay) ?? startTimeOfDay
+        endTime = self.timeOfDay(from: container, forKey: .endTime) ?? endTime
+        startTime = self.timeOfDay(from: container, forKey: .startTime) ?? startTime
+        subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
@@ -116,9 +116,9 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(about, forKey: .about)
-        try container.encode(endTimeOfDay, forKey: .endTimeOfDay)
-        try container.encode(startTimeOfDay, forKey: .startTimeOfDay)
+        try container.encode(endTime, forKey: .endTime)
+        try container.encode(startTime, forKey: .startTime)
+        try container.encode(subtitle, forKey: .subtitle)
         try container.encode(title, forKey: .title)
     }
 
@@ -132,9 +132,9 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.about != rhs.about ||
-            lhs.endTimeOfDay != rhs.endTimeOfDay ||
-            lhs.startTimeOfDay != rhs.startTimeOfDay ||
+            lhs.endTime != rhs.endTime ||
+            lhs.startTime != rhs.startTime ||
+            lhs.subtitle != rhs.subtitle ||
             lhs.title != rhs.title
     }
 
