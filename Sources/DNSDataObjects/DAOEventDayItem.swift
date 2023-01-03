@@ -31,9 +31,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case endTime, startTime, subtitle, title
+        case distribution, endTime, startTime, subtitle, title
     }
 
+    open var distribution = DNSVisibility.everyone
     open var endTime = DNSTimeOfDay()
     open var startTime = DNSTimeOfDay()
     open var subtitle = DNSString()
@@ -54,6 +55,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     open func update(from object: DAOEventDayItem) {
         super.update(from: object)
+        self.distribution = object.distribution
         self.endTime = object.endTime
         self.startTime = object.startTime
         // swiftlint:disable force_cast
@@ -69,6 +71,8 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     override open func dao(from data: DNSDataDictionary) -> DAOEventDayItem {
         _ = super.dao(from: data)
+        let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
+        self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
         self.endTime = self.timeOfDay(from: data[field(.endTime)] as Any?) ?? self.endTime
         self.startTime = self.timeOfDay(from: data[field(.startTime)] as Any?) ?? self.startTime
         self.subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self.subtitle
@@ -78,6 +82,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
+            field(.distribution): self.distribution.rawValue,
             field(.endTime): self.endTime,
             field(.startTime): self.startTime,
             field(.subtitle): self.subtitle.asDictionary,
@@ -105,6 +110,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
         endTime = self.timeOfDay(from: container, forKey: .endTime) ?? endTime
         startTime = self.timeOfDay(from: container, forKey: .startTime) ?? startTime
         subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
@@ -116,6 +122,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(distribution, forKey: .distribution)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(startTime, forKey: .startTime)
         try container.encode(subtitle, forKey: .subtitle)
@@ -132,6 +139,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.distribution != rhs.distribution ||
             lhs.endTime != rhs.endTime ||
             lhs.startTime != rhs.startTime ||
             lhs.subtitle != rhs.subtitle ||
