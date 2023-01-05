@@ -91,6 +91,15 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     @CodableConfiguration(from: DAOEvent.self) open var chat = DAOChat()
     @CodableConfiguration(from: DAOEvent.self) open var mediaItems: [DAOMedia] = []
 
+    public var startDate: Date {
+        guard let startDay = days.first else { return Date() }
+        return startDay.date
+    }
+    public var endDate: Date {
+        guard let endDay = days.last else { return Date() }
+        return endDay.date
+    }
+
     // MARK: - Initializers -
     required public init() {
         super.init()
