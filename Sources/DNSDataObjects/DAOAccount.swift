@@ -97,12 +97,14 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case avatar, cards, dob, emailNotifications, name, pushNotifications, users
+        case avatar, cards, dob, emailNotifications, name, pricingTierId
+        case pushNotifications, users
     }
 
     open var dob: Date?
     open var emailNotifications = false
     open var name = PersonNameComponents()
+    open var pricingTierId = ""
     open var pushNotifications = false
     @CodableConfiguration(from: DAOAccount.self) open var avatar: DAOMedia? = nil
     @CodableConfiguration(from: DAOAccount.self) open var cards: [DAOCard] = []
@@ -137,6 +139,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         self.dob = object.dob
         self.emailNotifications = object.emailNotifications
         self.name = object.name
+        self.pricingTierId = object.pricingTierId
         self.pushNotifications = object.pushNotifications
         // swiftlint:disable force_cast
         self.avatar = object.avatar?.copy() as? DAOMedia
@@ -161,6 +164,8 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
                                             self.emailNotifications)!
         let nameData = self.dictionary(from: data[field(.name)] as Any?)
         self.name = PersonNameComponents(from: nameData) ?? self.name
+        self.pricingTierId = self.string(from: data[field(.pricingTierId)] ??
+                                           self.pricingTierId)!
         self.pushNotifications = self.bool(from: data[field(.pushNotifications)] ??
                                            self.pushNotifications)!
         let usersData = self.dataarray(from: data[field(.users)] as Any?)
@@ -179,6 +184,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
             field(.dob): self.dob?.dnsDate(as: .shortMilitary),
             field(.emailNotifications): self.emailNotifications,
             field(.name): self.name.asDictionary,
+            field(.pricingTierId): self.pricingTierId,
             field(.pushNotifications): self.pushNotifications,
             field(.users): self.users.map { $0.asDictionary },
         ]) { (current, _) in current }
@@ -209,6 +215,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         dob = self.date(from: container, forKey: .dob) ?? dob
         emailNotifications = self.bool(from: container, forKey: .emailNotifications) ?? emailNotifications
         name = self.personName(from: container, forKey: .name) ?? name
+        pricingTierId = self.string(from: container, forKey: .pricingTierId) ?? pricingTierId
         pushNotifications = self.bool(from: container, forKey: .pushNotifications) ?? pushNotifications
         users = self.daoUserArray(with: configuration, from: container, forKey: .users)
     }
@@ -223,6 +230,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
         try container.encode(emailNotifications, forKey: .emailNotifications)
         try container.encode(name, forKey: .name)
+        try container.encode(pricingTierId, forKey: .pricingTierId)
         try container.encode(pushNotifications, forKey: .pushNotifications)
         try container.encode(users, forKey: .users, configuration: configuration)
     }
@@ -243,6 +251,7 @@ open class DAOAccount: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
             lhs.dob != rhs.dob ||
             lhs.emailNotifications != rhs.emailNotifications ||
             lhs.name != rhs.name ||
+            lhs.pricingTierId != rhs.pricingTierId ||
             lhs.pushNotifications != rhs.pushNotifications
     }
 

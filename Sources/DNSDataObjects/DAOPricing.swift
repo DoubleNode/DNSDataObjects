@@ -1,5 +1,5 @@
 //
-//  DAOActivity.swift
+//  DAOPricing.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,29 +9,17 @@
 import DNSCore
 import Foundation
 
-public protocol PTCLCFGDAOActivityType: PTCLCFGBaseObject {
-    var activityTypeType: DAOActivityType.Type { get }
-    func activityType<K>(from container: KeyedDecodingContainer<K>,
-                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey
-    func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
-                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey
+public protocol PTCLCFGDAOPricing: PTCLCFGBaseObject {
+    var pricingType: DAOPricing.Type { get }
+    func pricing<K>(from container: KeyedDecodingContainer<K>,
+                    forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricing? where K: CodingKey
+    func pricingArray<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricing] where K: CodingKey
 }
 
-public protocol PTCLCFGActivityTypeObject: PTCLCFGDAOActivityType, PTCLCFGDAOPricing {
+public protocol PTCLCFGPricingObject: PTCLCFGDAOPricing, PTCLCFGDAOPricingTier {
 }
-public class CFGActivityTypeObject: PTCLCFGActivityTypeObject {
-    public var activityTypeType: DAOActivityType.Type = DAOActivityType.self
-    open func activityType<K>(from container: KeyedDecodingContainer<K>,
-                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityType? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOActivityType.self, forKey: key, configuration: self) ?? nil } catch { }
-        return nil
-    }
-    open func activityTypeArray<K>(from container: KeyedDecodingContainer<K>,
-                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityType] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOActivityType].self, forKey: key, configuration: self) ?? [] } catch { }
-        return []
-    }
-    
+public class CFGPricingObject: PTCLCFGPricingObject {
     public var pricingType: DAOPricing.Type = DAOPricing.self
     open func pricing<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricing? where K: CodingKey {
@@ -43,32 +31,51 @@ public class CFGActivityTypeObject: PTCLCFGActivityTypeObject {
         do { return try container.decodeIfPresent([DAOPricing].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
+    
+    public var pricingTierType: DAOPricingTier.Type = DAOPricingTier.self
+    open func pricingTier<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricingTier? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPricingTier.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func pricingTierArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricingTier] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPricingTier].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
-open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
-    public typealias Config = PTCLCFGActivityTypeObject
-    public static var config: Config = CFGActivityTypeObject()
+open class DAOPricing: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
+    public typealias Config = PTCLCFGPricingObject
+    public static var config: Config = CFGPricingObject()
 
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
-    open class func createActivityType() -> DAOActivityType { config.activityTypeType.init() }
-    open class func createActivityType(from object: DAOActivityType) -> DAOActivityType { config.activityTypeType.init(from: object) }
-    open class func createActivityType(from data: DNSDataDictionary) -> DAOActivityType? { config.activityTypeType.init(from: data) }
-
     open class func createPricing() -> DAOPricing { config.pricingType.init() }
     open class func createPricing(from object: DAOPricing) -> DAOPricing { config.pricingType.init(from: object) }
-    open class func createPricing(from data: DAOPricing) -> DAOPricing? { config.pricingType.init(from: data) }
+    open class func createPricing(from data: DNSDataDictionary) -> DAOPricing? { config.pricingType.init(from: data) }
+
+    open class func createPricingTier() -> DAOPricingTier { config.pricingTierType.init() }
+    open class func createPricingTier(from object: DAOPricingTier) -> DAOPricingTier { config.pricingTierType.init(from: object) }
+    open class func createPricingTier(from data: DNSDataDictionary) -> DAOPricingTier? { config.pricingTierType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case code, name, pricing
+        case tiers
     }
 
-    open var code = ""
-    open var name = DNSString()
-    open var pricing: DAOPricing = DAOPricing()
+    open var tiers: [DAOPricingTier] = []
+
+    open func price(for tierId: String,
+                    and time: Date = Date()) -> DNSPrice? {
+        let tier = tiers
+            .filter { $0.id == tierId }
+            .sorted { $0.priority > $1.priority }
+            .first ?? tiers.first
+        return tier?.price(for: time)
+    }
 
     // MARK: - Initializers -
     required public init() {
@@ -77,23 +84,16 @@ open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, Encod
     required public init(id: String) {
         super.init(id: id)
     }
-    public init(code: String, name: DNSString) {
-        self.code = code
-        self.name = name
-        super.init(id: code)
-    }
-    
+
     // MARK: - DAO copy methods -
-    required public init(from object: DAOActivityType) {
+    required public init(from object: DAOPricing) {
         super.init(from: object)
         self.update(from: object)
     }
-    open func update(from object: DAOActivityType) {
+    open func update(from object: DAOPricing) {
         super.update(from: object)
-        self.code = object.code
         // swiftlint:disable force_cast
-        self.name = object.name.copy() as! DNSString
-        self.pricing = object.pricing.copy() as! DAOPricing
+        self.tiers = object.tiers.map { $0.copy() as! DAOPricingTier }
         // swiftlint:enable force_cast
     }
 
@@ -102,19 +102,16 @@ open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOActivityType {
+    override open func dao(from data: DNSDataDictionary) -> DAOPricing {
         _ = super.dao(from: data)
-        self.code = self.string(from: data[field(.code)] as Any?) ?? self.code
-        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
-        self.pricing = self.daoPricing(from: data[field(.pricing)] as Any?) ?? self.pricing
+        let tiersData = self.dataarray(from: data[field(.tiers)] as Any?)
+        self.tiers = tiersData.compactMap { Self.createPricingTier(from: $0) }
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.code): self.code,
-            field(.name): self.name.asDictionary,
-            field(.pricing): self.pricing.asDictionary,
+            field(.tiers): self.tiers.map { $0.asDictionary },
         ]) { (current, _) in current }
         return retval
     }
@@ -138,9 +135,7 @@ open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        code = self.string(from: container, forKey: .code) ?? code
-        name = self.dnsstring(from: container, forKey: .name) ?? name
-        pricing = self.daoPricing(with: configuration, from: container, forKey: .pricing) ?? pricing
+        tiers = self.daoPricingTierArray(with: configuration, from: container, forKey: .tiers)
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -148,31 +143,27 @@ open class DAOActivityType: DAOBaseObject, DecodingConfigurationProviding, Encod
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(code, forKey: .code)
-        try container.encode(name, forKey: .name)
-        try container.encode(pricing, forKey: .pricing)
+        try container.encode(tiers, forKey: .tiers, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOActivityType(from: self)
+        let copy = DAOPricing(from: self)
         return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DAOActivityType else { return true }
+        guard let rhs = rhs as? DAOPricing else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.code != rhs.code ||
-            lhs.name != rhs.name ||
-            lhs.pricing != rhs.pricing
+            lhs.tiers.hasDiffElementsFrom(rhs.tiers)
     }
 
     // MARK: - Equatable protocol methods -
-    static public func !=(lhs: DAOActivityType, rhs: DAOActivityType) -> Bool {
+    static public func !=(lhs: DAOPricing, rhs: DAOPricing) -> Bool {
         lhs.isDiffFrom(rhs)
     }
-    static public func ==(lhs: DAOActivityType, rhs: DAOActivityType) -> Bool {
+    static public func ==(lhs: DAOPricing, rhs: DAOPricing) -> Bool {
         !lhs.isDiffFrom(rhs)
     }
 }

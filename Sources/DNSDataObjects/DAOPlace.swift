@@ -179,7 +179,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case activities, address, alerts, announcements, chat, code, events, geohashes
-        case geopoint, hours, logo, name, phone, section, statuses, timeZone
+        case geopoint, hours, logo, name, phone, pricingTierId, section, statuses, timeZone
     }
 
     open var address: DNSPostalAddress = DNSPostalAddress()
@@ -204,6 +204,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
                 }
         }
     }
+    open var pricingTierId = ""
     open var timeZone: TimeZone = TimeZone.current
     // MARK: - Initializers -
     required public init() {
@@ -234,6 +235,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.geohashes = object.geohashes
         self.geopoint = object.geopoint
         self.phone = object.phone
+        self.pricingTierId = object.pricingTierId
         self.section = object.section?.copy() as? DAOSection
         self.timeZone = object.timeZone
         // swiftlint:disable force_cast
@@ -277,6 +279,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.logo = Self.createMedia(from: logoData) ?? self.logo
         self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.phone = self.string(from: data[field(.phone)] as Any?) ?? self.phone
+        self.pricingTierId = self.string(from: data[field(.pricingTierId)] as Any?) ?? self.pricingTierId
         let sectionData = self.dictionary(from: data[field(.section)] as Any?)
         self.section = Self.createSection(from: sectionData) ?? self.section
         let statusesData = self.dataarray(from: data[field(.statuses)] as Any?)
@@ -304,6 +307,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             field(.hours): self.hours.asDictionary,
             field(.name): self.name,
             field(.phone): self.phone,
+            field(.pricingTierId): self.pricingTierId,
             field(.section): self.section?.asDictionary ?? .empty,
             field(.statuses): self.statuses.map { $0.asDictionary },
             field(.timeZone): self.timeZone.identifier,
@@ -341,6 +345,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         logo = self.daoMedia(with: configuration, from: container, forKey: .logo)
         name = self.dnsstring(from: container, forKey: .name) ?? name
         phone = self.string(from: container, forKey: .phone) ?? phone
+        pricingTierId = self.string(from: container, forKey: .pricingTierId) ?? pricingTierId
         section = self.daoSection(with: configuration, from: container, forKey: .section) ?? section
         statuses = self.daoPlaceStatusArray(with: configuration, from: container, forKey: .statuses)
         timeZone = self.timeZone(from: container, forKey: .timeZone) ?? timeZone
@@ -368,6 +373,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         try container.encode(logo, forKey: .logo, configuration: configuration)
         try container.encode(name, forKey: .name)
         try container.encode(phone, forKey: .phone)
+        try container.encode(pricingTierId, forKey: .pricingTierId)
         try container.encode(section, forKey: .section, configuration: configuration)
         try container.encode(statuses, forKey: .statuses, configuration: configuration)
         try container.encode(timeZone, forKey: .timeZone)
@@ -398,6 +404,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             lhs.hours != rhs.hours ||
             lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
+            lhs.pricingTierId != rhs.pricingTierId ||
             lhs.timeZone != rhs.timeZone
     }
 

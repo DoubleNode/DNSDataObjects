@@ -17,9 +17,20 @@ public protocol PTCLCFGDAOProduct: PTCLCFGBaseObject {
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOProduct] where K: CodingKey
 }
 
-public protocol PTCLCFGProductObject: PTCLCFGBaseObject {
+public protocol PTCLCFGProductObject: PTCLCFGBaseObject, PTCLCFGDAOPricing {
 }
 public class CFGProductObject: PTCLCFGProductObject {
+    public var pricingType: DAOPricing.Type = DAOPricing.self
+    open func pricing<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricing? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPricing.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func pricingArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricing] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPricing].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
 }
 open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGProductObject
@@ -28,14 +39,19 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
+    // MARK: - Class Factory methods -
+    open class func createPricing() -> DAOPricing { config.pricingType.init() }
+    open class func createPricing(from object: DAOPricing) -> DAOPricing { config.pricingType.init(from: object) }
+    open class func createPricing(from data: DAOPricing) -> DAOPricing? { config.pricingType.init(from: data) }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case about, price, sku, title
+        case about, pricing, sku, title
     }
     
     open var about = DNSString()
-    open var price: Float = 0
+    open var pricing: DAOPricing = DAOPricing()
     open var sku = ""
     open var title = DNSString()
     
@@ -54,10 +70,10 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     }
     open func update(from object: DAOProduct) {
         super.update(from: object)
-        self.price = object.price
         self.sku = object.sku
         // swiftlint:disable force_cast
         self.about = object.about.copy() as! DNSString
+        self.pricing = object.pricing.copy() as! DAOPricing
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -70,7 +86,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     override open func dao(from data: DNSDataDictionary) -> DAOProduct {
         _ = super.dao(from: data)
         self.about = self.dnsstring(from: data[field(.about)] as Any?) ?? self.about
-        self.price = self.float(from: data[field(.price)] as Any?) ?? self.price
+        self.pricing = self.daoPricing(from: data[field(.pricing)] as Any?) ?? self.pricing
         self.sku = self.string(from: data[field(.sku)] as Any?) ?? self.sku
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
@@ -79,7 +95,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         var retval = super.asDictionary
         retval.merge([
             field(.about): self.about.asDictionary,
-            field(.price): self.price,
+            field(.pricing): self.pricing.asDictionary,
             field(.sku): self.sku,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
@@ -106,7 +122,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         about = self.dnsstring(from: container, forKey: .about) ?? about
-        price = self.float(from: container, forKey: .price) ?? price
+        pricing = self.daoPricing(with: configuration, from: container, forKey: .pricing) ?? pricing
         sku = self.string(from: container, forKey: .sku) ?? sku
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
@@ -117,7 +133,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(about, forKey: .about)
-        try container.encode(price, forKey: .price)
+        try container.encode(pricing, forKey: .pricing)
         try container.encode(sku, forKey: .sku)
         try container.encode(title, forKey: .title)
     }
@@ -133,7 +149,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.about != rhs.about ||
-            lhs.price != rhs.price ||
+            lhs.pricing != rhs.pricing ||
             lhs.sku != rhs.sku ||
             lhs.title != rhs.title
     }

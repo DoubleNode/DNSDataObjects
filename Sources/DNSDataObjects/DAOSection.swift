@@ -91,10 +91,11 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case children, name, parent, places
+        case children, name, parent, places, pricingTierId
     }
 
     open var name = DNSString()
+    open var pricingTierId = ""
     @CodableConfiguration(from: DAOSection.self) open var children: [DAOSection] = []
     @CodableConfiguration(from: DAOSection.self) open var parent: DAOSection? = nil
     @CodableConfiguration(from: DAOSection.self) open var places: [DAOPlace] = []
@@ -116,6 +117,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         super.update(from: object)
         self.name = object.name
         self.parent = object.parent?.copy() as? DAOSection
+        self.pricingTierId = object.pricingTierId
         // swiftlint:disable force_cast
         self.children = object.children.map { $0.copy() as! DAOSection }
         self.name = object.name.copy() as! DNSString
@@ -137,6 +139,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         self.parent = Self.createSectionParent(from: parentData)
         let placesData = self.dataarray(from: data[field(.places)] as Any?)
         self.places = placesData.compactMap { Self.createPlace(from: $0) }
+        self.pricingTierId = self.string(from: data[field(.pricingTierId)] as Any?) ?? self.pricingTierId
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -146,6 +149,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
             field(.name): self.name.asDictionary,
             field(.parent): self.parent?.asDictionary ?? .empty,
             field(.places): self.places.map { $0.asDictionary },
+            field(.pricingTierId): self.pricingTierId,
         ]) { (current, _) in current }
         return retval
     }
@@ -173,6 +177,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         children = self.daoSectionChildArray(with: configuration, from: container, forKey: .children)
         parent = self.daoSectionParent(with: configuration, from: container, forKey: .parent) ?? parent
         places = self.daoPlaceArray(with: configuration, from: container, forKey: .places)
+        pricingTierId = self.string(from: container, forKey: .pricingTierId) ?? pricingTierId
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -184,6 +189,7 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         try container.encode(name, forKey: .name)
         try container.encode(parent, forKey: .parent, configuration: configuration)
         try container.encode(places, forKey: .places, configuration: configuration)
+        try container.encode(pricingTierId, forKey: .pricingTierId)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -199,7 +205,8 @@ open class DAOSection: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
             (lhs.parent?.isDiffFrom(rhs.parent) ?? (lhs.parent != rhs.parent)) ||
             lhs.children.hasDiffElementsFrom(rhs.children) ||
             lhs.places.hasDiffElementsFrom(rhs.places) ||
-            lhs.name != rhs.name
+            lhs.name != rhs.name ||
+            lhs.pricingTierId != rhs.pricingTierId
     }
 
     // MARK: - Equatable protocol methods -
