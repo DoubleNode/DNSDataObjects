@@ -63,9 +63,10 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case priority, seasons, title
+        case dataStrings, priority, seasons, title
     }
 
+    open var dataStrings: [String: DNSString] = [:]
     open var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
@@ -109,6 +110,8 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         self.priority = object.priority
         self.title = object.title
         // swiftlint:disable force_cast
+        self.dataStrings = [:]
+        object.dataStrings.forEach { self.dataStrings[$0] = ($1.copy() as! DNSString) }
         self.seasons = object.seasons.map { $0.copy() as! DAOPricingSeason }
         // swiftlint:enable force_cast
     }
@@ -120,6 +123,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     override open func dao(from data: DNSDataDictionary) -> DAOPricingTier {
         _ = super.dao(from: data)
+        self.dataStrings = self.dictionary(from: data[field(.dataStrings)] as Any?) as? [String: DNSString] ?? self.dataStrings
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         let seasonsData = self.dataarray(from: data[field(.seasons)] as Any?)
         self.seasons = seasonsData.compactMap { Self.createPricingSeason(from: $0) }
@@ -129,6 +133,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
+            field(.dataStrings): self.dataStrings,
             field(.priority): self.priority,
             field(.seasons): self.seasons.map { $0.asDictionary },
             field(.title): self.title,
@@ -155,6 +160,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        dataStrings = try container.decodeIfPresent([String: DNSString].self, forKey: .dataStrings) ?? [:]
         priority = self.int(from: container, forKey: .priority) ?? priority
         seasons = self.daoPricingSeasonArray(with: configuration, from: container, forKey: .seasons)
         title = self.string(from: container, forKey: .title) ?? title
@@ -165,6 +171,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(dataStrings, forKey: .dataStrings)
         try container.encode(priority, forKey: .priority)
         try container.encode(seasons, forKey: .seasons, configuration: configuration)
         try container.encode(title, forKey: .title)
@@ -181,6 +188,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.seasons.hasDiffElementsFrom(rhs.seasons) ||
+            lhs.dataStrings != rhs.dataStrings ||
             lhs.priority != rhs.priority ||
             lhs.title != rhs.title
     }
