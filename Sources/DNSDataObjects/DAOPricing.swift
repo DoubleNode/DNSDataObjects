@@ -68,13 +68,23 @@ open class DAOPricing: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     open var tiers: [DAOPricingTier] = []
 
+    open func dataString(for tierId: String,
+                         and stringId: String) -> DNSString? {
+        self.tier(for: tierId)?.dataStrings[stringId]
+    }
+    open func dataStrings(for tierId: String) -> [String: DNSString] {
+        self.tier(for: tierId)?.dataStrings ?? [:]
+    }
     open func price(for tierId: String,
                     and time: Date = Date()) -> DNSPrice? {
+        self.tier(for: tierId)?.price(for: time)
+    }
+    open func tier(for tierId: String) -> DAOPricingTier? {
         let tier = tiers
             .filter { $0.id == tierId }
             .sorted { $0.priority > $1.priority }
             .first ?? tiers.first
-        return tier?.price(for: time)
+        return tier
     }
 
     // MARK: - Initializers -
