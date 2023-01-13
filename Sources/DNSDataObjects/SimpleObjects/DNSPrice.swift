@@ -31,9 +31,9 @@ public class DNSPrice: DNSDataTranslation, Codable {
 
     public var isActive: Bool { isActive() }
     public func isActive(for time: Date = Date()) -> Bool {
-        guard startTime != Date.zeroTime && endTime != Date.zeroTime else { return true }
-        guard startTime != Date.zeroTime else { return time.timeOfDay() < endTime }
-        guard endTime != Date.zeroTime else { return time.timeOfDay() > startTime }
+        if startTime == Date.zeroTime && endTime == Date.zeroTime { return true }
+        else if startTime == Date.zeroTime { return time.timeOfDay() < endTime }
+        else if endTime == Date.zeroTime { return time.timeOfDay() > startTime }
         return time.timeOfDay() > startTime && time.timeOfDay() < endTime
     }
 
