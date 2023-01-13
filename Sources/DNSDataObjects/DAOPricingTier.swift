@@ -87,6 +87,13 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
             .compactMap { $0.price(for: time) }
             .first
     }
+    open func season(for seasonId: String) -> DAOPricingSeason? {
+        let season = seasons
+            .filter { $0.id == seasonId }
+            .sorted { $0.priority > $1.priority }
+            .first ?? seasons.first
+        return season
+    }
 
     // MARK: - Initializers -
     required public init() {
