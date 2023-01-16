@@ -92,6 +92,13 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         return time > startTime && time < endTime
     }
 
+    open var item: DAOPricingItem? { item() }
+    open func item(for time: Date = Date()) -> DAOPricingItem? {
+        items
+            .filter { $0.price(for: time) != nil }
+            .sorted { $0.priority > $1.priority }
+            .first
+    }
     open var price: DNSPrice? { price() }
     open func price(for time: Date = Date()) -> DNSPrice? {
         items
