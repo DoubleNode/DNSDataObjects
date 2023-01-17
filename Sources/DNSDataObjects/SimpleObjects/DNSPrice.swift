@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSPrice: DNSDataTranslation, Codable {
+public class DNSPrice: DNSDataTranslation, Codable, NSCopying {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
