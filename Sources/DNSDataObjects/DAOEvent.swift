@@ -17,7 +17,7 @@ public protocol PTCLCFGDAOEvent: PTCLCFGBaseObject {
                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOEvent] where K: CodingKey
 }
 
-public protocol PTCLCFGEventObject: PTCLCFGDAOChat, PTCLCFGDAOEventDay, PTCLCFGDAOMedia {
+public protocol PTCLCFGEventObject: PTCLCFGDAOChat, PTCLCFGDAOEventDay, PTCLCFGDAOMedia, PTCLCFGDAOPricing {
 }
 public class CFGEventObject: PTCLCFGEventObject {
     public var chatType: DAOChat.Type = DAOChat.self
@@ -31,7 +31,7 @@ public class CFGEventObject: PTCLCFGEventObject {
         do { return try container.decodeIfPresent([DAOChat].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
-
+    
     public var eventDayType: DAOEventDay.Type = DAOEventDay.self
     open func eventDay<K>(from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOEventDay? where K: CodingKey {
@@ -43,7 +43,7 @@ public class CFGEventObject: PTCLCFGEventObject {
         do { return try container.decodeIfPresent([DAOEventDay].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
-
+    
     public var mediaType: DAOMedia.Type = DAOMedia.self
     open func media<K>(from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
@@ -53,6 +53,18 @@ public class CFGEventObject: PTCLCFGEventObject {
     open func mediaArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOMedia].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    
+    public var pricingType: DAOPricing.Type = DAOPricing.self
+    open func pricing<K>(from container: KeyedDecodingContainer<K>,
+                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricing? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPricing.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func pricingArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricing] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPricing].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }
@@ -76,18 +88,22 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open class func createMedia(from object: DAOMedia) -> DAOMedia { config.mediaType.init(from: object) }
     open class func createMedia(from data: DNSDataDictionary) -> DAOMedia? { config.mediaType.init(from: data) }
 
+    open class func createPricing() -> DAOPricing { config.pricingType.init() }
+    open class func createPricing(from object: DAOPricing) -> DAOPricing { config.pricingType.init(from: object) }
+    open class func createPricing(from data: DAOPricing) -> DAOPricing? { config.pricingType.init(from: data) }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case attachments, body, chat, days, distribution, enabled, mediaItems
-        case pricingTierId, title
+        case pricing, title
     }
 
     open var body = DNSString()
     open var days: [DAOEventDay] = []
     open var distribution = DNSVisibility.everyone
     open var enabled = false
-    open var pricingTierId = ""
+    open var pricing: DAOPricing = DAOPricing()
     open var title = DNSString()
     @CodableConfiguration(from: DAOEvent.self) open var attachments: [DAOMedia] = []
     @CodableConfiguration(from: DAOEvent.self) open var chat = DAOChat()
@@ -119,13 +135,13 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         super.update(from: object)
         self.distribution = object.distribution
         self.enabled = object.enabled
-        self.pricingTierId = object.pricingTierId
         // swiftlint:disable force_cast
         self.attachments = object.attachments.map { $0.copy() as! DAOMedia }
         self.body = object.body.copy() as! DNSString
         self.chat = object.chat.copy() as! DAOChat
         self.days = object.days.map { $0.copy() as! DAOEventDay }
         self.mediaItems = object.mediaItems.map { $0.copy() as! DAOMedia }
+        self.pricing = object.pricing.copy() as! DAOPricing
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -149,7 +165,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.enabled = self.bool(from: data[field(.enabled)] as Any?) ?? self.enabled
         let mediaItemsData = self.dataarray(from: data[field(.mediaItems)] as Any?)
         self.mediaItems = mediaItemsData.compactMap { Self.createMedia(from: $0) }
-        self.pricingTierId = self.string(from: data[field(.pricingTierId)] as Any?) ?? self.pricingTierId
+        self.pricing = self.daoPricing(from: data[field(.pricing)] as Any?) ?? self.pricing
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
@@ -163,7 +179,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             field(.distribution): self.distribution.rawValue,
             field(.enabled): self.enabled,
             field(.mediaItems): self.mediaItems.map { $0.asDictionary },
-            field(.pricingTierId): self.pricingTierId,
+            field(.pricing): self.pricing.asDictionary,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
@@ -195,7 +211,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
         enabled = self.bool(from: container, forKey: .enabled) ?? enabled
         mediaItems = self.daoMediaArray(with: configuration, from: container, forKey: .mediaItems)
-        pricingTierId = self.string(from: container, forKey: .pricingTierId) ?? pricingTierId
+        pricing = self.daoPricing(with: configuration, from: container, forKey: .pricing) ?? pricing
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
@@ -211,7 +227,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         try container.encode(distribution, forKey: .distribution)
         try container.encode(enabled, forKey: .enabled)
         try container.encode(mediaItems, forKey: .mediaItems, configuration: configuration)
-        try container.encode(pricingTierId, forKey: .pricingTierId)
+        try container.encode(pricing, forKey: .pricing)
         try container.encode(title, forKey: .title)
     }
 
@@ -232,7 +248,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             lhs.chat != rhs.chat ||
             lhs.distribution != rhs.distribution ||
             lhs.enabled != rhs.enabled ||
-            lhs.pricingTierId != rhs.pricingTierId ||
+            lhs.pricing != rhs.pricing ||
             lhs.title != rhs.title
     }
 
