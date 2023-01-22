@@ -159,7 +159,7 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
             field(.attachments): self.attachments.map { $0.asDictionary },
             field(.body): self.body.asDictionary,
             field(.chat): self.chat.asDictionary,
-            field(.date): self.date,
+            field(.date): self.date.dnsDate(as: .shortMilitary),
             field(.distribution): self.distribution.rawValue,
             field(.items): self.items.map { $0.asDictionary },
             field(.mediaItems): self.mediaItems.map { $0.asDictionary },
@@ -207,7 +207,7 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         try container.encode(attachments, forKey: .attachments, configuration: configuration)
         try container.encode(body, forKey: .body)
         try container.encode(chat, forKey: .chat, configuration: configuration)
-        try container.encode(date, forKey: .date)
+        try container.encode(date.dnsDate(as: .shortMilitary), forKey: .date)
         try container.encode(distribution, forKey: .distribution)
         try container.encode(items, forKey: .items, configuration: configuration)
         try container.encode(mediaItems, forKey: .mediaItems, configuration: configuration)
