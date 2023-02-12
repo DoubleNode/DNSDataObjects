@@ -85,7 +85,11 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
     open var body = DNSString()
     open var date = Date()
     open var distribution = DNSVisibility.everyone
-    open var items: [DAOEventDayItem] = []
+    open var items: [DAOEventDayItem] = []  {
+        didSet {
+            self.items.sort { $0.startTime < $1.startTime }
+        }
+    }
     open var notes: [DNSNote] = []
     open var title = DNSString()
     @CodableConfiguration(from: DAOEventDay.self) open var attachments: [DAOMedia] = []

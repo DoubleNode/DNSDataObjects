@@ -100,7 +100,11 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
 
     open var body = DNSString()
-    open var days: [DAOEventDay] = []
+    open var days: [DAOEventDay] = [] {
+        didSet {
+            self.days.sort { $0.date < $1.date }
+        }
+    }
     open var distribution = DNSVisibility.everyone
     open var enabled = false
     open var pricing: DAOPricing = DAOPricing()
