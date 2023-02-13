@@ -6,6 +6,7 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import CoreLocation
 import DNSCore
 import Foundation
 
@@ -95,10 +96,11 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case attachments, body, chat, days, distribution, enabled, mediaItems
+        case address, attachments, body, chat, days, distribution, enabled, mediaItems
         case pricing, title
     }
 
+    open var address: DNSPostalAddress = DNSPostalAddress()
     open var body = DNSString()
     open var days: [DAOEventDay] = [] {
         didSet {
@@ -107,6 +109,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     open var distribution = DNSVisibility.everyone
     open var enabled = false
+    open var geopoint: CLLocation?
     open var pricing: DAOPricing = DAOPricing()
     open var title = DNSString()
     @CodableConfiguration(from: DAOEvent.self) open var attachments: [DAOMedia] = []
