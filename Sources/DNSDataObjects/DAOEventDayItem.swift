@@ -32,10 +32,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case address, distribution, endTime, startTime, subtitle, title
+        case address, distribution, endTime, geopoint, startTime, subtitle, title
     }
 
-    open var address: DNSPostalAddress = DNSPostalAddress()
+    open var address: DNSPostalAddress?
     open var distribution = DNSVisibility.everyone
     open var endTime = DNSTimeOfDay()
     open var geopoint: CLLocation?
@@ -58,8 +58,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     open func update(from object: DAOEventDayItem) {
         super.update(from: object)
+        self.address = object.address
         self.distribution = object.distribution
         self.endTime = object.endTime
+        self.geopoint = object.geopoint
         self.startTime = object.startTime
         // swiftlint:disable force_cast
         self.subtitle = object.subtitle.copy() as! DNSString
@@ -74,9 +76,11 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     override open func dao(from data: DNSDataDictionary) -> DAOEventDayItem {
         _ = super.dao(from: data)
+        self.address = self.dnsPostalAddress(from: data[field(.address)] as Any?) ?? self.address
         let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
         self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
         self.endTime = self.timeOfDay(from: data[field(.endTime)] as Any?) ?? self.endTime
+        self.geopoint = self.location(from: data[field(.geopoint)] as Any?) ?? self.geopoint
         self.startTime = self.timeOfDay(from: data[field(.startTime)] as Any?) ?? self.startTime
         self.subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self.subtitle
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
@@ -84,6 +88,16 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
+        if let address {
+            retval.merge([
+                field(.address): address.asDictionary,
+            ]) { (current, _) in current }
+        }
+        if let geopoint {
+            retval.merge([
+                field(.geopoint): geopoint.asDictionary,
+            ]) { (current, _) in current }
+        }
         retval.merge([
             field(.distribution): self.distribution.rawValue,
             field(.endTime): self.endTime,
@@ -113,8 +127,11 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        address = self.dnsPostalAddress(from: container, forKey: .address) ?? address
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
         endTime = self.timeOfDay(from: container, forKey: .endTime) ?? endTime
+        let geopointData = try container.decodeIfPresent([String: Double].self, forKey: .geopoint) ?? [:]
+        geopoint = CLLocation(from: geopointData)
         startTime = self.timeOfDay(from: container, forKey: .startTime) ?? startTime
         subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
         title = self.dnsstring(from: container, forKey: .title) ?? title
@@ -125,8 +142,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
         try container.encode(distribution, forKey: .distribution)
         try container.encode(endTime, forKey: .endTime)
+        try container.encode(geopoint?.asDictionary as? [String: Double], forKey: .geopoint)
         try container.encode(startTime, forKey: .startTime)
         try container.encode(subtitle, forKey: .subtitle)
         try container.encode(title, forKey: .title)
@@ -142,8 +161,10 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.address != rhs.address ||
             lhs.distribution != rhs.distribution ||
             lhs.endTime != rhs.endTime ||
+            lhs.geopoint != rhs.geopoint ||
             lhs.startTime != rhs.startTime ||
             lhs.subtitle != rhs.subtitle ||
             lhs.title != rhs.title

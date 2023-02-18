@@ -96,11 +96,11 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case address, attachments, body, chat, days, distribution, enabled, mediaItems
-        case pricing, title
+        case address, attachments, body, chat, days, distribution, enabled, geopoint
+        case mediaItems, pricing, title
     }
 
-    open var address: DNSPostalAddress = DNSPostalAddress()
+    open var address: DNSPostalAddress?
     open var body = DNSString()
     open var days: [DAOEventDay] = [] {
         didSet {
@@ -140,8 +140,10 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     open func update(from object: DAOEvent) {
         super.update(from: object)
+        self.address = object.address
         self.distribution = object.distribution
         self.enabled = object.enabled
+        self.geopoint = object.geopoint
         // swiftlint:disable force_cast
         self.attachments = object.attachments.map { $0.copy() as! DAOMedia }
         self.body = object.body.copy() as! DNSString
@@ -161,6 +163,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     override open func dao(from data: DNSDataDictionary) -> DAOEvent {
         _ = super.dao(from: data)
         let attachmentsData = self.dataarray(from: data[field(.attachments)] as Any?)
+        self.address = self.dnsPostalAddress(from: data[field(.address)] as Any?) ?? self.address
         self.attachments = attachmentsData.compactMap { Self.createMedia(from: $0) }
         self.body = self.dnsstring(from: data[field(.body)] as Any?) ?? self.body
         let chatData = self.dictionary(from: data[field(.chat)] as Any?)
@@ -170,6 +173,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         let distributionData = self.string(from: data[field(.distribution)] as Any?) ?? self.distribution.rawValue
         self.distribution = DNSVisibility(rawValue: distributionData) ?? .everyone
         self.enabled = self.bool(from: data[field(.enabled)] as Any?) ?? self.enabled
+        self.geopoint = self.location(from: data[field(.geopoint)] as Any?) ?? self.geopoint
         let mediaItemsData = self.dataarray(from: data[field(.mediaItems)] as Any?)
         self.mediaItems = mediaItemsData.compactMap { Self.createMedia(from: $0) }
         self.pricing = self.daoPricing(from: data[field(.pricing)] as Any?) ?? self.pricing
@@ -178,6 +182,16 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
+        if let address {
+            retval.merge([
+                field(.address): address.asDictionary,
+            ]) { (current, _) in current }
+        }
+        if let geopoint {
+            retval.merge([
+                field(.geopoint): geopoint.asDictionary,
+            ]) { (current, _) in current }
+        }
         retval.merge([
             field(.attachments): self.attachments.map { $0.asDictionary },
             field(.body): self.body.asDictionary,
@@ -211,12 +225,15 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        address = self.dnsPostalAddress(from: container, forKey: .address) ?? address
         attachments = self.daoMediaArray(with: configuration, from: container, forKey: .attachments)
         body = self.dnsstring(from: container, forKey: .body) ?? body
         chat = self.daoChat(with: configuration, from: container, forKey: .chat) ?? chat
         days = self.daoEventDayArray(with: configuration, from: container, forKey: .days)
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
         enabled = self.bool(from: container, forKey: .enabled) ?? enabled
+        let geopointData = try container.decodeIfPresent([String: Double].self, forKey: .geopoint) ?? [:]
+        geopoint = CLLocation(from: geopointData)
         mediaItems = self.daoMediaArray(with: configuration, from: container, forKey: .mediaItems)
         pricing = self.daoPricing(with: configuration, from: container, forKey: .pricing) ?? pricing
         title = self.dnsstring(from: container, forKey: .title) ?? title
@@ -227,12 +244,14 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(address, forKey: .address)
         try container.encode(attachments, forKey: .attachments, configuration: configuration)
         try container.encode(body, forKey: .body)
         try container.encode(chat, forKey: .chat, configuration: configuration)
         try container.encode(days, forKey: .days, configuration: configuration)
         try container.encode(distribution, forKey: .distribution)
         try container.encode(enabled, forKey: .enabled)
+        try container.encode(geopoint?.asDictionary as? [String: Double], forKey: .geopoint)
         try container.encode(mediaItems, forKey: .mediaItems, configuration: configuration)
         try container.encode(pricing, forKey: .pricing)
         try container.encode(title, forKey: .title)
@@ -248,6 +267,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.address != rhs.address ||
             lhs.attachments.hasDiffElementsFrom(rhs.attachments) ||
             lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||
             lhs.days.hasDiffElementsFrom(rhs.days) ||
@@ -255,6 +275,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             lhs.chat != rhs.chat ||
             lhs.distribution != rhs.distribution ||
             lhs.enabled != rhs.enabled ||
+            lhs.geopoint != rhs.geopoint ||
             lhs.pricing != rhs.pricing ||
             lhs.title != rhs.title
     }

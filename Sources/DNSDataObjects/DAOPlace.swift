@@ -273,6 +273,7 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         self.events = eventsData.compactMap { Self.createEvent(from: $0) }
         let geohashesData = self.array(from: data[field(.geohashes)] as Any?)
         self.geohashes = geohashesData.compactMap { self.string(from: $0 as Any?) }
+        self.geopoint = self.location(from: data[field(.geopoint)] as Any?) ?? self.geopoint
         let hoursData = self.dictionary(from: data[field(.hours)] as Any?)
         self.hours = Self.createPlaceHours(from: hoursData) ?? self.hours
         let logoData = self.dictionary(from: data[field(.logo)] as Any?)
