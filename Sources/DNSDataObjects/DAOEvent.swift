@@ -118,11 +118,13 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
 
     public var startDate: Date {
         guard let startDay = days.first else { return Date() }
-        return startDay.date
+        let startTime = DNSTimeOfDay(hour: 0, minute: 0)
+        return startTime.time(on: startDay.date)
     }
     public var endDate: Date {
         guard let endDay = days.last else { return Date() }
-        return endDay.date
+        let endTime = DNSTimeOfDay(hour: 23, minute: 59)
+        return endTime.time(on: endDay.date)
     }
 
     // MARK: - Initializers -
