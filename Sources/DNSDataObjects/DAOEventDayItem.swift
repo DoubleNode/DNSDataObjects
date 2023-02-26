@@ -161,7 +161,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.address != rhs.address ||
+            (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
             lhs.distribution != rhs.distribution ||
             lhs.endTime != rhs.endTime ||
             lhs.geopoint != rhs.geopoint ||

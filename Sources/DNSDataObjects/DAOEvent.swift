@@ -269,7 +269,7 @@ open class DAOEvent: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
-            lhs.address != rhs.address ||
+            (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
             lhs.attachments.hasDiffElementsFrom(rhs.attachments) ||
             lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||
             lhs.days.hasDiffElementsFrom(rhs.days) ||
