@@ -31,7 +31,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case cancelLabel, disclaimer, okayLabel, subTitle, title
+        case cancelLabel, disclaimer, okayLabel, subtitle, title
         case body = "description"
     }
 
@@ -39,7 +39,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
     open var cancelLabel = DNSString()
     open var disclaimer = DNSString()
     open var okayLabel = DNSString()
-    open var subTitle = DNSString()
+    open var subtitle = DNSString()
     open var title = DNSString()
 
     // MARK: - Initializers -
@@ -62,7 +62,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
         self.cancelLabel = object.cancelLabel.copy() as! DNSString
         self.disclaimer = object.disclaimer.copy() as! DNSString
         self.okayLabel = object.okayLabel.copy() as! DNSString
-        self.subTitle = object.subTitle.copy() as! DNSString
+        self.subtitle = object.subtitle.copy() as! DNSString
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -78,7 +78,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
         self.cancelLabel = self.dnsstring(from: data[field(.cancelLabel)] as Any?) ?? self.cancelLabel
         self.disclaimer = self.dnsstring(from: data[field(.disclaimer)] as Any?) ?? self.disclaimer
         self.okayLabel = self.dnsstring(from: data[field(.okayLabel)] as Any?) ?? self.okayLabel
-        self.subTitle = self.dnsstring(from: data[field(.subTitle)] as Any?) ?? self.subTitle
+        self.subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self.subtitle
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
         return self
     }
@@ -89,7 +89,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
             field(.cancelLabel): self.cancelLabel.asDictionary,
             field(.disclaimer): self.disclaimer.asDictionary,
             field(.okayLabel): self.okayLabel.asDictionary,
-            field(.subTitle): self.subTitle.asDictionary,
+            field(.subtitle): self.subtitle.asDictionary,
             field(.title): self.title.asDictionary,
         ]) { (current, _) in current }
         return retval
@@ -118,7 +118,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
         cancelLabel = self.dnsstring(from: container, forKey: .cancelLabel) ?? cancelLabel
         disclaimer = self.dnsstring(from: container, forKey: .disclaimer) ?? disclaimer
         okayLabel = self.dnsstring(from: container, forKey: .okayLabel) ?? okayLabel
-        subTitle = self.dnsstring(from: container, forKey: .subTitle) ?? subTitle
+        subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
@@ -131,7 +131,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
         try container.encode(cancelLabel, forKey: .cancelLabel)
         try container.encode(disclaimer, forKey: .disclaimer)
         try container.encode(okayLabel, forKey: .okayLabel)
-        try container.encode(subTitle, forKey: .subTitle)
+        try container.encode(subtitle, forKey: .subtitle)
         try container.encode(title, forKey: .title)
     }
 
@@ -149,7 +149,7 @@ open class DAOAppActionStrings: DAOBaseObject, DecodingConfigurationProviding, E
             lhs.cancelLabel != rhs.cancelLabel ||
             lhs.disclaimer != rhs.disclaimer ||
             lhs.okayLabel != rhs.okayLabel ||
-            lhs.subTitle != rhs.subTitle ||
+            lhs.subtitle != rhs.subtitle ||
             lhs.title != rhs.title
     }
 

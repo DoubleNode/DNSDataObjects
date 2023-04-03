@@ -17,6 +17,6 @@ public extension DAOAppAction {
     var cancelLabel: DNSString { get { strings.cancelLabel } set { strings.cancelLabel = newValue } }
     var disclaimer: DNSString { get { strings.disclaimer } set { strings.disclaimer = newValue } }
     var okayLabel: DNSString { get { strings.okayLabel } set { strings.okayLabel = newValue } }
-    var subTitle: DNSString { get { strings.subTitle } set { strings.subTitle = newValue } }
+    var subtitle: DNSString { get { strings.subtitle } set { strings.subtitle = newValue } }
     var title: DNSString { get { strings.title } set { strings.title = newValue } }
 }

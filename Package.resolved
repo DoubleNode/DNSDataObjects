@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "da868b57056f6a5f36aa7b175ed377ec150a003c",
-        "version" : "1.10.44"
+        "revision" : "7df16f91c476c0d265dad6e99a92a74b97844ebb",
+        "version" : "1.10.46"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Nirma/SFSymbol",
       "state" : {
-        "revision" : "d6680f79d5b293ddfc4640ad6d4101697426e840",
-        "version" : "2.0.0"
+        "revision" : "c18f260b9b69d1c24e40ad367e8a589563fb8f3d",
+        "version" : "2.2.0"
       }
     },
     {
