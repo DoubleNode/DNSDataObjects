@@ -17,9 +17,21 @@ public protocol PTCLCFGDAOProduct: PTCLCFGBaseObject {
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOProduct] where K: CodingKey
 }
 
-public protocol PTCLCFGProductObject: PTCLCFGBaseObject, PTCLCFGDAOPricing {
+public protocol PTCLCFGProductObject: PTCLCFGBaseObject, PTCLCFGDAOMedia, PTCLCFGDAOPricing {
 }
 public class CFGProductObject: PTCLCFGProductObject {
+    public var mediaType: DAOMedia.Type = DAOMedia.self
+    open func media<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOMedia.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func mediaArray<K>(from container: KeyedDecodingContainer<K>,
+                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOMedia].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
     public var pricingType: DAOPricing.Type = DAOPricing.self
     open func pricing<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricing? where K: CodingKey {
@@ -40,6 +52,10 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
+    open class func createMedia() -> DAOMedia { config.mediaType.init() }
+    open class func createMedia(from object: DAOMedia) -> DAOMedia { config.mediaType.init(from: object) }
+    open class func createMedia(from data: DNSDataDictionary) -> DAOMedia? { config.mediaType.init(from: data) }
+
     open class func createPricing() -> DAOPricing { config.pricingType.init() }
     open class func createPricing(from object: DAOPricing) -> DAOPricing { config.pricingType.init(from: object) }
     open class func createPricing(from data: DAOPricing) -> DAOPricing? { config.pricingType.init(from: data) }
@@ -47,14 +63,15 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case about, pricing, sku, title
+        case about, mediaItems, pricing, sku, title
     }
     
     open var about = DNSString()
     open var pricing: DAOPricing = DAOPricing()
     open var sku = ""
     open var title = DNSString()
-    
+    @CodableConfiguration(from: DAOProduct.self) open var mediaItems: [DAOMedia] = []
+
     // MARK: - Initializers -
     required public init() {
         super.init()
@@ -73,6 +90,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         self.sku = object.sku
         // swiftlint:disable force_cast
         self.about = object.about.copy() as! DNSString
+        self.mediaItems = object.mediaItems.map { $0.copy() as! DAOMedia }
         self.pricing = object.pricing.copy() as! DAOPricing
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
@@ -86,6 +104,8 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     override open func dao(from data: DNSDataDictionary) -> DAOProduct {
         _ = super.dao(from: data)
         self.about = self.dnsstring(from: data[field(.about)] as Any?) ?? self.about
+        let mediaItemsData = self.dataarray(from: data[field(.mediaItems)] as Any?)
+        self.mediaItems = mediaItemsData.compactMap { Self.createMedia(from: $0) }
         self.pricing = self.daoPricing(from: data[field(.pricing)] as Any?) ?? self.pricing
         self.sku = self.string(from: data[field(.sku)] as Any?) ?? self.sku
         self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
@@ -95,6 +115,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         var retval = super.asDictionary
         retval.merge([
             field(.about): self.about.asDictionary,
+            field(.mediaItems): self.mediaItems.map { $0.asDictionary },
             field(.pricing): self.pricing.asDictionary,
             field(.sku): self.sku,
             field(.title): self.title.asDictionary,
@@ -122,6 +143,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         about = self.dnsstring(from: container, forKey: .about) ?? about
+        mediaItems = self.daoMediaArray(with: configuration, from: container, forKey: .mediaItems)
         pricing = self.daoPricing(with: configuration, from: container, forKey: .pricing) ?? pricing
         sku = self.string(from: container, forKey: .sku) ?? sku
         title = self.dnsstring(from: container, forKey: .title) ?? title
@@ -133,6 +155,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(about, forKey: .about)
+        try container.encode(mediaItems, forKey: .mediaItems, configuration: configuration)
         try container.encode(pricing, forKey: .pricing)
         try container.encode(sku, forKey: .sku)
         try container.encode(title, forKey: .title)
@@ -149,6 +172,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.about != rhs.about ||
+            lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||
             lhs.pricing != rhs.pricing ||
             lhs.sku != rhs.sku ||
             lhs.title != rhs.title
