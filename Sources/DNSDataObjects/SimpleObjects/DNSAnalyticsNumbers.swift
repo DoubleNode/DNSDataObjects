@@ -1,5 +1,5 @@
 //
-//  DNSSystemStateNumbers.swift
+//  DNSAnalyticsNumbers.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
+public class DNSAnalyticsNumbers: DNSDataTranslation, Codable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -34,11 +34,11 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     }
 
     // MARK: - DAO copy methods -
-    public init(from object: DNSSystemStateNumbers) {
+    public init(from object: DNSAnalyticsNumbers) {
         super.init()
         self.update(from: object)
     }
-    open func update(from object: DNSSystemStateNumbers) {
+    open func update(from object: DNSAnalyticsNumbers) {
         self.android = object.android
         self.iOS = object.iOS
         self.total = object.total
@@ -49,7 +49,7 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
         super.init()
         _ = self.dao(from: data)
     }
-    open func dao(from data: DNSDataDictionary) -> DNSSystemStateNumbers {
+    open func dao(from data: DNSDataDictionary) -> DNSAnalyticsNumbers {
         self.android = self.double(from: data[field(.android)] as Any?) ?? self.android
         self.iOS = self.double(from: data[field(.iOS)] as Any?) ?? self.iOS
         self.total = self.double(from: data[field(.total)] as Any?) ?? self.total
@@ -81,11 +81,11 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
 
     // MARK: - NSCopying protocol methods -
     open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DNSSystemStateNumbers(from: self)
+        let copy = DNSAnalyticsNumbers(from: self)
         return copy
     }
     open func isDiffFrom(_ rhs: Any?) -> Bool {
-        guard let rhs = rhs as? DNSSystemStateNumbers else { return true }
+        guard let rhs = rhs as? DNSAnalyticsNumbers else { return true }
         let lhs = self
         return lhs.android != rhs.android ||
             lhs.iOS != rhs.iOS ||
@@ -93,10 +93,10 @@ public class DNSSystemStateNumbers: DNSDataTranslation, Codable {
     }
 
     // MARK: - Equatable protocol methods -
-    static public func !=(lhs: DNSSystemStateNumbers, rhs: DNSSystemStateNumbers) -> Bool {
+    static public func !=(lhs: DNSAnalyticsNumbers, rhs: DNSAnalyticsNumbers) -> Bool {
         lhs.isDiffFrom(rhs)
     }
-    static public func ==(lhs: DNSSystemStateNumbers, rhs: DNSSystemStateNumbers) -> Bool {
+    static public func ==(lhs: DNSAnalyticsNumbers, rhs: DNSAnalyticsNumbers) -> Bool {
         !lhs.isDiffFrom(rhs)
     }
 }

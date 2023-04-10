@@ -34,11 +34,11 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         case failureCodes, failureRate, state, stateOverride, totalPoints
     }
     
-    open var failureCodes: [String: DNSSystemStateNumbers] = [:]
-    open var failureRate = DNSSystemStateNumbers()
+    open var failureCodes: [String: DNSAnalyticsNumbers] = [:]
+    open var failureRate = DNSAnalyticsNumbers()
     open var state: DNSSystemState = .green
     open var stateOverride: DNSSystemState = .none
-    open var totalPoints = DNSSystemStateNumbers()
+    open var totalPoints = DNSAnalyticsNumbers()
 
     // MARK: - Initializers -
     required public init() {
@@ -72,16 +72,16 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         let failureCodesData: [String: DNSDataDictionary] = data[field(.failureCodes)] as? [String: DNSDataDictionary] ?? [:]
         self.failureCodes = [:]
         failureCodesData.forEach { key, value in
-            self.failureCodes[key] = DNSSystemStateNumbers(from: value)
+            self.failureCodes[key] = DNSAnalyticsNumbers(from: value)
         }
         let failureRateData = self.dictionary(from: data[field(.failureRate)] as Any?)
-        self.failureRate = DNSSystemStateNumbers(from: failureRateData)
+        self.failureRate = DNSAnalyticsNumbers(from: failureRateData)
         let rawState = self.string(from: data[field(.state)] as Any?) ?? self.state.rawValue
         self.state = DNSSystemState(rawValue: rawState) ?? self.state
         let rawStateOverride = self.string(from: data[field(.stateOverride)] as Any?) ?? self.state.rawValue
         self.stateOverride = DNSSystemState(rawValue: rawStateOverride) ?? self.stateOverride
         let totalPointsData = self.dictionary(from: data[field(.totalPoints)] as Any?)
-        self.totalPoints = DNSSystemStateNumbers(from: totalPointsData)
+        self.totalPoints = DNSAnalyticsNumbers(from: totalPointsData)
         return self
     }
     override open var asDictionary: DNSDataDictionary {

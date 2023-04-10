@@ -10,13 +10,13 @@ import DNSCore
 import Foundation
 
 extension DAOSystem {
-    public var failureCodes: [String: DNSSystemStateNumbers] {
+    public var failureCodes: [String: DNSAnalyticsNumbers] {
         self.currentState.failureCodes
     }
-    public var failureRate: DNSSystemStateNumbers {
+    public var failureRate: DNSAnalyticsNumbers {
         self.currentState.failureRate
     }
-    public var totalPoints: DNSSystemStateNumbers {
+    public var totalPoints: DNSAnalyticsNumbers {
         self.currentState.totalPoints
     }
     public var state: DNSSystemState {
