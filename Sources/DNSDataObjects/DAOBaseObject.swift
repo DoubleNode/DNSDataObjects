@@ -20,9 +20,10 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case id, meta
+        case analyticsData, id, meta
     }
 
+    open var analyticsData: [DAOAnalyticsData] = []
     open var id: String = ""
     open var meta: DNSMetadata = DNSMetadata()
 
@@ -44,6 +45,9 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     open func update(from object: DAOBaseObject) {
         self.id = object.id
         self.meta = object.meta
+        // swiftlint:disable force_cast
+        self.analyticsData = object.analyticsData.map { $0.copy() as! DAOAnalyticsData }
+        // swiftlint:enable force_cast
     }
 
     // MARK: - DAO translation methods -
@@ -53,6 +57,8 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
         _ = self.dao(from: data)
     }
     open func dao(from data: DNSDataDictionary) -> DAOBaseObject {
+        let analyticsDataData = self.dataarray(from: data[field(.analyticsData)] as Any?)
+        self.analyticsData = analyticsDataData.compactMap { DAOAnalyticsData(from: $0) }
         self.id = self.string(from: data[field(.id)] as Any?) ?? self.id
         let metaData = self.dictionary(from: data[field(.meta)] as Any?)
         self.meta = DNSMetadata(from: metaData)
@@ -60,6 +66,7 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     }
     open var asDictionary: DNSDataDictionary {
         let retval: DNSDataDictionary = [
+            field(.analyticsData): self.analyticsData.map { $0.asDictionary },
             field(.id): self.id,
             field(.meta): self.meta.asDictionary,
         ]
@@ -70,11 +77,13 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     required public init(from decoder: Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        analyticsData = try container.decodeIfPresent(Swift.type(of: analyticsData), forKey: .analyticsData) ?? analyticsData
         id = self.string(from: container, forKey: .id) ?? id
         meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
     open func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(analyticsData, forKey: .analyticsData)
         try container.encode(id, forKey: .id)
         try container.encode(meta, forKey: .meta)
     }
@@ -83,11 +92,13 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     required public init(from decoder: Decoder, configuration: Config) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        analyticsData = try container.decodeIfPresent(Swift.type(of: analyticsData), forKey: .analyticsData) ?? analyticsData
         id = self.string(from: container, forKey: .id) ?? id
         meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(analyticsData, forKey: .analyticsData)
         try container.encode(id, forKey: .id)
         try container.encode(meta, forKey: .meta)
     }
@@ -100,7 +111,8 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOBaseObject else { return true }
         let lhs = self
-        return lhs.id != rhs.id ||
+        return lhs.analyticsData.hasDiffElementsFrom(rhs.analyticsData) ||
+            lhs.id != rhs.id ||
             lhs.meta != rhs.meta
     }
 

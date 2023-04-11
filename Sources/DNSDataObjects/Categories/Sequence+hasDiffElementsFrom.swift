@@ -10,6 +10,21 @@ import DNSCore
 import Foundation
 import KeyedCodable
 
+public extension Sequence where Element: DNSAnalyticsNumbers {
+    var count: Int { return reduce(0) { acc, row in acc + 1 } }
+
+    func hasDiffElementsFrom(_ rhs: [DNSAnalyticsNumbers]) -> Bool {
+        guard self.count == rhs.count else { return true }
+        var anyNonMatches = false
+        self.forEach { lhsElement in
+            let foundMatch = rhs.reduce(false) { $0 || !lhsElement.isDiffFrom($1) }
+            if !foundMatch {
+                anyNonMatches = true
+            }
+        }
+        return anyNonMatches
+    }
+}
 public extension Sequence where Element: DAOBaseObject {
     var count: Int { return reduce(0) { acc, row in acc + 1 } }
 
@@ -25,10 +40,10 @@ public extension Sequence where Element: DAOBaseObject {
         return anyNonMatches
     }
 }
-public extension Sequence where Element: DNSPrice {
+public extension Sequence where Element: DNSNote {
     var count: Int { return reduce(0) { acc, row in acc + 1 } }
 
-    func hasDiffElementsFrom(_ rhs: [DNSPrice]) -> Bool {
+    func hasDiffElementsFrom(_ rhs: [DNSNote]) -> Bool {
         guard self.count == rhs.count else { return true }
         var anyNonMatches = false
         self.forEach { lhsElement in
@@ -40,10 +55,10 @@ public extension Sequence where Element: DNSPrice {
         return anyNonMatches
     }
 }
-public extension Sequence where Element: DNSNote {
+public extension Sequence where Element: DNSPrice {
     var count: Int { return reduce(0) { acc, row in acc + 1 } }
 
-    func hasDiffElementsFrom(_ rhs: [DNSNote]) -> Bool {
+    func hasDiffElementsFrom(_ rhs: [DNSPrice]) -> Bool {
         guard self.count == rhs.count else { return true }
         var anyNonMatches = false
         self.forEach { lhsElement in
