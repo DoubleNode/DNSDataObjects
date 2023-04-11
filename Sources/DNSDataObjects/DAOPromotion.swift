@@ -67,13 +67,13 @@ open class DAOPromotion: DAOBaseObject, DecodingConfigurationProviding, Encoding
              placement, priority, startTime, subtitle, title
     }
 
-    var body = DNSString()
-    var disclaimer = DNSString()
-    var displayDayOfWeek = DNSDayOfWeekFlags()
-    var enabled: Bool = true
-    var endTime: Date = Date()
-    var placement = ""
-    var priority: Int = DNSPriority.normal {
+    open var body = DNSString()
+    open var disclaimer = DNSString()
+    open var displayDayOfWeek = DNSDayOfWeekFlags()
+    open var enabled: Bool = true
+    open var endTime: Date = Date()
+    open var placement = ""
+    open var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
                 priority = DNSPriority.highest
@@ -82,9 +82,9 @@ open class DAOPromotion: DAOBaseObject, DecodingConfigurationProviding, Encoding
             }
         }
     }
-    var startTime: Date = Date()
-    var subtitle = DNSString()
-    var title = DNSString()
+    open var startTime: Date = Date()
+    open var subtitle = DNSString()
+    open var title = DNSString()
     @CodableConfiguration(from: DAOAppAction.self) open var action: DAOAppAction? = nil
     @CodableConfiguration(from: DAOPromotion.self) open var mediaItems: [DAOMedia] = []
 
