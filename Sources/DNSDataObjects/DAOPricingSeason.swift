@@ -51,11 +51,6 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
-    public enum C {
-        public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
-        public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
-    }
-
     // MARK: - Class Factory methods -
     open class func createPricingItem() -> DAOPricingItem { config.pricingItemType.init() }
     open class func createPricingItem(from object: DAOPricingItem) -> DAOPricingItem { config.pricingItemType.init(from: object) }
@@ -69,6 +64,11 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
         case endTime, items, priority, startTime
+    }
+
+    public enum C {
+        public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
+        public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
     }
 
     open var endTime = C.defaultEndTime

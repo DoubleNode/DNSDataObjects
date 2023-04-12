@@ -67,11 +67,16 @@ open class DAOPromotion: DAOBaseObject, DecodingConfigurationProviding, Encoding
              placement, priority, startTime, subtitle, title
     }
 
+    public enum C {
+        public static let defaultEndTime = Date(timeIntervalSinceReferenceDate: Date.Seconds.deltaOneYear * 30.0)
+        public static let defaultStartTime = Date(timeIntervalSinceReferenceDate: 0.0)
+    }
+
     open var body = DNSString()
     open var disclaimer = DNSString()
     open var displayDayOfWeek = DNSDayOfWeekFlags()
     open var enabled: Bool = true
-    open var endTime: Date = Date()
+    open var endTime: Date = C.defaultEndTime
     open var placement = ""
     open var priority: Int = DNSPriority.normal {
         didSet {
@@ -82,7 +87,7 @@ open class DAOPromotion: DAOBaseObject, DecodingConfigurationProviding, Encoding
             }
         }
     }
-    open var startTime: Date = Date()
+    open var startTime: Date = C.defaultStartTime
     open var subtitle = DNSString()
     open var title = DNSString()
     @CodableConfiguration(from: DAOAppAction.self) open var action: DAOAppAction? = nil
