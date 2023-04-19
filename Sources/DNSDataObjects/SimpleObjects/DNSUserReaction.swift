@@ -26,6 +26,7 @@ public class DNSUserReaction: DNSDataTranslation, Codable {
 
     public var isAngered: Bool { reaction == .angered }
     public var isCared: Bool { reaction == .cared }
+    public var isFavorited: Bool { reaction == .favorited }
     public var isHumored: Bool { reaction == .humored }
     public var isLiked: Bool { reaction == .liked }
     public var isLoved: Bool { reaction == .loved }

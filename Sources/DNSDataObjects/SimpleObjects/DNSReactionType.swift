@@ -12,6 +12,7 @@ public enum DNSReactionType: String, CaseIterable, Codable {
     case unknown = ""
     case angered
     case cared
+    case favorited
     case humored
     case liked
     case loved
