@@ -6,10 +6,14 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import DNSBaseTheme
 import DNSCore
 import Foundation
 
 public extension DAOAppAction {
+    // MARK: - Themes Properties -
+    var cancelButtonTheme: DNSThemeButtonStyle { get { themes.cancelButton } set { themes.cancelButton = newValue } }
+    var okButtonTheme: DNSThemeButtonStyle { get { themes.okButton } set { themes.okButton = newValue } }
     // MARK: - Images Properties -
     var topImageUrl: DNSURL { get { images.topUrl } set { images.topUrl = newValue } }
     // MARK: - Strings Properties -

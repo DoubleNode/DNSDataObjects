@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "activelabel.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/optonaut/ActiveLabel.swift",
+      "state" : {
+        "revision" : "36949c1a69ef8b40574da20c9e24b115f387b1cf",
+        "version" : "1.1.5"
+      }
+    },
+    {
       "identity" : "alamofire",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
@@ -19,6 +28,15 @@
       }
     },
     {
+      "identity" : "animatedfield",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNodeOpen/AnimatedField.git",
+      "state" : {
+        "revision" : "9aa84cc2f9bcfb0174946f8ab849d315bd2ada86",
+        "version" : "2.5.49"
+      }
+    },
+    {
       "identity" : "atomicswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNodeOpen/AtomicSwift.git",
@@ -28,12 +46,21 @@
       }
     },
     {
+      "identity" : "dnsbasetheme",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSBaseTheme.git",
+      "state" : {
+        "revision" : "a739a2c9b93385f3fc3f06c24a2498ed24fc4ea1",
+        "version" : "1.10.14"
+      }
+    },
+    {
       "identity" : "dnscore",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "7df16f91c476c0d265dad6e99a92a74b97844ebb",
-        "version" : "1.10.46"
+        "revision" : "46b0e5637e2f1b415918b19763f2c738dc81dfd4",
+        "version" : "1.10.47"
       }
     },
     {
@@ -82,12 +109,39 @@
       }
     },
     {
+      "identity" : "skeletonview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Juanpe/SkeletonView.git",
+      "state" : {
+        "revision" : "739a4f5d78731bebc48811c75fa9e1f4c4cef23e",
+        "version" : "1.30.4"
+      }
+    },
+    {
+      "identity" : "swift-mask-textfield",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNodeOpen/swift-mask-textfield.git",
+      "state" : {
+        "revision" : "a5546b7ae52f8d6e0b067c25606f3455056b92a5",
+        "version" : "1.1.2"
+      }
+    },
+    {
       "identity" : "swiftybeaver",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
       "state" : {
         "revision" : "12b5acf96d98f91d50de447369bd18df74600f1a",
         "version" : "1.9.6"
+      }
+    },
+    {
+      "identity" : "swipecellkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwipeCellKit/SwipeCellKit",
+      "state" : {
+        "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
+        "version" : "2.7.1"
       }
     }
   ],

@@ -17,11 +17,12 @@ public protocol PTCLCFGDAOAppAction: PTCLCFGBaseObject {
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppAction] where K: CodingKey
 }
 
-public protocol PTCLCFGAppActionObject: PTCLCFGDAOAppActionImages, PTCLCFGDAOAppActionStrings {
+public protocol PTCLCFGAppActionObject: PTCLCFGDAOAppActionImages, PTCLCFGDAOAppActionStrings, PTCLCFGDAOAppActionThemes {
 }
 public class CFGAppActionObject: PTCLCFGAppActionObject {
     public var appActionImagesType: DAOAppActionImages.Type = DAOAppActionImages.self
     public var appActionStringsType: DAOAppActionStrings.Type = DAOAppActionStrings.self
+    public var appActionThemesType: DAOAppActionThemes.Type = DAOAppActionThemes.self
 
     open func appActionImages<K>(from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionImages? where K: CodingKey {
@@ -33,6 +34,11 @@ public class CFGAppActionObject: PTCLCFGAppActionObject {
         do { return try container.decodeIfPresent(DAOAppActionStrings.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
+    open func appActionThemes<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionThemes? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAppActionThemes.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
 
     open func appActionImagesArray<K>(from container: KeyedDecodingContainer<K>,
                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionImages] where K: CodingKey {
@@ -42,6 +48,11 @@ public class CFGAppActionObject: PTCLCFGAppActionObject {
     open func appActionStringsArray<K>(from container: KeyedDecodingContainer<K>,
                                        forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAppActionStrings].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func appActionThemesArray<K>(from container: KeyedDecodingContainer<K>,
+                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionThemes] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAppActionThemes].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }
@@ -61,26 +72,33 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     open class func createAppActionStrings(from object: DAOAppActionStrings) -> DAOAppActionStrings { config.appActionStringsType.init(from: object) }
     open class func createAppActionStrings(from data: DNSDataDictionary) -> DAOAppActionStrings? { config.appActionStringsType.init(from: data) }
 
+    open class func createAppActionThemes() -> DAOAppActionThemes { config.appActionThemesType.init() }
+    open class func createAppActionThemes(from object: DAOAppActionThemes) -> DAOAppActionThemes { config.appActionThemesType.init(from: object) }
+    open class func createAppActionThemes(from data: DNSDataDictionary) -> DAOAppActionThemes? { config.appActionThemesType.init(from: data) }
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case actionType, deepLink, images, strings
+        case actionType, deepLink, images, strings, themes
     }
 
     open var actionType: DNSAppActionType = .popup
     open var deepLink: URL?
     @CodableConfiguration(from: DAOAppAction.self) open var images: DAOAppActionImages = DAOAppActionImages()
     @CodableConfiguration(from: DAOAppAction.self) open var strings: DAOAppActionStrings = DAOAppActionStrings()
+    @CodableConfiguration(from: DAOAppAction.self) open var themes: DAOAppActionThemes = DAOAppActionThemes()
 
     // MARK: - Initializers -
     required public init() {
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
+        themes = Self.createAppActionThemes()
         super.init()
     }
     required public init(id: String) {
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
+        themes = Self.createAppActionThemes()
         super.init(id: id)
     }
 
@@ -88,6 +106,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     required public init(from object: DAOAppAction) {
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
+        themes = Self.createAppActionThemes()
         super.init(from: object)
         self.update(from: object)
     }
@@ -98,6 +117,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         // swiftlint:disable force_cast
         self.images = object.images.copy() as! DAOAppActionImages
         self.strings = object.strings.copy() as! DAOAppActionStrings
+        self.themes = object.themes.copy() as! DAOAppActionThemes
         // swiftlint:enable force_cast
     }
 
@@ -106,6 +126,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         guard !data.isEmpty else { return nil }
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
+        themes = Self.createAppActionThemes()
         super.init(from: data)
     }
     override open func dao(from data: DNSDataDictionary) -> DAOAppAction {
@@ -119,6 +140,9 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         // strings section
         let stringsData = self.dictionary(from: data[field(.strings)] as Any?)
         self.strings = Self.createAppActionStrings(from: stringsData) ?? self.strings
+        // themes section
+        let themesData = self.dictionary(from: data[field(.themes)] as Any?)
+        self.themes = Self.createAppActionThemes(from: themesData) ?? self.themes
         return self
     }
     override open var asDictionary: DNSDataDictionary {
@@ -128,6 +152,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
             field(.deepLink): self.deepLink,
             field(.images): self.images.asDictionary,
             field(.strings): self.strings.asDictionary,
+            field(.themes): self.themes.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
@@ -155,7 +180,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
         images = self.daoAppActionImages(with: configuration, from: container, forKey: .images) ?? images
         strings = self.daoAppActionStrings(with: configuration, from: container, forKey: .strings) ?? strings
-
+        themes = self.daoAppActionThemes(with: configuration, from: container, forKey: .themes) ?? themes
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -167,6 +192,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         try container.encode(deepLink, forKey: .deepLink)
         try container.encode(images, forKey: .images, configuration: configuration)
         try container.encode(strings, forKey: .strings, configuration: configuration)
+        try container.encode(themes, forKey: .themes, configuration: configuration)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -178,11 +204,12 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         guard let rhs = rhs as? DAOAppAction else { return true }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.actionType != rhs.actionType ||
-            lhs.deepLink != rhs.deepLink ||
-            lhs.images != rhs.images ||
-            lhs.strings != rhs.strings
+        return super.isDiffFrom(rhs)
+            || lhs.actionType != rhs.actionType
+            || lhs.deepLink != rhs.deepLink
+            || lhs.images != rhs.images
+            || lhs.strings != rhs.strings
+            || lhs.themes != rhs.themes
     }
 
     // MARK: - Equatable protocol methods -

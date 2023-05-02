@@ -96,7 +96,7 @@ open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         guard !data.isEmpty else { return nil }
         super.init(from: data)
     }
-    override open func dao(from data: DNSDataDictionary) -> DAOChat{
+    override open func dao(from data: DNSDataDictionary) -> DAOChat {
         _ = super.dao(from: data)
         let messagesData = self.dataarray(from: data[field(.messages)] as Any?)
         self.messages = messagesData.compactMap { Self.createChatMessage(from: $0) }
