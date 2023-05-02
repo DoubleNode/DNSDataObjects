@@ -10,6 +10,11 @@ import DNSCore
 import Foundation
 
 public extension DAOAppAction {
+    // MARK: - Colors Properties -
+    var cancelButtonBackground: DNSUIColor? { get { colors.cancelButtonBackground } set { colors.cancelButtonBackground = newValue } }
+    var cancelButtonText: DNSUIColor? { get { colors.cancelButtonText } set { colors.cancelButtonText = newValue } }
+    var okButtonBackground: DNSUIColor? { get { colors.okButtonBackground } set { colors.okButtonBackground = newValue } }
+    var okButtonText: DNSUIColor? { get { colors.okButtonText } set { colors.okButtonText = newValue } }
     // MARK: - Images Properties -
     var topImageUrl: DNSURL { get { images.topUrl } set { images.topUrl = newValue } }
     // MARK: - Strings Properties -

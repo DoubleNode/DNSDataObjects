@@ -17,12 +17,18 @@ public protocol PTCLCFGDAOAppAction: PTCLCFGBaseObject {
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppAction] where K: CodingKey
 }
 
-public protocol PTCLCFGAppActionObject: PTCLCFGDAOAppActionImages, PTCLCFGDAOAppActionStrings {
+public protocol PTCLCFGAppActionObject: PTCLCFGDAOAppActionColors, PTCLCFGDAOAppActionImages, PTCLCFGDAOAppActionStrings {
 }
 public class CFGAppActionObject: PTCLCFGAppActionObject {
+    public var appActionColorsType: DAOAppActionColors.Type = DAOAppActionColors.self
     public var appActionImagesType: DAOAppActionImages.Type = DAOAppActionImages.self
     public var appActionStringsType: DAOAppActionStrings.Type = DAOAppActionStrings.self
 
+    open func appActionColors<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionColors? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOAppActionColors.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func appActionImages<K>(from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionImages? where K: CodingKey {
         do { return try container.decodeIfPresent(DAOAppActionImages.self, forKey: key, configuration: self) ?? nil } catch { }
@@ -34,6 +40,11 @@ public class CFGAppActionObject: PTCLCFGAppActionObject {
         return nil
     }
 
+    open func appActionColorsArray<K>(from container: KeyedDecodingContainer<K>,
+                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionColors] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAppActionColors].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
     open func appActionImagesArray<K>(from container: KeyedDecodingContainer<K>,
                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionImages] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOAppActionImages].self, forKey: key, configuration: self) ?? [] } catch { }
@@ -53,6 +64,10 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
+    open class func createAppActionColors() -> DAOAppActionColors { config.appActionColorsType.init() }
+    open class func createAppActionColors(from object: DAOAppActionColors) -> DAOAppActionColors { config.appActionColorsType.init(from: object) }
+    open class func createAppActionColors(from data: DNSDataDictionary) -> DAOAppActionColors? { config.appActionColorsType.init(from: data) }
+
     open class func createAppActionImages() -> DAOAppActionImages { config.appActionImagesType.init() }
     open class func createAppActionImages(from object: DAOAppActionImages) -> DAOAppActionImages { config.appActionImagesType.init(from: object) }
     open class func createAppActionImages(from data: DNSDataDictionary) -> DAOAppActionImages? { config.appActionImagesType.init(from: data) }
@@ -64,21 +79,24 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case actionType, deepLink, images, strings
+        case actionType, colors, deepLink, images, strings
     }
 
     open var actionType: DNSAppActionType = .popup
     open var deepLink: URL?
+    @CodableConfiguration(from: DAOAppAction.self) open var colors: DAOAppActionColors = DAOAppActionColors()
     @CodableConfiguration(from: DAOAppAction.self) open var images: DAOAppActionImages = DAOAppActionImages()
     @CodableConfiguration(from: DAOAppAction.self) open var strings: DAOAppActionStrings = DAOAppActionStrings()
 
     // MARK: - Initializers -
     required public init() {
+        colors = Self.createAppActionColors()
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
         super.init()
     }
     required public init(id: String) {
+        colors = Self.createAppActionColors()
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
         super.init(id: id)
@@ -86,6 +104,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
 
     // MARK: - DAO copy methods -
     required public init(from object: DAOAppAction) {
+        colors = Self.createAppActionColors()
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
         super.init(from: object)
@@ -96,6 +115,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         self.actionType = object.actionType
         self.deepLink = object.deepLink
         // swiftlint:disable force_cast
+        self.colors = object.colors.copy() as! DAOAppActionColors
         self.images = object.images.copy() as! DAOAppActionImages
         self.strings = object.strings.copy() as! DAOAppActionStrings
         // swiftlint:enable force_cast
@@ -104,6 +124,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
     // MARK: - DAO translation methods -
     required public init?(from data: DNSDataDictionary) {
         guard !data.isEmpty else { return nil }
+        colors = Self.createAppActionColors()
         images = Self.createAppActionImages()
         strings = Self.createAppActionStrings()
         super.init(from: data)
@@ -113,6 +134,9 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         let typeString = self.string(from: data[field(.actionType)] as Any?) ?? ""
         self.actionType = DNSAppActionType(rawValue: typeString) ?? .popup
         self.deepLink = self.url(from: data[field(.deepLink)] as Any?) ?? self.deepLink
+        // colors section
+        let colorsData = self.dictionary(from: data[field(.colors)] as Any?)
+        self.colors = Self.createAppActionColors(from: colorsData) ?? self.colors
         // images section
         let imagesData = self.dictionary(from: data[field(.images)] as Any?)
         self.images = Self.createAppActionImages(from: imagesData) ?? self.images
@@ -126,6 +150,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         retval.merge([
             field(.actionType): self.actionType,
             field(.deepLink): self.deepLink,
+            field(.colors): self.colors.asDictionary,
             field(.images): self.images.asDictionary,
             field(.strings): self.strings.asDictionary,
         ]) { (current, _) in current }
@@ -153,6 +178,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         let container = try decoder.container(keyedBy: CodingKeys.self)
         actionType = try container.decodeIfPresent(Swift.type(of: actionType), forKey: .actionType) ?? actionType
         deepLink = self.url(from: container, forKey: .deepLink) ?? deepLink
+        colors = self.daoAppActionColors(with: configuration, from: container, forKey: .colors) ?? colors
         images = self.daoAppActionImages(with: configuration, from: container, forKey: .images) ?? images
         strings = self.daoAppActionStrings(with: configuration, from: container, forKey: .strings) ?? strings
 
@@ -165,6 +191,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(actionType, forKey: .actionType)
         try container.encode(deepLink, forKey: .deepLink)
+        try container.encode(colors, forKey: .colors, configuration: configuration)
         try container.encode(images, forKey: .images, configuration: configuration)
         try container.encode(strings, forKey: .strings, configuration: configuration)
     }
@@ -181,6 +208,7 @@ open class DAOAppAction: DAOBaseObject, DecodingConfigurationProviding, Encoding
         return super.isDiffFrom(rhs) ||
             lhs.actionType != rhs.actionType ||
             lhs.deepLink != rhs.deepLink ||
+            lhs.colors != rhs.colors ||
             lhs.images != rhs.images ||
             lhs.strings != rhs.strings
     }
