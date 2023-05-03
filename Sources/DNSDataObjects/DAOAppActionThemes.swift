@@ -29,14 +29,17 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
     public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
+    public static var defaultCancelButton = DNSThemeButtonStyle.default
+    public static var defaultOkayButton = DNSThemeButtonStyle.default
+
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case cancelButton, okButton
+        case cancelButton, okayButton
     }
 
-    open var cancelButton = DNSThemeButtonStyle.default
-    open var okButton = DNSThemeButtonStyle.default
+    open var cancelButton = DAOAppActionThemes.defaultCancelButton
+    open var okayButton = DAOAppActionThemes.defaultOkayButton
 
     // MARK: - Initializers -
     required public init() {
@@ -55,7 +58,7 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
         super.update(from: object)
         // swiftlint:disable force_cast
         self.cancelButton = object.cancelButton.copy() as! DNSThemeButtonStyle
-        self.okButton = object.okButton.copy() as! DNSThemeButtonStyle
+        self.okayButton = object.okayButton.copy() as! DNSThemeButtonStyle
         // swiftlint:enable force_cast
     }
 
@@ -67,14 +70,14 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
     override open func dao(from data: DNSDataDictionary) -> DAOAppActionThemes {
         _ = super.dao(from: data)
         self.cancelButton = self.dnsThemeButtonStyle(from: data[field(.cancelButton)] as Any?) ?? self.cancelButton
-        self.okButton = self.dnsThemeButtonStyle(from: data[field(.okButton)] as Any?) ?? self.okButton
+        self.okayButton = self.dnsThemeButtonStyle(from: data[field(.okayButton)] as Any?) ?? self.okayButton
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
             field(.cancelButton): cancelButton,
-            field(.okButton): okButton,
+            field(.okayButton): okayButton,
         ]) { (current, _) in current }
         return retval
     }
@@ -107,7 +110,7 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(cancelButton, forKey: .cancelButton)
-//        try container.encode(okButton, forKey: .okButton)
+//        try container.encode(okayButton, forKey: .okayButton)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -121,7 +124,7 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
         let lhs = self
         return super.isDiffFrom(rhs)
             || lhs.cancelButton != rhs.cancelButton
-            || lhs.okButton != rhs.okButton
+            || lhs.okayButton != rhs.okayButton
     }
 
     // MARK: - Equatable protocol methods -

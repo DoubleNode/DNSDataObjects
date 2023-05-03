@@ -13,7 +13,7 @@ import Foundation
 public extension DAOAppAction {
     // MARK: - Themes Properties -
     var cancelButtonTheme: DNSThemeButtonStyle { get { themes.cancelButton } set { themes.cancelButton = newValue } }
-    var okButtonTheme: DNSThemeButtonStyle { get { themes.okButton } set { themes.okButton = newValue } }
+    var okayButtonTheme: DNSThemeButtonStyle { get { themes.okayButton } set { themes.okayButton = newValue } }
     // MARK: - Images Properties -
     var topImageUrl: DNSURL { get { images.topUrl } set { images.topUrl = newValue } }
     // MARK: - Strings Properties -
