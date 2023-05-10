@@ -76,8 +76,8 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
-            field(.cancelButton): cancelButton,
-            field(.okayButton): okayButton,
+            field(.cancelButton): cancelButton.asDictionary,
+            field(.okayButton): okayButton.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
