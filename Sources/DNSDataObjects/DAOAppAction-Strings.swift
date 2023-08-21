@@ -1,5 +1,5 @@
 //
-//  DAOAppActionStrings.swift
+//  DAOAppAction-Strings.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.

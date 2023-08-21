@@ -67,8 +67,8 @@ open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         case messages, participants
     }
 
-    @CodableConfiguration(from: DAOCard.self) open var messages: [DAOChatMessage] = []
-    @CodableConfiguration(from: DAOCard.self) open var participants: [DAOAccount] = []
+    @CodableConfiguration(from: DAOChat.self) open var messages: [DAOChatMessage] = []
+    @CodableConfiguration(from: DAOChat.self) open var participants: [DAOAccount] = []
 
     // MARK: - Initializers -
     required public init() {

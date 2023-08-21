@@ -1,5 +1,5 @@
 //
-//  DAOAppActionThemes.swift
+//  DAOAppAction-Themes.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
@@ -108,7 +108,7 @@ open class DAOAppActionThemes: DAOBaseObject, DecodingConfigurationProviding, En
     }
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        var _/*container*/ = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(cancelButton, forKey: .cancelButton)
 //        try container.encode(okayButton, forKey: .okayButton)
     }

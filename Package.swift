@@ -12,9 +12,9 @@ import PackageDescription
 let package = Package(
     name: "DNSDataObjects",
     platforms: [
-        .iOS(.v15),
-        .tvOS(.v15),
-        .macOS(.v10_15),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .macOS(.v13),
         .watchOS(.v9),
     ],
     products: [
@@ -26,13 +26,13 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.6.4"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.7.1"),
         .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: "4.2.0"),
-        .package(url: "https://github.com/DoubleNode/DNSBaseTheme.git", from: "1.10.20"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.10.48"),
-        .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.10.1"),
-        .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.10.0"),
-        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.3.1"),
+        .package(url: "https://github.com/DoubleNode/DNSBaseTheme.git", from: "1.11.0"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.0"),
+        .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.11.0"),
+        .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.11.0"),
+        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.4.1"),
         .package(url: "https://github.com/dgrzeszczak/KeyedCodable.git", from: "3.1.2"),
     ],
     targets: [
