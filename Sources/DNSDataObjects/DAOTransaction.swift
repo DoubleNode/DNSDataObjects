@@ -181,6 +181,7 @@ open class DAOTransaction: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOTransaction else { return true }
+        guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||

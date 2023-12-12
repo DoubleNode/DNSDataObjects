@@ -226,6 +226,7 @@ open class DAOPromotion: DAOBaseObject, DecodingConfigurationProviding, Encoding
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOPromotion else { return true }
+        guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||

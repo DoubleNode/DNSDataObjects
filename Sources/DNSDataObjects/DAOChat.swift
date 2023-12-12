@@ -152,6 +152,7 @@ open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOChat else { return true }
+        guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
