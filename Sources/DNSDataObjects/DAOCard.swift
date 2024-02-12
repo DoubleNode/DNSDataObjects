@@ -47,12 +47,17 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case billingAddress, cardHolderName, cardNumber, expiration, nickname, pinNumber, transactions
+        case billingAddress, cardHolderEmail, cardHolderName, cardHolderPhone
+        case cardNumber, cardType, `default`, expiration, nickname, pinNumber, transactions
     }
 
     open var billingAddress: DNSPostalAddress = DNSPostalAddress()
+    open var cardHolderEmail = ""
     open var cardHolderName = PersonNameComponents()
+    open var cardHolderPhone = ""
     open var cardNumber = ""
+    open var cardType = ""
+    open var `default` = false
     open var expiration: Date?
     open var nickname = ""
     open var pinNumber = ""
@@ -80,8 +85,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     open func update(from object: DAOCard) {
         super.update(from: object)
         self.billingAddress = object.billingAddress
+        self.cardHolderEmail = object.cardHolderEmail
         self.cardHolderName = object.cardHolderName
+        self.cardHolderPhone = object.cardHolderPhone
         self.cardNumber = object.cardNumber
+        self.cardType = object.cardType
+        self.default = object.default
         self.expiration = object.expiration
         self.nickname = object.nickname
         self.pinNumber = object.pinNumber
@@ -98,8 +107,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     override open func dao(from data: DNSDataDictionary) -> DAOCard {
         _ = super.dao(from: data)
         self.billingAddress = self.dnsPostalAddress(from: data[field(.billingAddress)] as Any?) ?? self.billingAddress
+        self.cardHolderEmail = self.string(from: data[field(.cardHolderEmail)] as Any?) ?? self.cardHolderEmail
         self.cardHolderName = self.personName(from: data[field(.cardHolderName)] as Any?) ?? self.cardHolderName
+        self.cardHolderPhone = self.string(from: data[field(.cardHolderPhone)] as Any?) ?? self.cardHolderPhone
         self.cardNumber = self.string(from: data[field(.cardNumber)] as Any?) ?? self.cardNumber
+        self.cardType = self.string(from: data[field(.cardType)] as Any?) ?? self.cardType
+        self.default = self.bool(from: data[field(.default)] as Any?) ?? self.default
         self.expiration = self.time(from: data[field(.expiration)] as Any?) ?? self.expiration
         self.nickname = self.string(from: data[field(.nickname)] as Any?) ?? self.nickname
         self.pinNumber = self.string(from: data[field(.pinNumber)] as Any?) ?? self.pinNumber
@@ -111,8 +124,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         var retval = super.asDictionary
         retval.merge([
             field(.billingAddress): self.billingAddress.asDictionary,
+            field(.cardHolderEmail): self.cardHolderEmail,
             field(.cardHolderName): self.cardHolderName.asDictionary,
+            field(.cardHolderPhone): self.cardHolderPhone,
             field(.cardNumber): self.cardNumber,
+            field(.cardType): self.cardType,
+            field(.default): self.default,
             field(.expiration): self.expiration,
             field(.nickname): self.nickname,
             field(.pinNumber): self.pinNumber,
@@ -141,8 +158,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         billingAddress = self.dnsPostalAddress(from: container, forKey: .billingAddress) ?? billingAddress
+        cardHolderEmail = self.string(from: container, forKey: .cardHolderEmail) ?? cardHolderEmail
         cardHolderName = self.personName(from: container, forKey: .cardHolderName) ?? cardHolderName
+        cardHolderPhone = self.string(from: container, forKey: .cardHolderPhone) ?? cardHolderPhone
         cardNumber = self.string(from: container, forKey: .cardNumber) ?? cardNumber
+        cardType = self.string(from: container, forKey: .cardType) ?? cardType
+        self.default = self.bool(from: container, forKey: .default) ?? self.default
         expiration = self.date(from: container, forKey: .expiration) ?? expiration
         nickname = self.string(from: container, forKey: .nickname) ?? nickname
         pinNumber = self.string(from: container, forKey: .pinNumber) ?? pinNumber
@@ -155,8 +176,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(billingAddress, forKey: .billingAddress)
+        try container.encode(cardHolderEmail, forKey: .cardHolderEmail)
         try container.encode(cardHolderName, forKey: .cardHolderName)
+        try container.encode(cardHolderPhone, forKey: .cardHolderPhone)
         try container.encode(cardNumber, forKey: .cardNumber)
+        try container.encode(cardType, forKey: .cardType)
+        try container.encode(self.default, forKey: .default)
         try container.encode(expiration, forKey: .expiration)
         try container.encode(nickname, forKey: .nickname)
         try container.encode(pinNumber, forKey: .pinNumber)
@@ -176,8 +201,12 @@ open class DAOCard: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         return super.isDiffFrom(rhs) ||
             lhs.transactions.hasDiffElementsFrom(rhs.transactions) ||
             lhs.billingAddress != rhs.billingAddress ||
+            lhs.cardHolderEmail != rhs.cardHolderEmail ||
             lhs.cardHolderName != rhs.cardHolderName ||
+            lhs.cardHolderPhone != rhs.cardHolderPhone ||
             lhs.cardNumber != rhs.cardNumber ||
+            lhs.cardType != rhs.cardType ||
+            lhs.default != rhs.default ||
             lhs.expiration != rhs.expiration ||
             lhs.nickname != rhs.nickname ||
             lhs.pinNumber != rhs.pinNumber
