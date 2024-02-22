@@ -10,7 +10,9 @@ import Foundation
 
 public enum DNSSystemState: String, CaseIterable, Codable {
     case none
+    case black
     case green
+    case grey
     case orange
     case red
     case yellow
