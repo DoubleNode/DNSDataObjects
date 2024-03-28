@@ -26,10 +26,10 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.8.1"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.9.0"),
         .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: "4.3.0"),
         .package(url: "https://github.com/DoubleNode/DNSBaseTheme.git", from: "1.11.0"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.4"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.5"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.11.0"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.11.0"),
         .package(url: "https://github.com/kaishin/Gifu.git", from: "3.4.1"),
