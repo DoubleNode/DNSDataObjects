@@ -102,7 +102,7 @@ open class DAOBasket: DAOBaseObject, DecodingConfigurationProviding, EncodingCon
    open func update(from object: DAOBasket) {
        super.update(from: object)
        // swiftlint:disable force_cast
-       self.items = object.items.map { $0.copy() as! DAOBasketItem }
+       self.items = object.items    // avoid recursive loop // .map { $0.copy() as! DAOBasketItem }
        self.account = object.account?.copy() as? DAOAccount
        self.place = object.place?.copy() as? DAOPlace
        // swiftlint:enable force_cast
