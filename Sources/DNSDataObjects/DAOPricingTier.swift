@@ -122,6 +122,13 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
             .first ?? seasons.first
         return season
     }
+    open func exceptionTitle(for time: Date = Date()) -> DNSString? {
+        let exception = exceptions
+            .filter { $0.isActive }
+            .sorted { $0.priority > $1.priority }
+            .first
+        return exception?.title
+    }
 
     // MARK: - Initializers -
     required public init() {

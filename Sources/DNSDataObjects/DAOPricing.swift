@@ -86,6 +86,10 @@ open class DAOPricing: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
             .first ?? tiers.first
         return tier
     }
+    open func exceptionTitle(for tierId: String,
+                             and time: Date = Date()) -> DNSString? {
+        self.tier(for: tierId)?.exceptionTitle(for: time)
+    }
 
     // MARK: - Initializers -
     required public init() {
