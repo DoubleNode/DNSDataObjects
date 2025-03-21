@@ -29,10 +29,10 @@ let package = Package(
         .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.10.2"),
         .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: "4.3.0"),
         .package(url: "https://github.com/DoubleNode/DNSBaseTheme.git", from: "1.11.1"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.8"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.9"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.11.1"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.11.1"),
-        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.4.1"),
+        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.5.1"),
         .package(url: "https://github.com/dgrzeszczak/KeyedCodable.git", from: "3.1.2"),
     ],
     targets: [
