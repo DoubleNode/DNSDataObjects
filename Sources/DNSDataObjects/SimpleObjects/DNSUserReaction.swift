@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSUserReaction: DNSDataTranslation, Codable {
+public class DNSUserReaction: DNSDataTranslation, Codable, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -83,7 +83,7 @@ public class DNSUserReaction: DNSDataTranslation, Codable {
     }
     
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         userId = self.string(from: container, forKey: .userId) ?? userId
@@ -94,7 +94,7 @@ public class DNSUserReaction: DNSDataTranslation, Codable {
         viewed = self.bool(from: container, forKey: .viewed) ?? viewed
         viewedOn = self.time(from: container, forKey: .viewedOn) ?? viewedOn
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(userId, forKey: .userId)
         try container.encode(created, forKey: .created)

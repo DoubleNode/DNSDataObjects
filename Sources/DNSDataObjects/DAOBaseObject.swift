@@ -14,7 +14,7 @@ public protocol PTCLCFGDAOBaseObject {
 
 public protocol PTCLCFGBaseObject: PTCLCFGDAOBaseObject {
 }
-open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration, NSCopying {
+open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration, NSCopying, @unchecked Sendable {
     public typealias Config = PTCLCFGBaseObject
 
     // MARK: - Properties -
@@ -74,14 +74,14 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         analyticsData = try container.decodeIfPresent(Swift.type(of: analyticsData), forKey: .analyticsData) ?? analyticsData
         id = self.string(from: container, forKey: .id) ?? id
         meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(analyticsData, forKey: .analyticsData)
         try container.encode(id, forKey: .id)
@@ -89,14 +89,14 @@ open class DAOBaseObject: DNSDataTranslation, Codable, CodableWithConfiguration,
     }
 
     // MARK: - CodableWithConfiguration protocol methods -
-    required public init(from decoder: Decoder, configuration: Config) throws {
+    required public init(from decoder: any Decoder, configuration: any Config) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         analyticsData = try container.decodeIfPresent(Swift.type(of: analyticsData), forKey: .analyticsData) ?? analyticsData
         id = self.string(from: container, forKey: .id) ?? id
         meta = try container.decodeIfPresent(Swift.type(of: meta), forKey: .meta) ?? meta
     }
-    open func encode(to encoder: Encoder, configuration: Config) throws {
+    open func encode(to encoder: any Encoder, configuration: any Config) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(analyticsData, forKey: .analyticsData)
         try container.encode(id, forKey: .id)

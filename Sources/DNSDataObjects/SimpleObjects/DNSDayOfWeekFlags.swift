@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DNSDayOfWeekFlags: DNSDataTranslation, Codable, NSCopying {
+open class DNSDayOfWeekFlags: DNSDataTranslation, Codable, NSCopying, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {

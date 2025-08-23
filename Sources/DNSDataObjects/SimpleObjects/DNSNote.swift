@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSNote: DNSDataTranslation, Codable {
+public class DNSNote: DNSDataTranslation, Codable, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -68,14 +68,14 @@ public class DNSNote: DNSDataTranslation, Codable {
     }
     
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         body = self.dnsstring(from: container, forKey: .body) ?? body
         distribution = try container.decodeIfPresent(Swift.type(of: distribution), forKey: .distribution) ?? distribution
         priority = self.int(from: container, forKey: .priority) ?? priority
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(body, forKey: .body)
         try container.encode(distribution, forKey: .distribution)

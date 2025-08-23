@@ -10,32 +10,32 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoSection<K>(with configuration: PTCLCFGDAOSection,
+    func daoSection<K>(with configuration: any PTCLCFGDAOSection,
                        from container: KeyedDecodingContainer<K>,
                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
         return configuration.section(from: container, forKey: key)
     }
-    func daoSectionChild<K>(with configuration: PTCLCFGDAOSectionSection,
+    func daoSectionChild<K>(with configuration: any PTCLCFGDAOSectionSection,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
         return configuration.sectionChild(from: container, forKey: key)
     }
-    func daoSectionParent<K>(with configuration: PTCLCFGDAOSectionSection,
+    func daoSectionParent<K>(with configuration: any PTCLCFGDAOSectionSection,
                              from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOSection? where K: CodingKey {
         return configuration.sectionParent(from: container, forKey: key)
     }
-    func daoSectionArray<K>(with configuration: PTCLCFGDAOSection,
+    func daoSectionArray<K>(with configuration: any PTCLCFGDAOSection,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
         return configuration.sectionArray(from: container, forKey: key)
     }
-    func daoSectionChildArray<K>(with configuration: PTCLCFGDAOSectionSection,
+    func daoSectionChildArray<K>(with configuration: any PTCLCFGDAOSectionSection,
                                  from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
         return configuration.sectionChildArray(from: container, forKey: key)
     }
-    func daoSectionParentArray<K>(with configuration: PTCLCFGDAOSectionSection,
+    func daoSectionParentArray<K>(with configuration: any PTCLCFGDAOSectionSection,
                                   from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSection] where K: CodingKey {
         return configuration.sectionParentArray(from: container, forKey: key)

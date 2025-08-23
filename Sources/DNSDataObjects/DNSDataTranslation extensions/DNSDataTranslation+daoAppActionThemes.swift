@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoAppActionThemes<K>(with configuration: PTCLCFGDAOAppActionThemes,
+    func daoAppActionThemes<K>(with configuration: any PTCLCFGDAOAppActionThemes,
                                from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionThemes? where K: CodingKey {
         return configuration.appActionThemes(from: container, forKey: key)
     }
-    func daoAppActionThemesArray<K>(with configuration: PTCLCFGDAOAppActionThemes,
+    func daoAppActionThemesArray<K>(with configuration: any PTCLCFGDAOAppActionThemes,
                                     from container: KeyedDecodingContainer<K>,
                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionThemes] where K: CodingKey {
         return configuration.appActionThemesArray(from: container, forKey: key)

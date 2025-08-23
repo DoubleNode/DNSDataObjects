@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
+open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -74,13 +74,13 @@ open class DNSDailyHours: DNSDataTranslation, Codable, NSCopying {
     }
     
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         close = self.timeOfDay(from: container, forKey: .close) ?? close
         open = self.timeOfDay(from: container, forKey: .open) ?? open
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(close, forKey: .close)
         try container.encode(open, forKey: .open)

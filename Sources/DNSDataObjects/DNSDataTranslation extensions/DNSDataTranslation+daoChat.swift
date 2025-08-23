@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoChat<K>(with configuration: PTCLCFGDAOChat,
+    func daoChat<K>(with configuration: any PTCLCFGDAOChat,
                     from container: KeyedDecodingContainer<K>,
                     forKey key: KeyedDecodingContainer<K>.Key) -> DAOChat? where K: CodingKey {
         return configuration.chat(from: container, forKey: key)
     }
-    func daoChatArray<K>(with configuration: PTCLCFGDAOChat,
+    func daoChatArray<K>(with configuration: any PTCLCFGDAOChat,
                          from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> [DAOChat] where K: CodingKey {
         return configuration.chatArray(from: container, forKey: key)

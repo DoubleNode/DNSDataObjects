@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoBasketItem<K>(with configuration: PTCLCFGDAOBasketItem,
+    func daoBasketItem<K>(with configuration: any PTCLCFGDAOBasketItem,
                         from container: KeyedDecodingContainer<K>,
                         forKey key: KeyedDecodingContainer<K>.Key) -> DAOBasketItem? where K: CodingKey {
         return configuration.basketItem(from: container, forKey: key)
     }
-    func daoBasketItemArray<K>(with configuration: PTCLCFGDAOBasketItem,
+    func daoBasketItemArray<K>(with configuration: any PTCLCFGDAOBasketItem,
                              from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBasketItem] where K: CodingKey {
         return configuration.basketItemArray(from: container, forKey: key)

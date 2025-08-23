@@ -11,6 +11,6 @@ import DNSError
 public extension DNSCodeLocation {
     typealias dataObjects = DNSDataObjectsCodeLocation
 }
-open class DNSDataObjectsCodeLocation: DNSCodeLocation {
+open class DNSDataObjectsCodeLocation: DNSCodeLocation, @unchecked Sendable {
     override open class var domainPreface: String { "com.doublenode.dataObjects." }
 }

@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoNotification<K>(with configuration: PTCLCFGDAONotification,
+    func daoNotification<K>(with configuration: any PTCLCFGDAONotification,
                             from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> DAONotification? where K: CodingKey {
         return configuration.notification(from: container, forKey: key)
     }
-    func daoNotificationArray<K>(with configuration: PTCLCFGDAONotification,
+    func daoNotificationArray<K>(with configuration: any PTCLCFGDAONotification,
                                  from container: KeyedDecodingContainer<K>,
                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAONotification] where K: CodingKey {
         return configuration.notificationArray(from: container, forKey: key)

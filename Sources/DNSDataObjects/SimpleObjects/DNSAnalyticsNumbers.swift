@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSAnalyticsNumbers: DNSDataTranslation, Codable {
+public class DNSAnalyticsNumbers: DNSDataTranslation, Codable, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -65,14 +65,14 @@ public class DNSAnalyticsNumbers: DNSDataTranslation, Codable {
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         android = self.double(from: container, forKey: .android) ?? android
         iOS = self.double(from: container, forKey: .iOS) ?? iOS
         total = self.double(from: container, forKey: .total) ?? total
     }
-    open func encode(to encoder: Encoder) throws {
+    open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(android, forKey: .android)
         try container.encode(iOS, forKey: .iOS)

@@ -7,18 +7,18 @@
 //
 
 import DNSCore
-import UIKit
+@preconcurrency import UIKit
 
-open class DNSMediaDisplay: Equatable, NSCopying {
-    open var imageView: UIImageView
-    open var placeholderImage: UIImage?
-    open var progressView: UIProgressView?
-    open var secondaryImageViews: [UIImageView] = []
+open class DNSMediaDisplay: Equatable, NSCopying, @unchecked Sendable {
+    @MainActor open var imageView: UIImageView
+    @MainActor open var placeholderImage: UIImage?
+    @MainActor open var progressView: UIProgressView?
+    @MainActor open var secondaryImageViews: [UIImageView] = []
 
-    public init(imageView: UIImageView,
-                placeholderImage: UIImage? = nil,
-                progressView: UIProgressView? = nil,
-                secondaryImageViews: [UIImageView] = []) {
+    nonisolated public init(imageView: UIImageView,
+                            placeholderImage: UIImage? = nil,
+                            progressView: UIProgressView? = nil,
+                            secondaryImageViews: [UIImageView] = []) {
         self.imageView = imageView
         self.placeholderImage = placeholderImage
         self.progressView = progressView
@@ -26,33 +26,46 @@ open class DNSMediaDisplay: Equatable, NSCopying {
         self.contentInit()
     }
 
-    open func contentInit() { }
-    open func display(from media: DAOMedia?) { }
+    nonisolated open func contentInit() { }
+    @MainActor open func display(from media: DAOMedia?) { }
 
     // NSCopying protocol methods
-    open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DNSMediaDisplay(imageView: imageView)
-        copy.imageView = imageView
-        copy.progressView = progressView
-        copy.secondaryImageViews = secondaryImageViews
+    nonisolated open func copy(with zone: NSZone? = nil) -> Any {
+        let imageView = MainActor.assumeIsolated { self.imageView }
+        let placeholderImage = MainActor.assumeIsolated { self.placeholderImage }
+        let progressView = MainActor.assumeIsolated { self.progressView }
+        let secondaryImageViews = MainActor.assumeIsolated { self.secondaryImageViews }
+        
+        let copy = DNSMediaDisplay(imageView: imageView,
+                                   placeholderImage: placeholderImage,
+                                   progressView: progressView,
+                                   secondaryImageViews: secondaryImageViews)
         return copy
     }
-    open func isDiffFrom(_ rhs: Any?) -> Bool {
+    nonisolated open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DNSMediaDisplay else { return true }
-        let lhs = self
-        return lhs.imageView != rhs.imageView ||
-            lhs.progressView != rhs.progressView ||
-            lhs.secondaryImageViews != rhs.secondaryImageViews
+        
+        let lhsImageView = MainActor.assumeIsolated { self.imageView }
+        let lhsProgressView = MainActor.assumeIsolated { self.progressView }
+        let lhsSecondaryImageViews = MainActor.assumeIsolated { self.secondaryImageViews }
+        
+        let rhsImageView = MainActor.assumeIsolated { rhs.imageView }
+        let rhsProgressView = MainActor.assumeIsolated { rhs.progressView }
+        let rhsSecondaryImageViews = MainActor.assumeIsolated { rhs.secondaryImageViews }
+        
+        return lhsImageView != rhsImageView ||
+               lhsProgressView != rhsProgressView ||
+               lhsSecondaryImageViews != rhsSecondaryImageViews
     }
 
     // MARK: - Equatable protocol methods -
-    static public func !=(lhs: DNSMediaDisplay, rhs: DNSMediaDisplay) -> Bool {
+    nonisolated static public func !=(lhs: DNSMediaDisplay, rhs: DNSMediaDisplay) -> Bool {
         lhs.isDiffFrom(rhs)
     }
-    static public func ==(lhs: DNSMediaDisplay, rhs: DNSMediaDisplay) -> Bool {
+    nonisolated static public func ==(lhs: DNSMediaDisplay, rhs: DNSMediaDisplay) -> Bool {
         !lhs.isDiffFrom(rhs)
     }
 
     // MARK: - Utility methods -
-    open func utilityDisplayPrepareForReuse(videoOnly: Bool = false) { }
+    @MainActor open func utilityDisplayPrepareForReuse(videoOnly: Bool = false) { }
 }

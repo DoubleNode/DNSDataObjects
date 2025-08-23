@@ -10,7 +10,7 @@ import DNSCore
 import Foundation
 
 extension DAOMedia {
-    public func display(using helper: DNSMediaDisplay) {
+    @MainActor public func display(using helper: DNSMediaDisplay) {
         helper.display(from: self)
     }
 }

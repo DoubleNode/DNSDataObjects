@@ -45,12 +45,12 @@ public class CFGChatObject: PTCLCFGChatObject {
         return []
     }
 }
-open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
+open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding, @unchecked Sendable {
     public typealias Config = PTCLCFGChatObject
-    public static var config: Config = CFGChatObject()
+    nonisolated(unsafe) public static var config: any Config = CFGChatObject()
 
-    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
-    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var decodingConfiguration: any DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: any DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
     open class func createAccount() -> DAOAccount { config.accountType.init() }
@@ -114,31 +114,31 @@ open class DAOChat: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         fatalError("init(from:) has not been implemented")
     }
-    override open func encode(to encoder: Encoder) throws {
+    override open func encode(to encoder: any Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)
     }
 
     // MARK: - CodableWithConfiguration protocol methods -
-    required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
+    required public init(from decoder: any Decoder, configuration: any DAOBaseObject.Config) throws {
         try super.init(from: decoder, configuration: configuration)
         try self.commonInit(from: decoder, configuration: Self.config)
     }
-    required public init(from decoder: Decoder, configuration: Config) throws {
+    required public init(from decoder: any Decoder, configuration: any Config) throws {
         try super.init(from: decoder, configuration: configuration)
         try self.commonInit(from: decoder, configuration: configuration)
     }
-    private func commonInit(from decoder: Decoder, configuration: Config) throws {
+    private func commonInit(from decoder: any Decoder, configuration: any Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         messages = self.daoChatMessageArray(with: configuration, from: container, forKey: .messages)
         participants = self.daoAccountArray(with: configuration, from: container, forKey: .participants)
     }
-    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+    override open func encode(to encoder: any Encoder, configuration: any DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
     }
-    open func encode(to encoder: Encoder, configuration: Config) throws {
+    open func encode(to encoder: any Encoder, configuration: any Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(messages, forKey: .messages, configuration: configuration)

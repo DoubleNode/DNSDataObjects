@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoFaqSection<K>(with configuration: PTCLCFGDAOFaqSection,
+    func daoFaqSection<K>(with configuration: any PTCLCFGDAOFaqSection,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOFaqSection? where K: CodingKey {
         return configuration.faqSection(from: container, forKey: key)
     }
-    func daoFaqSectionArray<K>(with configuration: PTCLCFGDAOFaqSection,
+    func daoFaqSectionArray<K>(with configuration: any PTCLCFGDAOFaqSection,
                                from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOFaqSection] where K: CodingKey {
         return configuration.faqSectionArray(from: container, forKey: key)

@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoAlert<K>(with configuration: PTCLCFGDAOAlert,
+    func daoAlert<K>(with configuration: any PTCLCFGDAOAlert,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOAlert? where K: CodingKey {
         return configuration.alert(from: container, forKey: key)
     }
-    func daoAlertArray<K>(with configuration: PTCLCFGDAOAlert,
+    func daoAlertArray<K>(with configuration: any PTCLCFGDAOAlert,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAlert] where K: CodingKey {
         return configuration.alertArray(from: container, forKey: key)

@@ -8,27 +8,30 @@
 
 import DNSCore
 import DNSCoreThreading
-import UIKit
+@preconcurrency import UIKit
 
-open class DNSMediaDisplayVideo: DNSMediaDisplayStaticImage {
+open class DNSMediaDisplayVideo: DNSMediaDisplayStaticImage, @unchecked Sendable {
     override open func display(from media: DAOMedia?) {
-        DNSUIThread.run {
-            guard let media else {
-                self.imageView.image = self.placeholderImage
-                return
+        DNSUIThread.run { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self = self else { return }
+                guard let media else {
+                    self.imageView.image = self.placeholderImage
+                    return
+                }
+                guard let url = media.url.asURL else {
+                    self.imageView.image = self.placeholderImage
+                    return
+                }
+                guard let preloadUrl = media.preloadUrl.asURL else {
+                    self.utilityDisplayVideo(url: url)
+                    return
+                }
+                self.utilityDisplayStaticImage(url: preloadUrl,
+                                               completion: { _/*success*/ in
+                    self.utilityDisplayVideo(url: url)
+                })
             }
-            guard let url = media.url.asURL else {
-                self.imageView.image = self.placeholderImage
-                return
-            }
-            guard let preloadUrl = media.preloadUrl.asURL else {
-                self.utilityDisplayVideo(url: url)
-                return
-            }
-            self.utilityDisplayStaticImage(url: preloadUrl,
-                                           completion: { _/*success*/ in
-                self.utilityDisplayVideo(url: url)
-            })
         }
     }
 
@@ -44,7 +47,7 @@ open class DNSMediaDisplayVideo: DNSMediaDisplayStaticImage {
         guard !videoOnly else { return }
         super.utilityDisplayPrepareForReuse(videoOnly: videoOnly)
     }
-    func utilityDisplayVideo(url: URL) {
+    @MainActor func utilityDisplayVideo(url: URL) {
         self.utilityDisplayPrepareForReuse()
         self.secondaryImageViews.forEach { $0.image = nil }
 //        let playerAsset = AVAsset(url: url)

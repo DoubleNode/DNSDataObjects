@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoPricingSeason<K>(with configuration: PTCLCFGDAOPricingSeason,
+    func daoPricingSeason<K>(with configuration: any PTCLCFGDAOPricingSeason,
                              from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricingSeason? where K: CodingKey {
         return configuration.pricingSeason(from: container, forKey: key)
     }
-    func daoPricingSeasonArray<K>(with configuration: PTCLCFGDAOPricingSeason,
+    func daoPricingSeasonArray<K>(with configuration: any PTCLCFGDAOPricingSeason,
                                   from container: KeyedDecodingContainer<K>,
                                   forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricingSeason] where K: CodingKey {
         return configuration.pricingSeasonArray(from: container, forKey: key)

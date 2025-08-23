@@ -12,29 +12,36 @@ import DNSCoreThreading
 import Gifu
 import UIKit
 
-open class DNSMediaDisplayAnimatedImage: DNSMediaDisplayStaticImage {
+@available(*, unavailable, message: "Swift 6 concurrency not supported")
+extension DNSMediaDisplayAnimatedImage: Sendable {}
+
+open class DNSMediaDisplayAnimatedImage: DNSMediaDisplayStaticImage, @unchecked Sendable {
     override open func display(from media: DAOMedia?) {
-        DNSUIThread.run {
-            guard let media else {
-                self.imageView.image = self.placeholderImage
-                return
+        DNSUIThread.run { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self = self else { return }
+                guard let media else {
+                    self.imageView.image = self.placeholderImage
+                    return
+                }
+                guard let url = media.url.asURL else {
+                    self.imageView.image = self.placeholderImage
+                    return
+                }
+                guard let preloadUrl = media.preloadUrl.asURL else {
+                    self.utilityDisplayAnimatedImage(url: url)
+                    return
+                }
+                self.utilityDisplayStaticImage(url: preloadUrl,
+                                               completion: { _/*success*/ in
+                    self.utilityDisplayAnimatedImage(url: url)
+                })
             }
-            guard let url = media.url.asURL else {
-                self.imageView.image = self.placeholderImage
-                return
-            }
-            guard let preloadUrl = media.preloadUrl.asURL else {
-                self.utilityDisplayAnimatedImage(url: url)
-                return
-            }
-            self.utilityDisplayStaticImage(url: preloadUrl,
-                                           completion: { _/*success*/ in
-                self.utilityDisplayAnimatedImage(url: url)
-            })
         }
     }
 
     // MARK: - Utility methods -
+    @MainActor
     func utilityDisplayAnimatedImage(url: URL) {
         guard let imageView = self.imageView as? GIFImageView else {
             self.utilityDisplayStaticImage(url: url)
@@ -46,22 +53,29 @@ open class DNSMediaDisplayAnimatedImage: DNSMediaDisplayStaticImage {
             .setImage(withURL: url,
                       cacheKey: url.absoluteString + Date().dnsDateTime(as: .fullSimple),
                       placeholderImage: placeholderImage,
-                      progress: { (progress) in
-                        self.progressView?.setProgress(Float(progress.fractionCompleted),
-                                                       animated: true)
-                        self.progressView?.isHidden = (progress.fractionCompleted >= 1.0)
+                      progress: { [weak self] (progress) in
+                        Task { @MainActor in
+                            self?.progressView?.setProgress(Float(progress.fractionCompleted),
+                                                           animated: true)
+                            self?.progressView?.isHidden = (progress.fractionCompleted >= 1.0)
+                        }
                       },
                       imageTransition: UIImageView.ImageTransition.crossDissolve(0.2),
-                      completion: { response in
-                        self.progressView?.isHidden = true
-                        self.secondaryImageViews.forEach { $0.image = nil }
-                        DNSUIThread.run(after: 0.5) {
+                      completion: { [weak self] response in
+                        Task { @MainActor in
+                            guard let self = self else { return }
+                            self.progressView?.isHidden = true
                             self.secondaryImageViews.forEach { $0.image = nil }
-                            guard let imageData = response.data else {
-                                imageView.startAnimatingGIF()
-                                return
+                            DNSUIThread.run(after: 0.5) { [weak self] in
+                                MainActor.assumeIsolated {
+                                    self?.secondaryImageViews.forEach { $0.image = nil }
+                                    guard let imageData = response.data else {
+                                        imageView.startAnimatingGIF()
+                                        return
+                                    }
+                                    imageView.animate(withGIFData: imageData)
+                                }
                             }
-                            imageView.animate(withGIFData: imageData)
                         }
                       })
     }

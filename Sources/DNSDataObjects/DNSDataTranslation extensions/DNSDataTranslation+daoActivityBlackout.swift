@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoActivityBlackout<K>(with configuration: PTCLCFGDAOActivityBlackout,
+    func daoActivityBlackout<K>(with configuration: any PTCLCFGDAOActivityBlackout,
                                 from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOActivityBlackout? where K: CodingKey {
         return configuration.activityBlackout(from: container, forKey: key)
     }
-    func daoActivityBlackoutArray<K>(with configuration: PTCLCFGDAOActivityBlackout,
+    func daoActivityBlackoutArray<K>(with configuration: any PTCLCFGDAOActivityBlackout,
                                      from container: KeyedDecodingContainer<K>,
                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOActivityBlackout] where K: CodingKey {
         return configuration.activityBlackoutArray(from: container, forKey: key)

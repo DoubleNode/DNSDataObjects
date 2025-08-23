@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoMedia<K>(with configuration: PTCLCFGDAOMedia,
+    func daoMedia<K>(with configuration: any PTCLCFGDAOMedia,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOMedia? where K: CodingKey {
         return configuration.media(from: container, forKey: key)
     }
-    func daoMediaArray<K>(with configuration: PTCLCFGDAOMedia,
+    func daoMediaArray<K>(with configuration: any PTCLCFGDAOMedia,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOMedia] where K: CodingKey {
         return configuration.mediaArray(from: container, forKey: key)

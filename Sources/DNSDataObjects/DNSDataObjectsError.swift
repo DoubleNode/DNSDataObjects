@@ -18,7 +18,7 @@ public enum DNSDataObjectsError: DNSError {
     case notImplemented(_ codeLocation: DNSCodeLocation)
     case notFound(field: String, value: String, _ codeLocation: DNSCodeLocation)
     case invalidParameters(parameters: [String], _ codeLocation: DNSCodeLocation)
-    case lowerError(error: Error, _ codeLocation: DNSCodeLocation)
+    case lowerError(error: any Error, _ codeLocation: DNSCodeLocation)
     // Domain-Specific Errors
     case typeMismatch(expectedType: String, actualType: String, _ codeLocation: DNSCodeLocation)
     case unexpectedNil(name: String, _ codeLocation: DNSCodeLocation)

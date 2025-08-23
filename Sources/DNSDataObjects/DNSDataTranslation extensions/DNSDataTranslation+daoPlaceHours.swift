@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoPlaceHours<K>(with configuration: PTCLCFGDAOPlaceHours,
+    func daoPlaceHours<K>(with configuration: any PTCLCFGDAOPlaceHours,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlaceHours? where K: CodingKey {
         return configuration.placeHours(from: container, forKey: key)
     }
-    func daoPlaceHoursArray<K>(with configuration: PTCLCFGDAOPlaceHours,
+    func daoPlaceHoursArray<K>(with configuration: any PTCLCFGDAOPlaceHours,
                                from container: KeyedDecodingContainer<K>,
                                forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlaceHours] where K: CodingKey {
         return configuration.placeHoursArray(from: container, forKey: key)

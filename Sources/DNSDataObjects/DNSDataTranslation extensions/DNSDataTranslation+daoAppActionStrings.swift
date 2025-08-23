@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoAppActionStrings<K>(with configuration: PTCLCFGDAOAppActionStrings,
+    func daoAppActionStrings<K>(with configuration: any PTCLCFGDAOAppActionStrings,
                                 from container: KeyedDecodingContainer<K>,
                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOAppActionStrings? where K: CodingKey {
         return configuration.appActionStrings(from: container, forKey: key)
     }
-    func daoAppActionStringsArray<K>(with configuration: PTCLCFGDAOAppActionStrings,
+    func daoAppActionStringsArray<K>(with configuration: any PTCLCFGDAOAppActionStrings,
                                      from container: KeyedDecodingContainer<K>,
                                      forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAppActionStrings] where K: CodingKey {
         return configuration.appActionStringsArray(from: container, forKey: key)

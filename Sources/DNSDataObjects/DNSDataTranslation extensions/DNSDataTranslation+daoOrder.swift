@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoOrder<K>(with configuration: PTCLCFGDAOOrder,
+    func daoOrder<K>(with configuration: any PTCLCFGDAOOrder,
                      from container: KeyedDecodingContainer<K>,
                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOOrder? where K: CodingKey {
         return configuration.order(from: container, forKey: key)
     }
-    func daoOrderArray<K>(with configuration: PTCLCFGDAOOrder,
+    func daoOrderArray<K>(with configuration: any PTCLCFGDAOOrder,
                           from container: KeyedDecodingContainer<K>,
                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOOrder] where K: CodingKey {
         return configuration.orderArray(from: container, forKey: key)

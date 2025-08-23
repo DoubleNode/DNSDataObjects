@@ -10,12 +10,12 @@ import DNSCore
 import Foundation
 
 public extension DNSDataTranslation {
-    func daoBeacon<K>(with configuration: PTCLCFGDAOBeacon,
+    func daoBeacon<K>(with configuration: any PTCLCFGDAOBeacon,
                       from container: KeyedDecodingContainer<K>,
                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOBeacon? where K: CodingKey {
         return configuration.beacon(from: container, forKey: key)
     }
-    func daoBeaconArray<K>(with configuration: PTCLCFGDAOBeacon,
+    func daoBeaconArray<K>(with configuration: any PTCLCFGDAOBeacon,
                            from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOBeacon] where K: CodingKey {
         return configuration.beaconArray(from: container, forKey: key)

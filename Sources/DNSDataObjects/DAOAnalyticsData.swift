@@ -21,12 +21,12 @@ public protocol PTCLCFGAnalyticsDataObject: PTCLCFGBaseObject {
 }
 public class CFGAnalyticsDataObject: PTCLCFGAnalyticsDataObject {
 }
-open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
+open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding, @unchecked Sendable {
     public typealias Config = PTCLCFGAnalyticsDataObject
-    public static var config: Config = CFGAnalyticsDataObject()
+    nonisolated(unsafe) public static var config: any Config = CFGAnalyticsDataObject()
 
-    public static var decodingConfiguration: DAOBaseObject.Config { Self.config }
-    public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
+    public static var decodingConfiguration: any DAOBaseObject.Config { Self.config }
+    public static var encodingConfiguration: any DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
 
@@ -86,32 +86,32 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
     }
 
     // MARK: - Codable protocol methods -
-    required public init(from decoder: Decoder) throws {
+    required public init(from decoder: any Decoder) throws {
         fatalError("init(from:) has not been implemented")
     }
-    override open func encode(to encoder: Encoder) throws {
+    override open func encode(to encoder: any Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)
     }
 
     // MARK: - CodableWithConfiguration protocol methods -
-    required public init(from decoder: Decoder, configuration: DAOBaseObject.Config) throws {
+    required public init(from decoder: any Decoder, configuration: any DAOBaseObject.Config) throws {
         try super.init(from: decoder, configuration: configuration)
         try self.commonInit(from: decoder, configuration: Self.config)
     }
-    required public init(from decoder: Decoder, configuration: Config) throws {
+    required public init(from decoder: any Decoder, configuration: any Config) throws {
         try super.init(from: decoder, configuration: configuration)
         try self.commonInit(from: decoder, configuration: configuration)
     }
-    private func commonInit(from decoder: Decoder, configuration: Config) throws {
+    private func commonInit(from decoder: any Decoder, configuration: any Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         data = try container.decodeIfPresent(Swift.type(of: data), forKey: .data) ?? data
         subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
         title = self.dnsstring(from: container, forKey: .title) ?? title
     }
-    override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
+    override open func encode(to encoder: any Encoder, configuration: any DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
     }
-    open func encode(to encoder: Encoder, configuration: Config) throws {
+    open func encode(to encoder: any Encoder, configuration: any Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(data, forKey: .data)
