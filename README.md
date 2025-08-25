@@ -48,6 +48,7 @@ dependencies: [
 -   DNSError v2.0.1+
 -   Gifu v3.5.1+
 -   KeyedCodable v3.1.2+
+-   swift-currency v1.0.0+
 
 ## Credits
 

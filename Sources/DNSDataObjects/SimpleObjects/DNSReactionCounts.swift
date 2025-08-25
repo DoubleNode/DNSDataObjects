@@ -9,7 +9,7 @@
 import DNSCore
 import Foundation
 
-public class DNSReactionCounts: DNSDataTranslation, Codable, @unchecked Sendable {
+public class DNSReactionCounts: DNSDataTranslation, Codable, NSCopying, @unchecked Sendable {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {

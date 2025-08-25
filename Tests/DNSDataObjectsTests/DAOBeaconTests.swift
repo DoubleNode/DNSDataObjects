@@ -17,7 +17,7 @@ final class DAOBeaconTests: XCTestCase {
         //XCTAssertEqual(DNSBaseStage().text, "Hello, World!")
     }
 
-    static var allTests = [
+    nonisolated(unsafe) static var allTests = [
         ("testExample", testExample),
     ]
 }

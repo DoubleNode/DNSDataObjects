@@ -6,6 +6,7 @@
 //  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
 //
 
+import Currency
 import DNSCore
 import Foundation
 
@@ -17,7 +18,7 @@ public class DNSPrice: DNSDataTranslation, Codable, NSCopying, @unchecked Sendab
     }
     
     public var endTime = Date.zeroTime
-    public var price: Float = 0
+    public var price: USD = 0
     public var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
@@ -61,7 +62,7 @@ public class DNSPrice: DNSDataTranslation, Codable, NSCopying, @unchecked Sendab
     }
     open func dao(from data: DNSDataDictionary) -> DNSPrice {
         self.endTime = self.timeOfDay(from: data[field(.endTime)] as Any?) ?? self.endTime
-        self.price = self.float(from: data[field(.price)] as Any?) ?? self.price
+        self.price = USD(exactAmount: self.decimal(from: data[field(.price)] as Any?) ?? self.price.exactAmount)
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         self.startTime = self.timeOfDay(from: data[field(.startTime)] as Any?) ?? self.startTime
         return self
@@ -69,7 +70,7 @@ public class DNSPrice: DNSDataTranslation, Codable, NSCopying, @unchecked Sendab
     open var asDictionary: DNSDataDictionary {
         let retval: DNSDataDictionary = [
             field(.endTime): self.endTime,
-            field(.price): self.price,
+            field(.price): self.price.exactAmount,
             field(.priority): self.priority,
             field(.startTime): self.startTime,
         ]
@@ -81,14 +82,14 @@ public class DNSPrice: DNSDataTranslation, Codable, NSCopying, @unchecked Sendab
         super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.timeOfDay(from: container, forKey: .endTime) ?? endTime
-        price = self.float(from: container, forKey: .price) ?? price
+        price = USD(exactAmount: self.decimal(from: container, forKey: .price) ?? price.exactAmount)
         priority = self.int(from: container, forKey: .priority) ?? priority
         startTime = self.timeOfDay(from: container, forKey: .startTime) ?? startTime
     }
     open func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
-        try container.encode(price, forKey: .price)
+        try container.encode(price.exactAmount, forKey: .price)
         try container.encode(priority, forKey: .priority)
         try container.encode(startTime, forKey: .startTime)
     }
