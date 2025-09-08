@@ -3,10 +3,12 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
+import DNSDataContracts
+import DNSDataTypes
 import Foundation
 
 public protocol PTCLCFGDAOAnalyticsData: PTCLCFGBaseObject {
@@ -21,7 +23,7 @@ public protocol PTCLCFGAnalyticsDataObject: PTCLCFGBaseObject {
 }
 public class CFGAnalyticsDataObject: PTCLCFGAnalyticsDataObject {
 }
-open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
+open class DAOAnalyticsData: DAOBaseObject, DAOAnalyticsDataProtocol, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGAnalyticsDataObject
     public static var config: Config = CFGAnalyticsDataObject()
 
@@ -37,8 +39,28 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
     }
 
     var data: [DNSAnalyticsNumbers] = []
-    var subtitle = DNSString()
-    var title = DNSString()
+    private var _subtitle = DNSString()
+    private var _title = DNSString()
+    
+    // MARK: - DAOAnalyticsDataProtocol conformance -
+    public var title: String { 
+        get { _title.asString }
+        set { _title = DNSString(with: newValue) }
+    }
+    public var subtitle: String { 
+        get { _subtitle.asString }
+        set { _subtitle = DNSString(with: newValue) }
+    }
+    
+    // Legacy properties for internal use
+    var titleDNS: DNSString {
+        get { _title }
+        set { _title = newValue }
+    }
+    var subtitleDNS: DNSString {
+        get { _subtitle }
+        set { _subtitle = newValue }
+    }
 
     // MARK: - Initializers -
     required public init() {
@@ -57,8 +79,8 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
         super.update(from: object)
         // swiftlint:disable force_cast
         self.data = object.data.map { $0.copy() as! DNSAnalyticsNumbers }
-        self.subtitle = object.subtitle.copy() as! DNSString
-        self.title = object.title.copy() as! DNSString
+        self._subtitle = object._subtitle.copy() as! DNSString
+        self._title = object._title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
 
@@ -71,23 +93,24 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
         _ = super.dao(from: data)
         let dataData = self.dataarray(from: data[field(.data)] as Any?)
         self.data = dataData.compactMap { DNSAnalyticsNumbers(from: $0) }
-        self.subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self.subtitle
-        self.title = self.dnsstring(from: data[field(.title)] as Any?) ?? self.title
+        self._subtitle = self.dnsstring(from: data[field(.subtitle)] as Any?) ?? self._subtitle
+        self._title = self.dnsstring(from: data[field(.title)] as Any?) ?? self._title
         return self
     }
     override open var asDictionary: DNSDataDictionary {
         var retval = super.asDictionary
         retval.merge([
             field(.data): self.data.map { $0.asDictionary },
-            field(.subtitle): self.subtitle.asDictionary,
-            field(.title): self.title.asDictionary,
+            field(.subtitle): self._subtitle.asDictionary,
+            field(.title): self._title.asDictionary,
         ]) { (current, _) in current }
         return retval
     }
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        super.init()
+        try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -105,8 +128,8 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         data = try container.decodeIfPresent(Swift.type(of: data), forKey: .data) ?? data
-        subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? subtitle
-        title = self.dnsstring(from: container, forKey: .title) ?? title
+        _subtitle = self.dnsstring(from: container, forKey: .subtitle) ?? _subtitle
+        _title = self.dnsstring(from: container, forKey: .title) ?? _title
     }
     override open func encode(to encoder: Encoder, configuration: DAOBaseObject.Config) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -115,8 +138,8 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(data, forKey: .data)
-        try container.encode(subtitle, forKey: .subtitle)
-        try container.encode(title, forKey: .title)
+        try container.encode(_subtitle, forKey: .subtitle)
+        try container.encode(_title, forKey: .title)
     }
 
     // MARK: - NSCopying protocol methods -
@@ -131,8 +154,8 @@ open class DAOAnalyticsData: DAOBaseObject, DecodingConfigurationProviding, Enco
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.data.hasDiffElementsFrom(rhs.data) ||
-            lhs.subtitle != rhs.subtitle ||
-            lhs.title != rhs.title
+            lhs._subtitle != rhs._subtitle ||
+            lhs._title != rhs._title
     }
 
     // MARK: - Equatable protocol methods -

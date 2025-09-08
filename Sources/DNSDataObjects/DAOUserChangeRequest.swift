@@ -3,10 +3,11 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
+import DNSDataTypes
 import Foundation
 
 public protocol PTCLCFGDAOUserChangeRequest: PTCLCFGBaseObject {
@@ -69,7 +70,8 @@ open class DAOUserChangeRequest: DAOChangeRequest, DecodingConfigurationProvidin
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOChangeRequest) {
-        fatalError("init(from:) has not been implemented")
+        super.init(from: object)
+        self.update(from: object)
     }
     required public init(from object: DAOUserChangeRequest) {
         super.init(from: object)
@@ -108,7 +110,8 @@ open class DAOUserChangeRequest: DAOChangeRequest, DecodingConfigurationProvidin
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        super.init()
+        try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)

@@ -3,13 +3,15 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
+import DNSDataContracts
+import DNSDataTypes
 import Foundation
 
-public class DNSMetadata: DNSDataTranslation, Codable {
+public class DNSMetadata: DNSDataTranslation, NSCopying, Codable, DAOMetadataProtocol {
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
@@ -57,7 +59,7 @@ public class DNSMetadata: DNSDataTranslation, Codable {
         object.reactions.forEach { key, value in
             self.reactions[key] = (value.copy() as! DNSUserReaction)
         }
-        self.reactionCounts = object.reactionCounts.copy() as! DNSReactionCounts
+        self.reactionCounts = object.reactionCounts // DNSReactionCounts doesn't support copying, so use reference
         // swiftlint:enable force_cast
         self.userReaction = object.userReaction?.copy() as? DNSUserReaction
         self.views = object.views

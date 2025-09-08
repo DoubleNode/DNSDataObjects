@@ -3,10 +3,12 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
+import DNSDataContracts
+import DNSDataTypes
 import Foundation
 import KeyedCodable
 
@@ -69,7 +71,7 @@ public class CFGUserObject: PTCLCFGUserObject {
         return []
     }
 }
-open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfigurationProviding {
+open class DAOUser: DAOBaseObject, DAOUserProtocol, DecodingConfigurationProviding, EncodingConfigurationProviding {
     public typealias Config = PTCLCFGUserObject
     public static var config: Config = CFGUserObject()
 
@@ -102,7 +104,6 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     open var consent: Date?
     open var consentBy: String = ""
     open var dob: Date?
-    open var email: String = ""
     open var name = PersonNameComponents()
     open var phone: String = ""
     open var type: DNSUserType = .unknown
@@ -110,6 +111,15 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     @CodableConfiguration(from: DAOTransaction.self) open var cards: [DAOCard] = []
     @CodableConfiguration(from: DAOTransaction.self) open var favorites: [DAOActivityType] = []
     @CodableConfiguration(from: DAOTransaction.self) open var myPlace: DAOPlace? = nil
+    
+    // Additional properties for protocol conformance
+    open var username: String?
+    open var userRole: DNSUserRole = .endUser  
+    open var status: DNSStatus = .open
+    open var visibility: DNSVisibility = .everyone
+    
+    // Internal storage for non-optional email
+    private var _email: String = ""
 
     @available(*, deprecated, renamed: "name.givenName", message: "Please use new property - name.givenName")
     public var firstName: String? {
@@ -142,6 +152,40 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
     public var isUnder13: Bool {
         [.unknown, .child].contains(self.type)
     }
+    
+    // MARK: - DAOUserProtocol conformance -
+    public var email: String? {
+        get { _email.isEmpty ? nil : _email }
+        set { _email = newValue ?? "" }
+    }
+    
+    public var phoneNumber: String? {
+        get { phone.isEmpty ? nil : phone }
+        set { phone = newValue ?? "" }
+    }
+    
+    public var userType: DNSUserType {
+        get { type }
+        set { type = newValue }
+    }
+    
+    public var displayName: String? {
+        get { 
+            let formatted = nameMedium
+            return formatted.isEmpty ? nil : formatted 
+        }
+        set { 
+            if let newValue = newValue {
+                name = PersonNameComponents.dnsBuildName(with: newValue) ?? name
+            }
+        }
+    }
+    
+    // Legacy email access for internal use
+    public var emailString: String {
+        get { _email }
+        set { _email = newValue }
+    }
 
     // MARK: - Initializers -
     required public init() {
@@ -151,7 +195,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         super.init(id: id)
     }
     public init(id: String, email: String, name: String) {
-        self.email = email
+        self._email = email
         self.name = PersonNameComponents.dnsBuildName(with: name) ?? self.name
         super.init(id: id)
     }
@@ -166,7 +210,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         self.consent = object.consent
         self.consentBy = object.consentBy
         self.dob = object.dob
-        self.email = object.email
+        self._email = object._email
         self.name = object.name
         self.phone = object.phone
         self.type = object.type
@@ -192,7 +236,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         self.consent = self.time(from: data[field(.consent)] as Any?) ?? self.consent
         self.consentBy = self.string(from: data[field(.consentBy)] as Any?) ?? self.consentBy
         self.dob = self.date(from: data[field(.dob)] as Any?) ?? self.dob
-        self.email = self.string(from: data[field(.email)] as Any?) ?? self.email
+        self._email = self.string(from: data[field(.email)] as Any?) ?? self._email
         let favoritesData = self.dataarray(from: data[field(.favorites)] as Any?)
         self.favorites = favoritesData.compactMap { Self.createActivityType(from: $0) }
         let nameData = self.dictionary(from: data[field(.name)] as Any?)
@@ -212,7 +256,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
             field(.consent): self.consent,
             field(.consentBy): self.consentBy,
             field(.dob): self.dob?.dnsDate(as: .shortMilitary),
-            field(.email): self.email,
+            field(.email): self._email,
             field(.favorites): self.favorites.map { $0.asDictionary },
             field(.name): self.name.asDictionary,
             field(.myPlace): self.myPlace?.asDictionary,
@@ -224,7 +268,8 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        super.init()
+        try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -246,7 +291,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         consent = self.time(from: container, forKey: .consent) ?? consent
         consentBy = self.string(from: container, forKey: .consentBy) ?? consentBy
         dob = self.date(from: container, forKey: .dob) ?? dob
-        email = self.string(from: container, forKey: .email) ?? email
+        _email = self.string(from: container, forKey: .email) ?? _email
         favorites = self.daoActivityTypeArray(with: configuration, from: container, forKey: .favorites)
         myPlace = self.daoPlace(with: configuration, from: container, forKey: .myPlace) ?? myPlace
         name = self.personName(from: container, forKey: .name) ?? name
@@ -264,7 +309,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
         try container.encode(consent, forKey: .consent)
         try container.encode(consentBy, forKey: .consentBy)
         try container.encode(dob?.dnsDate(as: .shortMilitary), forKey: .dob)
-        try container.encode(email, forKey: .email)
+        try container.encode(_email, forKey: .email)
         try container.encode(favorites, forKey: .favorites, configuration: configuration)
         try container.encode(myPlace, forKey: .myPlace, configuration: configuration)
         try container.encode(name, forKey: .name)
@@ -290,7 +335,7 @@ open class DAOUser: DAOBaseObject, DecodingConfigurationProviding, EncodingConfi
             lhs.consent != rhs.consent ||
             lhs.consentBy != rhs.consentBy ||
             lhs.dob != rhs.dob ||
-            lhs.email != rhs.email ||
+            lhs._email != rhs._email ||
             lhs.name != rhs.name ||
             lhs.phone != rhs.phone ||
             lhs.type != rhs.type

@@ -3,7 +3,7 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
@@ -102,7 +102,8 @@ open class DAOAccountLinkRequest: DAOChangeRequest, DecodingConfigurationProvidi
     
     // MARK: - DAO copy methods -
     required public init(from object: DAOChangeRequest) {
-        fatalError("init(from:) has not been implemented")
+        super.init(from: object)
+        self.update(from: object)
     }
     required public init(from object: DAOAccountLinkRequest) {
         super.init(from: object)
@@ -149,7 +150,8 @@ open class DAOAccountLinkRequest: DAOChangeRequest, DecodingConfigurationProvidi
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        super.init()
+        try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)

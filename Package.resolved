@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNodeOpen/AnimatedField.git",
       "state" : {
-        "revision" : "a2b81fb8016b696beaba68d4a4a82fd3228187bb",
-        "version" : "2.5.56"
+        "revision" : "4f2a586fa8f8fc68e812328b81ab6bdfeb402201",
+        "version" : "2.5.64"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "b2db7908f11f202a3321ea3c18eb731a5f00512e",
-        "version" : "1.11.9"
+        "revision" : "3e37d10f8698de371a3970ac9b694ca6d1eab4e7",
+        "version" : "1.11.10"
       }
     },
     {
@@ -70,6 +70,24 @@
       "state" : {
         "revision" : "6061fa5df1a49ea51043a0760283ffc5d6ccf312",
         "version" : "1.11.1"
+      }
+    },
+    {
+      "identity" : "dnsdatacontracts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSDataContracts.git",
+      "state" : {
+        "revision" : "8e0dba0f2a25785ef227c35b1218956494914b5f",
+        "version" : "1.11.5"
+      }
+    },
+    {
+      "identity" : "dnsdatatypes",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSDataTypes.git",
+      "state" : {
+        "revision" : "fbf47d6b83b2851065c0b4cb949324e91a2d237f",
+        "version" : "1.11.2"
       }
     },
     {
@@ -104,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/marmelroy/PhoneNumberKit",
       "state" : {
-        "revision" : "288b99e9e99926bc8be41220802df83c059fac9b",
-        "version" : "4.0.2"
+        "revision" : "8cba2258060e356d5fc4836d4ff8549faa2409dd",
+        "version" : "4.1.4"
       }
     },
     {
@@ -140,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SimplyDanny/SwiftLintPlugins",
       "state" : {
-        "revision" : "7a3d77f3dd9f91d5cea138e52c20cfceabf352de",
-        "version" : "0.58.2"
+        "revision" : "6166499ede0efe43c3809f101d2c3cd409e2b77a",
+        "version" : "0.61.0"
       }
     },
     {

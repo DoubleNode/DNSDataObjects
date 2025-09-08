@@ -3,10 +3,11 @@
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import DNSCore
+import DNSDataTypes
 import Foundation
 
 public protocol PTCLCFGDAOPricingTier: PTCLCFGBaseObject {
@@ -17,18 +18,18 @@ public protocol PTCLCFGDAOPricingTier: PTCLCFGBaseObject {
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricingTier] where K: CodingKey
 }
 
-public protocol PTCLCFGPricingTierObject: PTCLCFGDAOPricingException, PTCLCFGDAOPricingSeason, PTCLCFGDAOPricingTier {
+public protocol PTCLCFGPricingTierObject: PTCLCFGDAOPricingOverride, PTCLCFGDAOPricingSeason, PTCLCFGDAOPricingTier {
 }
 public class CFGPricingTierObject: PTCLCFGPricingTierObject {
-    public var pricingExceptionType: DAOPricingException.Type = DAOPricingException.self
-    open func pricingException<K>(from container: KeyedDecodingContainer<K>,
-                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricingException? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOPricingException.self, forKey: key, configuration: self) ?? nil } catch { }
+    public var pricingOverrideType: DAOPricingOverride.Type = DAOPricingOverride.self
+    open func pricingOverride<K>(from container: KeyedDecodingContainer<K>,
+                                 forKey key: KeyedDecodingContainer<K>.Key) -> DAOPricingOverride? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPricingOverride.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func pricingExceptionArray<K>(from container: KeyedDecodingContainer<K>,
-                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricingException] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOPricingException].self, forKey: key, configuration: self) ?? [] } catch { }
+    open func pricingOverrideArray<K>(from container: KeyedDecodingContainer<K>,
+                                       forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPricingOverride] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOPricingOverride].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 
@@ -64,9 +65,9 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     public static var encodingConfiguration: DAOBaseObject.Config { Self.config }
 
     // MARK: - Class Factory methods -
-    open class func createPricingException() -> DAOPricingException { config.pricingExceptionType.init() }
-    open class func createPricingException(from object: DAOPricingException) -> DAOPricingException { config.pricingExceptionType.init(from: object) }
-    open class func createPricingException(from data: DNSDataDictionary) -> DAOPricingException? { config.pricingExceptionType.init(from: data) }
+    open class func createPricingOverride() -> DAOPricingOverride { config.pricingOverrideType.init() }
+    open class func createPricingOverride(from object: DAOPricingOverride) -> DAOPricingOverride { config.pricingOverrideType.init(from: object) }
+    open class func createPricingOverride(from data: DNSDataDictionary) -> DAOPricingOverride? { config.pricingOverrideType.init(from: data) }
 
     open class func createPricingSeason() -> DAOPricingSeason { config.pricingSeasonType.init() }
     open class func createPricingSeason(from object: DAOPricingSeason) -> DAOPricingSeason { config.pricingSeasonType.init(from: object) }
@@ -79,11 +80,11 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case dataStrings, exceptions, priority, seasons, title
+        case dataStrings, overrides, priority, seasons, title
     }
 
     open var dataStrings: [String: DNSString] = [:]
-    open var exceptions: [DAOPricingException] = []
+    open var overrides: [DAOPricingOverride] = []
     open var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
@@ -96,16 +97,16 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     open var seasons: [DAOPricingSeason] = []
     open var title = ""
 
-    open func exception(for exceptionId: String) -> DAOPricingException? {
-        let exception = exceptions
+    open func exception(for exceptionId: String) -> DAOPricingOverride? {
+        let exception = overrides
             .filter { $0.id == exceptionId }
             .sorted { $0.priority > $1.priority }
-            .first ?? exceptions.first
+            .first ?? overrides.first
         return exception
     }
     open var price: DNSPrice? { price() }
     open func price(for time: Date = Date()) -> DNSPrice? {
-        exceptions
+        overrides
             .filter { $0.isActive }
             .sorted { $0.priority > $1.priority }
             .compactMap { $0.price(for: time) }
@@ -123,7 +124,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         return season
     }
     open func exceptionTitle(for time: Date = Date()) -> DNSString? {
-        let exception = exceptions
+        let exception = overrides
             .filter { $0.isActive }
             .sorted { $0.priority > $1.priority }
             .first
@@ -154,7 +155,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         // swiftlint:disable force_cast
         self.dataStrings = [:]
         object.dataStrings.forEach { self.dataStrings[$0] = ($1.copy() as! DNSString) }
-        self.exceptions = object.exceptions.map { $0.copy() as! DAOPricingException }
+        self.overrides = object.overrides.map { $0.copy() as! DAOPricingOverride }
         self.seasons = object.seasons.map { $0.copy() as! DAOPricingSeason }
         // swiftlint:enable force_cast
     }
@@ -167,8 +168,8 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     override open func dao(from data: DNSDataDictionary) -> DAOPricingTier {
         _ = super.dao(from: data)
         self.dataStrings = self.dictionary(from: data[field(.dataStrings)] as Any?) as? [String: DNSString] ?? self.dataStrings
-        let exceptionsData = self.dataarray(from: data[field(.exceptions)] as Any?)
-        self.exceptions = exceptionsData.compactMap { Self.createPricingException(from: $0) }
+        let overridesData = self.dataarray(from: data[field(.overrides)] as Any?)
+        self.overrides = overridesData.compactMap { Self.createPricingOverride(from: $0) }
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         let seasonsData = self.dataarray(from: data[field(.seasons)] as Any?)
         self.seasons = seasonsData.compactMap { Self.createPricingSeason(from: $0) }
@@ -179,7 +180,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         var retval = super.asDictionary
         retval.merge([
             field(.dataStrings): self.dataStrings,
-            field(.exceptions): self.exceptions,
+            field(.overrides): self.overrides,
             field(.priority): self.priority,
             field(.seasons): self.seasons.map { $0.asDictionary },
             field(.title): self.title,
@@ -189,7 +190,8 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
+        super.init()
+        try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
         try self.encode(to: encoder, configuration: Self.config)
@@ -207,7 +209,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         dataStrings = try container.decodeIfPresent([String: DNSString].self, forKey: .dataStrings) ?? [:]
-        exceptions = self.daoPricingExceptionArray(with: configuration, from: container, forKey: .exceptions)
+        overrides = self.DAOPricingOverrideArray(with: configuration, from: container, forKey: .overrides)
         priority = self.int(from: container, forKey: .priority) ?? priority
         seasons = self.daoPricingSeasonArray(with: configuration, from: container, forKey: .seasons)
         title = self.string(from: container, forKey: .title) ?? title
@@ -219,7 +221,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(dataStrings, forKey: .dataStrings)
-        try container.encode(exceptions, forKey: .exceptions, configuration: configuration)
+        try container.encode(overrides, forKey: .overrides, configuration: configuration)
         try container.encode(priority, forKey: .priority)
         try container.encode(seasons, forKey: .seasons, configuration: configuration)
         try container.encode(title, forKey: .title)
@@ -237,7 +239,7 @@ open class DAOPricingTier: DAOBaseObject, DecodingConfigurationProviding, Encodi
         let lhs = self
         return super.isDiffFrom(rhs) ||
             lhs.dataStrings != rhs.dataStrings ||
-            lhs.exceptions.hasDiffElementsFrom(rhs.exceptions) ||
+            lhs.overrides.hasDiffElementsFrom(rhs.overrides) ||
             lhs.priority != rhs.priority ||
             lhs.seasons.hasDiffElementsFrom(rhs.seasons) ||
             lhs.title != rhs.title

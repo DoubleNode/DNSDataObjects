@@ -1,10 +1,10 @@
-// swift-tools-version:5.7
+// swift-tools-version:6.0
 //
 //  Package.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSDataObjects
 //
 //  Created by Darren Ehlers.
-//  Copyright © 2022 - 2016 DoubleNode.com. All rights reserved.
+//  Copyright © 2025 - 2016 DoubleNode.com. All rights reserved.
 //
 
 import PackageDescription
@@ -29,10 +29,12 @@ let package = Package(
         .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.10.2"),
         .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: "4.3.0"),
         .package(url: "https://github.com/DoubleNode/DNSBaseTheme.git", from: "1.11.1"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.9"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.11.10"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.11.1"),
+        .package(url: "https://github.com/DoubleNode/DNSDataContracts.git", from: "1.11.5"),
+        .package(url: "https://github.com/DoubleNode/DNSDataTypes.git", from: "1.11.2"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.11.1"),
-        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.5.1"),
+        .package(url: "https://github.com/kaishin/Gifu.git", from: "3.1.2"),
         .package(url: "https://github.com/dgrzeszczak/KeyedCodable.git", from: "3.1.2"),
     ],
     targets: [
@@ -40,9 +42,8 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "DNSDataObjects",
-            dependencies: ["Alamofire", "AlamofireImage", "DNSBaseTheme",
-                           "DNSCore", "DNSCoreThreading", "DNSError",
-                           "Gifu", "KeyedCodable"]
+            dependencies: ["Alamofire", "AlamofireImage", "DNSBaseTheme", "DNSCore", "DNSCoreThreading",
+                           "DNSDataContracts", "DNSDataTypes", "DNSError", "Gifu", "KeyedCodable"]
         ),
         .testTarget(
             name: "DNSDataObjectsTests",
