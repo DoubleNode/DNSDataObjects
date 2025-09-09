@@ -134,7 +134,8 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         self.chat = object.chat.copy() as! DAOChat
         self.items = object.items.map { $0.copy() as! DAOEventDayItem }
         self.mediaItems = object.mediaItems.map { $0.copy() as! DAOMedia }
-        self.notes = object.notes.map { $0.copy() as! DNSNote }
+        // DNSNote doesn't implement NSCopying, so create new instances
+        self.notes = object.notes.map { DNSNote(from: $0) }
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
     }
@@ -193,7 +194,7 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -253,8 +254,7 @@ open class DAOEventDay: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
+        return (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
             lhs.attachments.hasDiffElementsFrom(rhs.attachments) ||
             lhs.items.hasDiffElementsFrom(rhs.items) ||
             lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||

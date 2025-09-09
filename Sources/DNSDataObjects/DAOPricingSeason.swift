@@ -87,7 +87,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
 
     public var isActive: Bool { isActive() }
     public func isActive(for time: Date = Date()) -> Bool {
-        guard startTime != C.defaultStartTime && endTime != C.defaultEndTime else { return true }
+        guard startTime != C.defaultStartTime || endTime != C.defaultEndTime else { return true }
         guard startTime != C.defaultStartTime else { return time < endTime }
         guard endTime != C.defaultEndTime else { return time > startTime }
         return time > startTime && time < endTime
@@ -123,7 +123,9 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         self.update(from: object)
     }
     open func update(from object: DAOPricingSeason) {
+        let originalId = self.id
         super.update(from: object)
+        self.id = originalId  // Preserve original ID
         self.endTime = object.endTime
         self.priority = object.priority
         self.startTime = object.startTime
@@ -159,7 +161,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {

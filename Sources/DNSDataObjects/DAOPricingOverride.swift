@@ -90,7 +90,7 @@ open class DAOPricingOverride: DAOBaseObject, DecodingConfigurationProviding, En
     public var isActive: Bool { isActive() }
     public func isActive(for time: Date = Date()) -> Bool {
         guard enabled else { return false }
-        guard startTime != C.defaultStartTime && endTime != C.defaultEndTime else { return true }
+        guard startTime != C.defaultStartTime || endTime != C.defaultEndTime else { return true }
         guard startTime != C.defaultStartTime else { return time < endTime }
         guard endTime != C.defaultEndTime else { return time > startTime }
         return time > startTime && time < endTime
@@ -168,7 +168,7 @@ open class DAOPricingOverride: DAOBaseObject, DecodingConfigurationProviding, En
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -209,8 +209,8 @@ open class DAOPricingOverride: DAOBaseObject, DecodingConfigurationProviding, En
 
     // MARK: - NSCopying protocol methods -
     override open func copy(with zone: NSZone? = nil) -> Any {
-        let copy = DAOPricingOverride(from: self)
-        return copy as Any
+        let copy = Self.createPricingOverride(from: self)
+        return copy
     }
     override open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOPricingOverride else { return true }

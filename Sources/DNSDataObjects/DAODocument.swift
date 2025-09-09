@@ -96,7 +96,7 @@ open class DAODocument: DAOBaseObject, DecodingConfigurationProviding, EncodingC
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -139,8 +139,7 @@ open class DAODocument: DAOBaseObject, DecodingConfigurationProviding, EncodingC
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.priority != rhs.priority ||
+        return lhs.priority != rhs.priority ||
             lhs.title != rhs.title ||
             lhs.url != rhs.url
     }

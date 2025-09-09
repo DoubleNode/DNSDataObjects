@@ -166,7 +166,7 @@ open class DAOPricingItem: DAOBaseObject, DecodingConfigurationProviding, Encodi
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -221,8 +221,7 @@ open class DAOPricingItem: DAOBaseObject, DecodingConfigurationProviding, Encodi
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            (lhs.priceDefault?.isDiffFrom(rhs.priceDefault) ?? (lhs.priceDefault != rhs.priceDefault)) ||
+        return (lhs.priceDefault?.isDiffFrom(rhs.priceDefault) ?? (lhs.priceDefault != rhs.priceDefault)) ||
             (lhs.priceFriday?.isDiffFrom(rhs.priceFriday) ?? (lhs.priceFriday != rhs.priceFriday)) ||
             (lhs.priceMonday?.isDiffFrom(rhs.priceMonday) ?? (lhs.priceMonday != rhs.priceMonday)) ||
             (lhs.priceSaturday?.isDiffFrom(rhs.priceSaturday) ?? (lhs.priceSaturday != rhs.priceSaturday)) ||

@@ -58,7 +58,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     open class func createPricing() -> DAOPricing { config.pricingType.init() }
     open class func createPricing(from object: DAOPricing) -> DAOPricing { config.pricingType.init(from: object) }
-    open class func createPricing(from data: DAOPricing) -> DAOPricing? { config.pricingType.init(from: data) }
+    open class func createPricing(from data: DNSDataDictionary) -> DAOPricing? { config.pricingType.init(from: data) }
 
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
@@ -125,7 +125,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -172,8 +172,7 @@ open class DAOProduct: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.about != rhs.about ||
+        return lhs.about != rhs.about ||
             lhs.mediaItems.hasDiffElementsFrom(rhs.mediaItems) ||
             lhs.pricing != rhs.pricing ||
             lhs.sku != rhs.sku ||

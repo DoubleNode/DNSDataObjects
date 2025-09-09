@@ -48,6 +48,14 @@ open class DAOBaseObject: DNSDataTranslation, DAOBaseObjectProtocol, Codable, Co
     required public init(id: String) {
         super.init()
         self.id = id
+        // Always sync the meta UID with the provided ID for consistency
+        // If the ID is a valid UUID, use it; otherwise generate a new one but keep the ID as-is
+        if let uuid = UUID(uuidString: id) {
+            self._meta.uid = uuid
+        } else {
+            // Keep the generated UUID but maintain the custom ID
+            // This allows non-UUID IDs while keeping metadata consistent
+        }
     }
 
     // MARK: - DAO copy methods -
@@ -56,7 +64,7 @@ open class DAOBaseObject: DNSDataTranslation, DAOBaseObjectProtocol, Codable, Co
         self.update(from: object)
     }
     open func update(from object: DAOBaseObject) {
-        self.id = object.id
+        self.id = object.id  // Copy the exact ID from source
         self._meta = object._meta.copy() as! DNSMetadata
         // swiftlint:disable force_cast
         self._analyticsData = object._analyticsData.map { $0.copy() as! DAOAnalyticsData }
@@ -124,9 +132,19 @@ open class DAOBaseObject: DNSDataTranslation, DAOBaseObjectProtocol, Codable, Co
     open func isDiffFrom(_ rhs: Any?) -> Bool {
         guard let rhs = rhs as? DAOBaseObject else { return true }
         let lhs = self
+        // Compare everything except the meta UID (since ID is the primary identifier)
+        let metaDiff = lhs._meta.created != rhs._meta.created ||
+                      lhs._meta.synced != rhs._meta.synced ||
+                      lhs._meta.updated != rhs._meta.updated ||
+                      lhs._meta.status != rhs._meta.status ||
+                      lhs._meta.createdBy != rhs._meta.createdBy ||
+                      lhs._meta.updatedBy != rhs._meta.updatedBy ||
+                      lhs._meta.reactionCounts != rhs._meta.reactionCounts ||
+                      lhs._meta.views != rhs._meta.views
+        
         return lhs._analyticsData.hasDiffElementsFrom(rhs._analyticsData) ||
             lhs.id != rhs.id ||
-            lhs._meta.isDiffFrom(rhs._meta)
+            metaDiff
     }
 
     // MARK: - Equatable protocol methods -

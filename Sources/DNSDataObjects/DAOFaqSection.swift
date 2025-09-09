@@ -82,6 +82,9 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
         self.faqs = object.faqs.map { $0.copy() as! DAOFaq }
         self.title = object.title.copy() as! DNSString
         // swiftlint:enable force_cast
+        
+        // Set the section reference on copied FAQs to maintain the relationship
+        self.faqs.forEach { $0.section = self }
     }
 
     // MARK: - DAO translation methods -
@@ -111,7 +114,7 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -156,8 +159,7 @@ open class DAOFaqSection: DAOBaseObject, DecodingConfigurationProviding, Encodin
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.faqs.hasDiffElementsFrom(rhs.faqs) ||
+        return lhs.faqs.hasDiffElementsFrom(rhs.faqs) ||
             lhs.code != rhs.code ||
             lhs.icon != rhs.icon ||
             lhs.title != rhs.title

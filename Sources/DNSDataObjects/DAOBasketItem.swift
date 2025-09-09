@@ -159,7 +159,7 @@ open class DAOBasketItem: DAOBaseObject, DecodingConfigurationProviding, Encodin
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {

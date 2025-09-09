@@ -80,8 +80,9 @@ open class DAOFaq: DAOBaseObject, DecodingConfigurationProviding, EncodingConfig
     }
     open func update(from object: DAOFaq) {
         super.update(from: object)
+        // Note: section reference will be set by the parent DAOFaqSection after copying
+        // to avoid circular reference during copy operations
         // swiftlint:disable force_cast
-        self.section = object.section.copy() as! DAOFaqSection
         self.question = object.question.copy() as! DNSString
         self.answer = object.answer.copy() as! DNSString
         // swiftlint:enable force_cast
@@ -113,7 +114,7 @@ open class DAOFaq: DAOBaseObject, DecodingConfigurationProviding, EncodingConfig
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {

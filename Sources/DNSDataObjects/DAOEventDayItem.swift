@@ -111,7 +111,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -163,8 +163,7 @@ open class DAOEventDayItem: DAOBaseObject, DecodingConfigurationProviding, Encod
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
+        return (lhs.address?.isDiffFrom(rhs.address) ?? (lhs.address != rhs.address)) ||
             lhs.distribution != rhs.distribution ||
             lhs.endTime != rhs.endTime ||
             lhs.geopoint != rhs.geopoint ||

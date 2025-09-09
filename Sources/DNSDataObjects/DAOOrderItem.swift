@@ -146,7 +146,7 @@ open class DAOOrderItem: DAOBaseObject, DecodingConfigurationProviding, Encoding
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -191,8 +191,7 @@ open class DAOOrderItem: DAOBaseObject, DecodingConfigurationProviding, Encoding
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            (lhs.account?.isDiffFrom(rhs.account) ?? (lhs.account != rhs.account)) ||
+        return (lhs.account?.isDiffFrom(rhs.account) ?? (lhs.account != rhs.account)) ||
             (lhs.order?.isDiffFrom(rhs.order) ?? (lhs.order != rhs.order)) ||
             (lhs.place?.isDiffFrom(rhs.place) ?? (lhs.place != rhs.place)) ||
             lhs.quantity != rhs.quantity

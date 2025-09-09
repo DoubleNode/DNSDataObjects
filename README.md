@@ -20,7 +20,7 @@ DNSDataObjects is a collection of blank worker classes used for the DNSFramework
 
 ## Requirements
 
--   iOS 16.0+ / tvOS 16.4+ / watchOS 9.4+ 
+-   iOS 16.0+ / macCatalyts 16.0+ / tvOS 16.4+ / watchOS 9.4+ 
 -   Xcode 14.3.1+
 -   Swift 5.8+
 
@@ -34,7 +34,7 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-.package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.11.12")
+.package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.12.0")
 ]
 ```
 
@@ -42,12 +42,11 @@ dependencies: [
 
 -   Alamofire v5.10.2+
 -   AlamofireImage v4.3.0+
--   DNSBaseTheme v1.11.1+
--   DNSCore v1.11.10+
--   DNSCoreThreading v1.11.1+
--   DNSDataContracts v1.11.5+
--   DNSDataTypes v1.11.2+
--   DNSError v1.11.1+
+-   DNSCore v1.12.0+
+-   DNSCoreThreading v1.12.0+
+-   DNSDataContracts v1.12.0+
+-   DNSDataTypes v1.12.0+
+-   DNSError v1.12.0+
 -   Gifu v3.5.1+
 -   KeyedCodable v3.1.2+
 

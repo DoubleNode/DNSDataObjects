@@ -8,7 +8,7 @@
 
 import DNSCore
 import DNSDataTypes
-import UIKit
+import Foundation
 
 public protocol PTCLCFGDAOPlaceStatus: PTCLCFGBaseObject {
     var placeStatusType: DAOPlaceStatus.Type { get }
@@ -101,7 +101,7 @@ open class DAOPlaceStatus: DAOBaseObject, DecodingConfigurationProviding, Encodi
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -149,8 +149,7 @@ open class DAOPlaceStatus: DAOBaseObject, DecodingConfigurationProviding, Encodi
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.endTime != rhs.endTime ||
+        return lhs.endTime != rhs.endTime ||
             lhs.message != rhs.message ||
             lhs.scope != rhs.scope ||
             lhs.startTime != rhs.startTime ||

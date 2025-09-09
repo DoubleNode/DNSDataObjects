@@ -71,10 +71,18 @@ open class DAOPricing: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     open func dataString(for tierId: String,
                          and stringId: String) -> DNSString? {
-        self.tier(for: tierId)?.dataStrings[stringId]
+        let exactTier = tiers
+            .filter { $0.id == tierId }
+            .sorted { $0.priority > $1.priority }
+            .first
+        return exactTier?.dataStrings[stringId]
     }
     open func dataStrings(for tierId: String) -> [String: DNSString] {
-        self.tier(for: tierId)?.dataStrings ?? [:]
+        let exactTier = tiers
+            .filter { $0.id == tierId }
+            .sorted { $0.priority > $1.priority }
+            .first
+        return exactTier?.dataStrings ?? [:]
     }
     open func price(for tierId: String,
                     and time: Date = Date()) -> DNSPrice? {
@@ -133,7 +141,7 @@ open class DAOPricing: DAOBaseObject, DecodingConfigurationProviding, EncodingCo
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {

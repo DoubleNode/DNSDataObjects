@@ -102,7 +102,7 @@ open class DAOPlaceEvent: DAOBaseObject, DecodingConfigurationProviding, Encodin
 
     // MARK: - Codable protocol methods -
     required public init(from decoder: Decoder) throws {
-        super.init()
+        try super.init(from: decoder)
         try commonInit(from: decoder, configuration: Self.config)
     }
     override open func encode(to encoder: Encoder) throws {
@@ -149,8 +149,7 @@ open class DAOPlaceEvent: DAOBaseObject, DecodingConfigurationProviding, Encodin
         guard self !== rhs else { return false }
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
-        return super.isDiffFrom(rhs) ||
-            lhs.endDate != rhs.endDate ||
+        return lhs.endDate != rhs.endDate ||
             lhs.name != rhs.name ||
             lhs.startDate != rhs.startDate ||
             lhs.timeZone != rhs.timeZone ||
