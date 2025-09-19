@@ -9,7 +9,7 @@
 import DNSCore
 import DNSError
 import Foundation
-import KeyedCodable
+//import KeyedCodable
 
 public protocol PTCLCFGDAOAccount: PTCLCFGBaseObject {
     var accountType: DAOAccount.Type { get }

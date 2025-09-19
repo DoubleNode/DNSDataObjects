@@ -10,7 +10,7 @@ import DNSCore
 import DNSDataContracts
 import DNSDataTypes
 import Foundation
-import KeyedCodable
+//import KeyedCodable
 
 public protocol PTCLCFGDAOUser: PTCLCFGBaseObject {
     var userType: DAOUser.Type { get }

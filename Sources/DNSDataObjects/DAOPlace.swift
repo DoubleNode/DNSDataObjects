@@ -302,12 +302,18 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
             field(.announcements): self.announcements.map { $0.asDictionary },
             field(.chat): self.chat.asDictionary,
             field(.code): self.code,
+        ]) { (current, _) in current }
+
+        retval.merge([
             field(.events): self.events.map { $0.asDictionary },
             field(.geohashes): self.geohashes.map { $0 },
             field(.geopoint): self.geopoint?.asDictionary,
             field(.hours): self.hours.asDictionary,
             field(.name): self.name,
             field(.phone): self.phone,
+        ]) { (current, _) in current }
+
+        retval.merge([
             field(.pricingTierId): self.pricingTierId,
             field(.section): self.section?.asDictionary ?? .empty,
             field(.statuses): self.statuses.map { $0.asDictionary },

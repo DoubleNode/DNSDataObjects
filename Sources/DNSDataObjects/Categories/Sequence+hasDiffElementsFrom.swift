@@ -9,7 +9,7 @@
 import DNSCore
 import DNSDataTypes
 import Foundation
-import KeyedCodable
+//import KeyedCodable
 
 public extension Sequence where Element: DNSAnalyticsNumbers {
     var count: Int { return reduce(0) { acc, row in acc + 1 } }

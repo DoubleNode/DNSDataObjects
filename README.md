@@ -40,15 +40,11 @@ dependencies: [
 
 ## Dependencies
 
--   Alamofire v5.10.2+
--   AlamofireImage v4.3.0+
 -   DNSCore v1.12.0+
 -   DNSCoreThreading v1.12.0+
 -   DNSDataContracts v1.12.0+
 -   DNSDataTypes v1.12.0+
 -   DNSError v1.12.0+
--   Gifu v3.5.1+
--   KeyedCodable v3.1.2+
 
 ## Credits
 
@@ -56,4 +52,4 @@ DNSDataObjects and the DNSFramework are owned and maintained by Darren Ehlers an
 
 ## License
 
-DNSDataObjects and the DNSFramework are Copyright © 2022 - 2016 Darren Ehlers and DoubleNode, LLC. All rights reserved.
+DNSDataObjects and the DNSFramework are Copyright © 2025 - 2016 Darren Ehlers and DoubleNode, LLC. All rights reserved.
