@@ -32,12 +32,15 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case failureCodes, failureRate, state, stateOverride, totalPoints
+        case confidence, failureCodes, failureRate, state, stateAndroid, stateIOS, stateOverride, totalPoints
     }
     
+    open var confidence: DNSSystemConfidence = .none
     open var failureCodes: [String: DNSAnalyticsNumbers] = [:]
     open var failureRate = DNSAnalyticsNumbers()
     open var state: DNSSystemState = .green
+    open var stateAndroid: DNSSystemState = .green
+    open var stateIOS: DNSSystemState = .green
     open var stateOverride: DNSSystemState = .none
     open var totalPoints = DNSAnalyticsNumbers()
 
@@ -56,9 +59,12 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     open func update(from object: DAOSystemState) {
         super.update(from: object)
+        self.confidence = object.confidence
         self.failureCodes = object.failureCodes
         self.failureRate = object.failureRate
         self.state = object.state
+        self.stateAndroid = object.stateAndroid
+        self.stateIOS = object.stateIOS
         self.stateOverride = object.stateOverride
         self.totalPoints = object.totalPoints
     }
@@ -70,6 +76,8 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     override open func dao(from data: DNSDataDictionary) -> DAOSystemState {
         _ = super.dao(from: data)
+        let rawConfidence = self.string(from: data[field(.confidence)] as Any?) ?? self.confidence.rawValue
+        self.confidence = DNSSystemConfidence(rawValue: rawConfidence) ?? self.confidence
         let failureCodesData: [String: DNSDataDictionary] = data[field(.failureCodes)] as? [String: DNSDataDictionary] ?? [:]
         self.failureCodes = [:]
         failureCodesData.forEach { key, value in
@@ -79,6 +87,10 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         self.failureRate = DNSAnalyticsNumbers(from: failureRateData)
         let rawState = self.string(from: data[field(.state)] as Any?) ?? self.state.rawValue
         self.state = DNSSystemState(rawValue: rawState) ?? self.state
+        let rawStateAndroid = self.string(from: data[field(.stateAndroid)] as Any?) ?? self.stateAndroid.rawValue
+        self.stateAndroid = DNSSystemState(rawValue: rawStateAndroid) ?? self.stateAndroid
+        let rawStateIOS = self.string(from: data[field(.stateIOS)] as Any?) ?? self.stateIOS.rawValue
+        self.stateIOS = DNSSystemState(rawValue: rawStateIOS) ?? self.stateIOS
         let rawStateOverride = self.string(from: data[field(.stateOverride)] as Any?) ?? self.state.rawValue
         self.stateOverride = DNSSystemState(rawValue: rawStateOverride) ?? self.stateOverride
         let totalPointsData = self.dictionary(from: data[field(.totalPoints)] as Any?)
@@ -92,9 +104,12 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         }
         var retval = super.asDictionary
         retval.merge([
+            field(.confidence): self.confidence,
             field(.failureCodes): failureCodesData,
             field(.failureRate): self.failureRate.asDictionary,
             field(.state): self.state.rawValue,
+            field(.stateAndroid): self.stateAndroid.rawValue,
+            field(.stateIOS): self.stateIOS.rawValue,
             field(.stateOverride): self.stateOverride.rawValue,
             field(.totalPoints): self.totalPoints.asDictionary,
         ]) { (current, _) in current }
@@ -121,9 +136,12 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
     }
     private func commonInit(from decoder: Decoder, configuration: Config) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        confidence = try container.decodeIfPresent(Swift.type(of: confidence), forKey: .confidence) ?? confidence
         failureCodes = try container.decodeIfPresent(Swift.type(of: failureCodes), forKey: .failureCodes) ?? failureCodes
         failureRate = try container.decodeIfPresent(Swift.type(of: failureRate), forKey: .failureRate) ?? failureRate
         state = try container.decodeIfPresent(Swift.type(of: state), forKey: .state) ?? state
+        stateAndroid = try container.decodeIfPresent(Swift.type(of: stateAndroid), forKey: .stateAndroid) ?? stateAndroid
+        stateIOS = try container.decodeIfPresent(Swift.type(of: stateIOS), forKey: .stateIOS) ?? stateIOS
         stateOverride = try container.decodeIfPresent(Swift.type(of: stateOverride), forKey: .stateOverride) ?? stateOverride
         totalPoints = try container.decodeIfPresent(Swift.type(of: totalPoints), forKey: .totalPoints) ?? totalPoints
     }
@@ -133,9 +151,12 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
     open func encode(to encoder: Encoder, configuration: Config) throws {
         try super.encode(to: encoder, configuration: configuration)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(confidence.rawValue, forKey: .confidence)
         try container.encode(failureCodes, forKey: .failureCodes)
         try container.encode(failureRate, forKey: .failureRate)
         try container.encode(state.rawValue, forKey: .state)
+        try container.encode(stateAndroid.rawValue, forKey: .stateAndroid)
+        try container.encode(stateIOS.rawValue, forKey: .stateIOS)
         try container.encode(stateOverride.rawValue, forKey: .stateOverride)
         try container.encode(totalPoints, forKey: .totalPoints)
     }
@@ -151,9 +172,12 @@ open class DAOSystemState: DAOBaseObject, DecodingConfigurationProviding, Encodi
         guard !super.isDiffFrom(rhs) else { return true }
         let lhs = self
         return super.isDiffFrom(rhs) ||
+            lhs.confidence != rhs.confidence ||
             lhs.failureCodes != rhs.failureCodes ||
             lhs.failureRate != rhs.failureRate ||
             lhs.state != rhs.state ||
+            lhs.stateAndroid != rhs.stateAndroid ||
+            lhs.stateIOS != rhs.stateIOS ||
             lhs.stateOverride != rhs.stateOverride ||
             lhs.totalPoints != rhs.totalPoints
     }

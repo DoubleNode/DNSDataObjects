@@ -17,7 +17,10 @@ struct MockDAOSystemStateFactory: MockDAOFactory {
     
     static func createMock() -> DAOSystemState {
         let systemState = DAOSystemState()
+        systemState.confidence = .none
         systemState.state = .green
+        systemState.stateAndroid = .green
+        systemState.stateIOS = .green
         systemState.stateOverride = .none
         systemState.failureRate = DNSAnalyticsNumbers()
         systemState.totalPoints = DNSAnalyticsNumbers()
@@ -27,9 +30,12 @@ struct MockDAOSystemStateFactory: MockDAOFactory {
     
     static func createMockWithTestData() -> DAOSystemState {
         let systemState = DAOSystemState(id: "system_state_test_data")
-        
-        // Set state properties
+
+        // Set confidence and state properties
+        systemState.confidence = .medium
         systemState.state = .yellow
+        systemState.stateAndroid = .green
+        systemState.stateIOS = .yellow
         systemState.stateOverride = .red
         
         // Create analytics numbers for failure rate
@@ -67,25 +73,32 @@ struct MockDAOSystemStateFactory: MockDAOFactory {
     
     static func createMockWithEdgeCases() -> DAOSystemState {
         let systemState = DAOSystemState()
-        
+
         // Edge cases
+        systemState.confidence = .none
         systemState.state = .none
+        systemState.stateAndroid = .none
+        systemState.stateIOS = .none
         systemState.stateOverride = .none
         systemState.failureRate = DNSAnalyticsNumbers() // Empty analytics
         systemState.totalPoints = DNSAnalyticsNumbers() // Empty analytics
         systemState.failureCodes = [:] // Empty dictionary
-        
+
         return systemState
     }
     
     static func createMockArray(count: Int) -> [DAOSystemState] {
         var systemStates: [DAOSystemState] = []
         let states: [DNSSystemState] = [.green, .yellow, .red, .none]
-        
+        let confidences: [DNSSystemConfidence] = [.high, .medium, .low, .insufficient, .none]
+
         for i in 0..<count {
             let systemState = DAOSystemState()
             systemState.id = "system_state\(i)" // Set explicit ID to match test expectations
+            systemState.confidence = confidences[i % confidences.count]
             systemState.state = states[i % states.count]
+            systemState.stateAndroid = states[(i + 1) % states.count]
+            systemState.stateIOS = states[(i + 2) % states.count]
             systemState.stateOverride = .none
             
             // Create varying analytics data

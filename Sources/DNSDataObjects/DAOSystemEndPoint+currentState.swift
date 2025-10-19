@@ -11,6 +11,9 @@ import DNSDataTypes
 import Foundation
 
 extension DAOSystemEndPoint {
+    public var confidence: DNSSystemConfidence {
+        self.currentState.confidence
+    }
     public var failureCodes: [String: DNSAnalyticsNumbers] {
         self.currentState.failureCodes
     }
@@ -22,6 +25,12 @@ extension DAOSystemEndPoint {
     }
     public var state: DNSSystemState {
         self.currentState.state
+    }
+    public var stateAndroid: DNSSystemState {
+        self.currentState.stateAndroid
+    }
+    public var stateIOS: DNSSystemState {
+        self.currentState.stateIOS
     }
     public var stateOverride: DNSSystemState {
         self.currentState.stateOverride

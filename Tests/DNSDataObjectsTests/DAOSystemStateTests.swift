@@ -17,9 +17,12 @@ final class DAOSystemStateTests: XCTestCase {
     
     func testInitialization() {
         let systemState = DAOSystemState()
-        
+
         XCTAssertNotNil(systemState)
+        XCTAssertEqual(systemState.confidence, .none)
         XCTAssertEqual(systemState.state, .green)
+        XCTAssertEqual(systemState.stateAndroid, .green)
+        XCTAssertEqual(systemState.stateIOS, .green)
         XCTAssertEqual(systemState.stateOverride, .none)
         XCTAssertNotNil(systemState.failureRate)
         XCTAssertNotNil(systemState.totalPoints)
@@ -29,9 +32,12 @@ final class DAOSystemStateTests: XCTestCase {
     func testInitializationWithId() {
         let testId = "test_system_state_123"
         let systemState = DAOSystemState(id: testId)
-        
+
         XCTAssertEqual(systemState.id, testId)
+        XCTAssertEqual(systemState.confidence, .none)
         XCTAssertEqual(systemState.state, .green)
+        XCTAssertEqual(systemState.stateAndroid, .green)
+        XCTAssertEqual(systemState.stateIOS, .green)
         XCTAssertEqual(systemState.stateOverride, .none)
         XCTAssertNotNil(systemState.failureRate)
         XCTAssertNotNil(systemState.totalPoints)
@@ -41,14 +47,17 @@ final class DAOSystemStateTests: XCTestCase {
     func testCopyInitialization() {
         let original = MockDAOSystemStateFactory.createMockWithTestData()
         let copy = DAOSystemState(from: original)
-        
+
         XCTAssertEqual(copy.id, original.id)
+        XCTAssertEqual(copy.confidence, original.confidence)
         XCTAssertEqual(copy.state, original.state)
+        XCTAssertEqual(copy.stateAndroid, original.stateAndroid)
+        XCTAssertEqual(copy.stateIOS, original.stateIOS)
         XCTAssertEqual(copy.stateOverride, original.stateOverride)
         XCTAssertEqual(copy.failureRate, original.failureRate)
         XCTAssertEqual(copy.totalPoints, original.totalPoints)
         XCTAssertEqual(copy.failureCodes.count, original.failureCodes.count)
-        
+
         // Verify it's a copy, not the same instance
         XCTAssertTrue(copy !== original)
     }
@@ -113,37 +122,133 @@ final class DAOSystemStateTests: XCTestCase {
     
     func testFailureCodesAssignment() {
         let systemState = DAOSystemState()
-        
+
         var failureCode1Data = DNSDataDictionary()
         failureCode1Data["count"] = 3
         failureCode1Data["total"] = 100
         failureCode1Data["percentage"] = 3.0
-        
+
         var failureCode2Data = DNSDataDictionary()
         failureCode2Data["count"] = 7
         failureCode2Data["total"] = 100
         failureCode2Data["percentage"] = 7.0
-        
+
         let failureCodes = [
             "HTTP_404": DNSAnalyticsNumbers(from: failureCode1Data),
             "NETWORK_ERROR": DNSAnalyticsNumbers(from: failureCode2Data)
         ]
-        
+
         systemState.failureCodes = failureCodes
         XCTAssertEqual(systemState.failureCodes.count, 2)
         XCTAssertNotNil(systemState.failureCodes["HTTP_404"])
         XCTAssertNotNil(systemState.failureCodes["NETWORK_ERROR"])
     }
-    
+
+    // MARK: - New Property Tests (confidence, stateAndroid, stateIOS) -
+
+    func testConfidenceAssignment() {
+        let systemState = DAOSystemState()
+
+        systemState.confidence = .high
+        XCTAssertEqual(systemState.confidence, .high)
+
+        systemState.confidence = .medium
+        XCTAssertEqual(systemState.confidence, .medium)
+
+        systemState.confidence = .low
+        XCTAssertEqual(systemState.confidence, .low)
+
+        systemState.confidence = .insufficient
+        XCTAssertEqual(systemState.confidence, .insufficient)
+
+        systemState.confidence = .none
+        XCTAssertEqual(systemState.confidence, .none)
+    }
+
+    func testStateAndroidAssignment() {
+        let systemState = DAOSystemState()
+
+        systemState.stateAndroid = .red
+        XCTAssertEqual(systemState.stateAndroid, .red)
+
+        systemState.stateAndroid = .yellow
+        XCTAssertEqual(systemState.stateAndroid, .yellow)
+
+        systemState.stateAndroid = .green
+        XCTAssertEqual(systemState.stateAndroid, .green)
+
+        systemState.stateAndroid = .none
+        XCTAssertEqual(systemState.stateAndroid, .none)
+    }
+
+    func testStateIOSAssignment() {
+        let systemState = DAOSystemState()
+
+        systemState.stateIOS = .red
+        XCTAssertEqual(systemState.stateIOS, .red)
+
+        systemState.stateIOS = .yellow
+        XCTAssertEqual(systemState.stateIOS, .yellow)
+
+        systemState.stateIOS = .green
+        XCTAssertEqual(systemState.stateIOS, .green)
+
+        systemState.stateIOS = .none
+        XCTAssertEqual(systemState.stateIOS, .none)
+    }
+
+    func testPlatformSpecificStates() {
+        let systemState = DAOSystemState()
+
+        // Test different states per platform
+        systemState.state = .green
+        systemState.stateAndroid = .yellow
+        systemState.stateIOS = .red
+
+        XCTAssertEqual(systemState.state, .green)
+        XCTAssertEqual(systemState.stateAndroid, .yellow)
+        XCTAssertEqual(systemState.stateIOS, .red)
+
+        // Verify they are independent
+        XCTAssertNotEqual(systemState.state, systemState.stateAndroid)
+        XCTAssertNotEqual(systemState.state, systemState.stateIOS)
+        XCTAssertNotEqual(systemState.stateAndroid, systemState.stateIOS)
+    }
+
+    func testConfidenceAndStateCorrelation() {
+        let systemState = DAOSystemState()
+
+        // High confidence with green state
+        systemState.confidence = .high
+        systemState.state = .green
+        XCTAssertEqual(systemState.confidence, .high)
+        XCTAssertEqual(systemState.state, .green)
+
+        // Low confidence with red state
+        systemState.confidence = .low
+        systemState.state = .red
+        XCTAssertEqual(systemState.confidence, .low)
+        XCTAssertEqual(systemState.state, .red)
+
+        // No confidence with none state
+        systemState.confidence = .none
+        systemState.state = .none
+        XCTAssertEqual(systemState.confidence, .none)
+        XCTAssertEqual(systemState.state, .none)
+    }
+
     // MARK: - Update Method Tests -
     
     func testUpdateFromObject() {
         let systemState1 = DAOSystemState()
         let systemState2 = MockDAOSystemStateFactory.createMockWithTestData()
-        
+
         systemState1.update(from: systemState2)
-        
+
+        XCTAssertEqual(systemState1.confidence, systemState2.confidence)
         XCTAssertEqual(systemState1.state, systemState2.state)
+        XCTAssertEqual(systemState1.stateAndroid, systemState2.stateAndroid)
+        XCTAssertEqual(systemState1.stateIOS, systemState2.stateIOS)
         XCTAssertEqual(systemState1.stateOverride, systemState2.stateOverride)
         XCTAssertEqual(systemState1.failureRate, systemState2.failureRate)
         XCTAssertEqual(systemState1.totalPoints, systemState2.totalPoints)
