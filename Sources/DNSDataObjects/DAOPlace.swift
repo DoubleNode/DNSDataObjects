@@ -206,6 +206,8 @@ open class DAOPlace: DAOBaseObject, DecodingConfigurationProviding, EncodingConf
     }
     open var pricingTierId = ""
     open var timeZone: TimeZone = TimeZone.current
+    open var isOpenNow: Bool { return hours.isOpenNow(for: timeZone) }
+
     // MARK: - Initializers -
     required public init() {
         hours = Self.createPlaceHours()

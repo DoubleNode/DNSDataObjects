@@ -245,3 +245,29 @@ open class DAOPlaceHours: DAOBaseObject, DecodingConfigurationProviding, Encodin
         !lhs.isDiffFrom(rhs)
     }
 }
+extension DAOPlaceHours {
+    /// Checks if the center is currently open based on today's hours and current time in the center's timezone
+    public func isOpenNow(for timeZone: TimeZone) -> Bool {
+        // Check if we have open/close times for today
+        guard let openTime = self.todayOpen,
+              let closeTime = self.todayClose else {
+            return false
+        }
+
+        // Get current time in the center's timezone
+        let now = Date()
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+
+        // todayOpen and todayClose are Date objects, compare directly
+        // Handle case where closing time is after midnight (e.g., open until 2am)
+        var adjustedCloseTime = closeTime
+        if closeTime < openTime {
+            // If close time is before open time, it's the next day
+            adjustedCloseTime = closeTime.addingTimeInterval(Date.Seconds.deltaOneDay)
+        }
+
+        // Check if current time is within open hours
+        return now >= openTime && now < adjustedCloseTime
+    }
+}
