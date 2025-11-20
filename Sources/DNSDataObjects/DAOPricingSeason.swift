@@ -64,7 +64,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
     // MARK: - Properties -
     private func field(_ from: CodingKeys) -> String { return from.rawValue }
     public enum CodingKeys: String, CodingKey {
-        case endTime, items, priority, startTime
+        case endTime, items, name, priority, startTime
     }
 
     public enum C {
@@ -74,6 +74,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
 
     open var endTime = C.defaultEndTime
     open var items: [DAOPricingItem] = []
+    open var name = DNSString()
     open var priority: Int = DNSPriority.normal {
         didSet {
             if priority > DNSPriority.highest {
@@ -130,6 +131,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         self.priority = object.priority
         self.startTime = object.startTime
         // swiftlint:disable force_cast
+        self.name = object.name.copy() as! DNSString
         self.items = object.items.map { $0.copy() as! DAOPricingItem }
         // swiftlint:enable force_cast
     }
@@ -144,6 +146,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         self.endTime = self.time(from: data[field(.endTime)] as Any?) ?? self.endTime
         let itemsData = self.dataarray(from: data[field(.items)] as Any?)
         self.items = itemsData.compactMap { Self.createPricingItem(from: $0) }
+        self.name = self.dnsstring(from: data[field(.name)] as Any?) ?? self.name
         self.priority = self.int(from: data[field(.priority)] as Any?) ?? self.priority
         self.startTime = self.time(from: data[field(.startTime)] as Any?) ?? self.startTime
         return self
@@ -153,6 +156,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         retval.merge([
             field(.endTime): self.endTime,
             field(.items): self.items.map { $0.asDictionary },
+            field(.name): self.name.asDictionary,
             field(.priority): self.priority,
             field(.startTime): self.startTime,
         ]) { (current, _) in current }
@@ -181,6 +185,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         let container = try decoder.container(keyedBy: CodingKeys.self)
         endTime = self.date(from: container, forKey: .endTime) ?? endTime
         items = self.daoPricingItemArray(with: configuration, from: container, forKey: .items)
+        name = self.dnsstring(from: container, forKey: .name) ?? name
         priority = self.int(from: container, forKey: .priority) ?? priority
         startTime = self.date(from: container, forKey: .startTime) ?? startTime
     }
@@ -192,6 +197,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(endTime, forKey: .endTime)
         try container.encode(items, forKey: .items, configuration: configuration)
+        try container.encode(name, forKey: .name)
         try container.encode(priority, forKey: .priority)
         try container.encode(startTime, forKey: .startTime)
     }
@@ -209,6 +215,7 @@ open class DAOPricingSeason: DAOBaseObject, DecodingConfigurationProviding, Enco
         return super.isDiffFrom(rhs) ||
             lhs.endTime != rhs.endTime ||
             lhs.items.hasDiffElementsFrom(rhs.items) ||
+            lhs.name != rhs.name ||
             lhs.priority != rhs.priority ||
             lhs.startTime != rhs.startTime
     }
